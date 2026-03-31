@@ -439,9 +439,9 @@ class TestRasterToBimiSvg:
 
     def test_uses_bezier_curves(self, white_circle_on_red):
         svg = raster_to_bimi_svg(white_circle_on_red, "Test Corp")
-        # Paths should contain C commands
+        # Paths should contain C (absolute) or c (relative) cubic bezier commands
         path_d = re.findall(r'd="([^"]*)"', svg)
-        assert any("C" in d for d in path_d)
+        assert any("C" in d or "c" in d for d in path_d)
 
     def test_under_32kb(self, white_circle_on_red):
         svg = raster_to_bimi_svg(white_circle_on_red, "Test Corp")
