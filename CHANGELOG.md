@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2026-03-31
+
+### Changed
+
+- Renamed `docker-compose.yml` to `docker-compose.dev.yml` for development use
+- New production `docker-compose.yml` using Waitress instead of Gunicorn, with no published ports
+- Added `docker-compose.override.example.yml` documenting how to connect to an external nginx reverse proxy stack
+- Added `docker-compose.override.yml` to `.gitignore`
+
 ## [0.2.0] - 2026-03-31
 
 ### Added
