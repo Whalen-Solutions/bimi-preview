@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -m pytest tests/test_bimi.py -v)"
+      "Bash(python -m pytest tests/test_bimi.py -v)",
+      "Bash(ruff check:*)",
+      "Bash(ruff format:*)",
+      "Bash(pytest -v)"
     ]
   }
 }
