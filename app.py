@@ -2,6 +2,8 @@
 
 import os
 import re
+import threading
+import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -20,7 +22,6 @@ from flask import (  # noqa: E402
     send_file,
     abort,
     session,
-    after_this_request,
 )
 from bimi import convert_to_bimi  # noqa: E402
 from llm import generate_email_content  # noqa: E402
@@ -30,6 +31,28 @@ app.secret_key = os.environ.get("SECRET_KEY", os.urandom(32))
 
 UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
+
+UPLOAD_MAX_AGE = 600  # seconds (10 minutes)
+
+
+def _cleanup_uploads(directory: Path, max_age: int) -> None:
+    """Delete files older than max_age seconds. Runs in a daemon thread."""
+    while True:
+        try:
+            now = time.time()
+            for f in directory.iterdir():
+                if f.is_file() and (now - f.stat().st_mtime) > max_age:
+                    f.unlink(missing_ok=True)
+        except Exception:
+            pass
+        time.sleep(60)
+
+
+threading.Thread(
+    target=_cleanup_uploads,
+    args=(UPLOAD_DIR, UPLOAD_MAX_AGE),
+    daemon=True,
+).start()
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff", "tif", "svg"}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
@@ -148,7 +171,6 @@ def preview():
         company=company,
         domain=clean_domain,
         industry=industry,
-        bimi_svg=bimi_svg,
         job_id=job_id,
         sender_email_parts=sender_email_parts,
         **llm_content,
@@ -163,12 +185,6 @@ def download(job_id: str):
     bimi_path = UPLOAD_DIR / f"{job_id}-bimi.svg"
     if not bimi_path.exists():
         abort(404)
-
-    @after_this_request
-    def cleanup(response):
-        bimi_path.unlink(missing_ok=True)
-        return response
-
     return send_file(
         bimi_path,
         mimetype="image/svg+xml",

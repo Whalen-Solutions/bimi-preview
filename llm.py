@@ -67,6 +67,7 @@ messages and notifications
 - Do not include any email addresses as literal text in the output (they will be \
 constructed separately)
 - Keep all text professional and realistic
+- If referencing a time the emails should be timely (e.g., do NOT promote an event for a prior year) 
 - Return ONLY valid JSON, no markdown fences, no explanation"""
 
 EXPECTED_KEYS = {

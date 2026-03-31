@@ -2,6 +2,9 @@
     "files.associations": {
         "*.jinja2.html": "jinja-html"
     },
+    "markdownlint.config": {
+        "MD024": {"siblings_only": true}
+    },
     "cSpell.words": [
         "allclose",
         "beziers",

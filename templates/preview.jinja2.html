@@ -255,12 +255,12 @@
     <h1>BIMI Preview</h1>
     <div class="actions">
       <a href="{{ url_for('index') }}" class="btn">&larr; New Preview</a>
-      <span class="btn btn-primary" style="opacity:.6;cursor:default;">
+      <a href="{{ url_for('download', job_id=job_id) }}" class="btn btn-primary">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 1v10M8 11L4 7M8 11l4-4M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        Downloaded
-      </span>
+        Download SVG
+      </a>
     </div>
   </div>
 
@@ -274,7 +274,7 @@
     <div class="inbox-row unread">
       <div class="unread-dot"><div class="unread-dot-fill"></div></div>
       <div class="avatar">
-        {{ bimi_svg | safe }}
+        <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
       </div>
       <div class="inbox-content">
         <span class="sender-name">{{ company }}</span>
@@ -349,7 +349,7 @@
     <div class="email-subject-line">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
     <div class="email-header">
       <div class="email-avatar">
-        {{ bimi_svg | safe }}
+        <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
       </div>
       <div class="email-meta">
         <div class="email-sender-row">
@@ -414,14 +414,6 @@
     var addr = parts.join('');
     document.getElementById('sender-email').textContent = addr;
     document.getElementById('sig-email').textContent = addr;
-
-    // Auto-download the BIMI SVG
-    var a = document.createElement('a');
-    a.href = {{ url_for('download', job_id=job_id) | tojson }};
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
   })();
 </script>
 </body>

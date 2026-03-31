@@ -18,8 +18,8 @@ BIMI Preview Generator -- a Flask web app that converts logos into BIMI-complian
 
 - LLM content generation is optional. If no API key is configured or the LLM call fails (including credit exhaustion), the preview renders with hardcoded default text via Jinja `| default()` filters -- no crash, no broken page.
 - Email addresses are constructed in client-side JS (not rendered in HTML) to prevent Cloudflare email obfuscation from mangling them.
-- The BIMI SVG is auto-downloaded on preview page load via a temporary JS-created anchor click.
-- Uploaded files are cleaned up immediately after conversion; only the generated BIMI SVG is retained temporarily for download.
+- The BIMI SVG is served via URL (`/bimi-svg/<job_id>`) and displayed in the preview using `<img>` tags. A download button links to `/download/<job_id>`.
+- A background daemon thread scans `uploads/` every 60 seconds and deletes files older than 10 minutes. Original uploads are deleted immediately after conversion.
 - The `email_body` field from LLM output is sanitized server-side -- only `<p>`, `<br>`, `<strong>`, and `<em>` tags are allowed.
 
 ## Tech Stack

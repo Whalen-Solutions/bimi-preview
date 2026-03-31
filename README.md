@@ -12,7 +12,7 @@ A Flask web app that converts a logo into a BIMI-compliant SVG and renders a rea
 2. **Convert** -- the app converts the image to a BIMI-compliant SVG Tiny-PS file with a square viewBox, solid background, circle-crop clearance, and all forbidden elements removed.
 3. **Generate** -- a small LLM (Claude Haiku or GPT-4o-mini) generates industry-appropriate email content: subject lines, preview text, email body, and realistic inbox neighbors.
 4. **Preview** -- see a pixel-accurate Gmail mockup with your BIMI avatar in the inbox list and the open email view (with the blue verified checkmark).
-5. **Download** -- grab the BIMI-compliant SVG to publish on your domain and configure in DNS.
+5. **Download** -- click the download button to grab the BIMI-compliant SVG to publish on your domain and configure in DNS. Files are automatically cleaned up after 10 minutes.
 
 ## Prerequisites
 

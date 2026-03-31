@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-03-31
+
+### Added
+
+- Background cleanup daemon thread that deletes uploaded files older than 10 minutes, removing the need for request-triggered cleanup
+- Manual download button on the preview page
+
+### Changed
+
+- BIMI SVG avatars in preview are now served via URL (`/bimi-svg/<job_id>`) using `<img>` tags instead of inline SVG markup
+- Download is no longer automatic on page load; users click the download button when ready
+- Files persist in `uploads/` until the background cleanup removes them (previously deleted immediately after download)
+- Sharper BIMI SVG output from raster images: higher upsample factors, reduced blur, tighter potrace and Bezier fitting tolerances
+
+### Removed
+
+- Auto-download JavaScript on preview page load
+- `@after_this_request` file deletion in the download route
+
 ## [0.1.0] - 2026-03-30
 
 ### Added
