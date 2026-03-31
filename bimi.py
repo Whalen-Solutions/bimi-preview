@@ -117,12 +117,12 @@ def preprocess_raster(path: str) -> tuple[np.ndarray, np.ndarray, int]:
 
     if transparent:
         # Resize preserving alpha
-        img_up = img.resize((upsampled_dim, upsampled_dim), Image.LANCZOS)
+        img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
         alpha = np.array(img_up.split()[-1])
         gt_mask = alpha > 127
         return gt_mask, gt_mask, upsampled_dim
 
-    img_up = img.resize((upsampled_dim, upsampled_dim), Image.LANCZOS)
+    img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
     img_gray = img_up.convert("L")
 
     # Ground-truth mask (before blurring)
@@ -482,7 +482,7 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     mask_resized = (
         np.array(
             Image.fromarray(binary.astype(np.uint8) * 255).resize(
-                (img.width, img.height), Image.NEAREST
+                (img.width, img.height), Image.Resampling.NEAREST
             )
         )
         > 127
@@ -585,6 +585,7 @@ def _infer_bg_color_from_svg(path: str) -> str:
         from io import BytesIO
 
         png_data = cairosvg.svg2png(url=path, output_width=64, output_height=64)
+        assert png_data is not None
         img = Image.open(BytesIO(png_data)).convert("RGB")
         return _dominant_color(img)
     except Exception:

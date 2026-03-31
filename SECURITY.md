@@ -7,7 +7,7 @@ vulnerability. Use GitHub private vulnerability reporting in the Security tab of
 
 When reporting a vulnerability, include:
 
-- the affected parsedmarc version or commit
+- the affected version or commit
 - the component or integration involved
 - clear reproduction details if available
 - potential impact

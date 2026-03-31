@@ -13,9 +13,12 @@
         "enctype",
         "endfor",
         "endwith",
+        "evenodd",
+        "fromarray",
         "genai",
         "gunicorn",
         "hrefs",
+        "LANCZOS",
         "larr",
         "libcairo",
         "linalg",
@@ -27,11 +30,13 @@
         "ogrid",
         "onclick",
         "otsu",
+        "Peucker",
         "potrace",
         "rarr",
         "rgba",
         "Roboto",
         "Segoe",
+        "skimage",
         "thresholding",
         "tojson",
         "urandom",
@@ -39,6 +44,8 @@
         "viewbox",
         "webp",
         "wireframes",
-        "WSGI"
+        "WSGI",
+        "xform",
+        "xlink"
     ]
 }
