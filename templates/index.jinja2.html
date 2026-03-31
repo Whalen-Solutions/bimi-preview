@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIMI Preview Generator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f8;
+    color: #202124;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    max-width: 520px;
+    width: 100%;
+    padding: 40px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    color: #5f6368;
+    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #5f6368;
+    margin-bottom: 6px;
+  }
+  input[type="text"], input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #202124;
+    transition: border-color .15s;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26,115,232,.15);
+  }
+  .field { margin-bottom: 20px; }
+  .hint {
+    font-size: 12px;
+    color: #80868b;
+    margin-top: 4px;
+  }
+  .file-input-wrapper {
+    position: relative;
+    border: 2px dashed #dadce0;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .file-input-wrapper:hover {
+    border-color: #1a73e8;
+    background: #f8faff;
+  }
+  .file-input-wrapper input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+  .file-label {
+    font-size: 14px;
+    color: #5f6368;
+  }
+  .file-label strong { color: #1a73e8; }
+  .file-name {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #202124;
+    font-weight: 500;
+    display: none;
+  }
+  button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s;
+    margin-top: 8px;
+  }
+  button[type="submit"]:hover { background: #1557b0; }
+  .flash {
+    background: #fce8e6;
+    color: #c5221f;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .prompt-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+  }
+  .prompt-link a {
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  .prompt-link a:hover { text-decoration: underline; }
+
+  /* Loading overlay */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .loading-overlay.active { display: flex; }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #dadce0;
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p {
+    font-size: 14px;
+    color: #5f6368;
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>BIMI Preview Generator</h1>
+  <p class="subtitle">
+    Upload a logo and see how it would appear as a verified sender avatar in Gmail.
+  </p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form action="{{ url_for('preview') }}" method="POST" enctype="multipart/form-data">
+    <div class="field">
+      <label for="domain">Email Domain</label>
+      <input type="text" id="domain" name="domain" placeholder="example.com" required
+             pattern="^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$">
+      <p class="hint">The domain your organization sends email from (e.g. acme.com)</p>
+    </div>
+
+    <div class="field">
+      <label for="company">Company Name</label>
+      <input type="text" id="company" name="company" placeholder="Acme Corporation" required maxlength="200">
+    </div>
+
+    <div class="field">
+      <label for="industry">Industry</label>
+      <input type="text" id="industry" name="industry" placeholder="e.g. Cybersecurity, Healthcare, Retail" required maxlength="200">
+    </div>
+
+    <div class="field">
+      <label>Logo Image</label>
+      <div class="file-input-wrapper" id="dropzone">
+        <input type="file" id="logo" name="logo" accept=".png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff,.tif,.svg" required>
+        <p class="file-label"><strong>Click to upload</strong> or drag and drop</p>
+        <p class="hint">PNG, JPG, SVG, WebP, GIF, BMP, or TIFF &mdash; max 16 MB</p>
+        <p class="file-name" id="fileName"></p>
+      </div>
+    </div>
+
+    <button type="submit">Generate BIMI Preview</button>
+  </form>
+
+
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Generating your BIMI preview&hellip;<br>This may take up to 30 seconds.</p>
+</div>
+
+<script>
+  const fileInput = document.getElementById('logo');
+  const fileName = document.getElementById('fileName');
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      fileName.textContent = fileInput.files[0].name;
+      fileName.style.display = 'block';
+    }
+  });
+
+  document.querySelector('form').addEventListener('submit', () => {
+    document.getElementById('loadingOverlay').classList.add('active');
+    var btn = document.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Generating\u2026';
+  });
+</script>
+</body>
+</html>

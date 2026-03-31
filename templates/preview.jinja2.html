@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIMI Preview &mdash; {{ company }}</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Google Sans", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f4f6f8;
+    color: #202124;
+    padding: 32px 16px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  /* Header bar */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #dadce0;
+    background: #fff;
+    color: #202124;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn:hover { background: #f1f3f4; }
+  .btn-primary {
+    background: #1a73e8;
+    color: #fff;
+    border-color: #1a73e8;
+  }
+  .btn-primary:hover { background: #1557b0; }
+
+  /* Section labels */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #5f6368;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  /* Gmail inbox list */
+  .inbox {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+  .inbox-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f3f4;
+    gap: 12px;
+    min-height: 52px;
+  }
+  .inbox-row:last-child { border-bottom: none; }
+  .inbox-row.unread { background: #f2f6fc; }
+  .inbox-row.unread .sender-name { font-weight: 700; }
+  .inbox-row.unread .subject { font-weight: 600; }
+
+  /* Unread dot */
+  .unread-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+  .unread-dot-fill {
+    width: 8px;
+    height: 8px;
+    background: #1a73e8;
+    border-radius: 50%;
+  }
+
+  /* Avatar */
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    overflow: hidden;
+  }
+  .avatar img, .avatar svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .inbox-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    overflow: hidden;
+  }
+  .sender-name {
+    font-size: 14px;
+    color: #202124;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .subject {
+    font-size: 14px;
+    color: #202124;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .preview-text {
+    font-size: 14px;
+    color: #5f6368;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .subject-sep {
+    color: #5f6368;
+    margin: 0 2px;
+  }
+  .inbox-time {
+    font-size: 12px;
+    color: #5f6368;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Open email view */
+  .email-view {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    padding: 28px 24px;
+  }
+  .email-subject-line {
+    font-size: 20px;
+    font-weight: 400;
+    color: #202124;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+  .email-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .email-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .email-avatar img, .email-avatar svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .email-meta { flex: 1; min-width: 0; }
+  .email-sender-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 2px;
+  }
+  .email-sender-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #202124;
+  }
+  .email-sender-addr {
+    font-size: 12px;
+    color: #5f6368;
+  }
+  .email-to {
+    font-size: 12px;
+    color: #5f6368;
+  }
+  .email-time-header {
+    font-size: 12px;
+    color: #5f6368;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .email-body {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3c4043;
+    margin-bottom: 24px;
+  }
+  .email-body p { margin-bottom: 12px; }
+  .email-signature {
+    font-size: 13px;
+    color: #5f6368;
+    border-top: 1px solid #e8eaed;
+    padding-top: 16px;
+    line-height: 1.5;
+  }
+
+  /* Back link */
+  .back-link {
+    display: inline-block;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  /* LLM prompt banner */
+  .llm-banner {
+    background: #e8f0fe;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #174ea6;
+    line-height: 1.5;
+  }
+  .llm-banner a { color: #1a73e8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>BIMI Preview</h1>
+    <div class="actions">
+      <a href="{{ url_for('index') }}" class="btn">&larr; New Preview</a>
+      <span class="btn btn-primary" style="opacity:.6;cursor:default;">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1v10M8 11L4 7M8 11l4-4M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Downloaded
+      </span>
+    </div>
+  </div>
+
+  {# ================================================================== #}
+  {# GMAIL INBOX LIST VIEW                                               #}
+  {# ================================================================== #}
+  <div class="section-label">Gmail Inbox</div>
+  <div class="inbox">
+
+    {# --- Row 1: The BIMI-verified sender (unread, top row) --- #}
+    <div class="inbox-row unread">
+      <div class="unread-dot"><div class="unread-dot-fill"></div></div>
+      <div class="avatar">
+        {{ bimi_svg | safe }}
+      </div>
+      <div class="inbox-content">
+        <span class="sender-name">{{ company }}</span>
+        <span class="subject-sep">&mdash;</span>
+        {#
+          PLACEHOLDER: Replace these with LLM-generated content.
+          The LLM prompt (see /prompt) instructs the model to return JSON
+          with inbox_subject, inbox_preview, email_subject, email_body, etc.
+        #}
+        <span class="subject">{{ inbox_subject | default("Your account security update for " + domain) }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="preview-text">{{ inbox_preview | default("We wanted to let you know about important changes to our platform that affect your account...") }}</span>
+      </div>
+      <span class="inbox-time">{{ inbox_time | default("10:42 AM") }}</span>
+    </div>
+
+    {# --- Row 2: Generic sender --- #}
+    <div class="inbox-row">
+      <div class="unread-dot"></div>
+      <div class="avatar" style="background:#7baaf7;">
+        {{ other_sender_1_initial | default("S") }}
+      </div>
+      <div class="inbox-content">
+        <span class="sender-name">{{ other_sender_1_name | default("Sarah Chen") }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="subject">{{ other_sender_1_subject | default("Re: Q2 planning doc") }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="preview-text">{{ other_sender_1_preview | default("Looks good to me. I added a few comments on the timeline section...") }}</span>
+      </div>
+      <span class="inbox-time">{{ other_sender_1_time | default("9:15 AM") }}</span>
+    </div>
+
+    {# --- Row 3: Generic sender --- #}
+    <div class="inbox-row">
+      <div class="unread-dot"></div>
+      <div class="avatar" style="background:#f5a623;">
+        {{ other_sender_2_initial | default("M") }}
+      </div>
+      <div class="inbox-content">
+        <span class="sender-name">{{ other_sender_2_name | default("Mike Torres") }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="subject">{{ other_sender_2_subject | default("Lunch Thursday?") }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="preview-text">{{ other_sender_2_preview | default("Hey, are you free Thursday around noon? There's a new place on 5th...") }}</span>
+      </div>
+      <span class="inbox-time">{{ other_sender_2_time | default("Yesterday") }}</span>
+    </div>
+
+    {# --- Row 4: Generic sender --- #}
+    <div class="inbox-row">
+      <div class="unread-dot"></div>
+      <div class="avatar" style="background:#aaa;">
+        {{ other_sender_3_initial | default("T") }}
+      </div>
+      <div class="inbox-content">
+        <span class="sender-name">{{ other_sender_3_name | default("Teamwork") }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="subject">{{ other_sender_3_subject | default("New comment on Project Atlas task #204") }}</span>
+        <span class="subject-sep">&mdash;</span>
+        <span class="preview-text">{{ other_sender_3_preview | default("Jamie left a comment: 'Updated the wireframes, ready for review...'") }}</span>
+      </div>
+      <span class="inbox-time">{{ other_sender_3_time | default("Mar 28") }}</span>
+    </div>
+
+  </div>
+
+  {# ================================================================== #}
+  {# OPEN EMAIL VIEW                                                     #}
+  {# ================================================================== #}
+  <div class="section-label">Open Email</div>
+  <div class="email-view">
+    <div class="email-subject-line">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
+    <div class="email-header">
+      <div class="email-avatar">
+        {{ bimi_svg | safe }}
+      </div>
+      <div class="email-meta">
+        <div class="email-sender-row">
+          <span class="email-sender-name">{{ company }}</span>
+          {# Gmail blue verified checkmark #}
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="8" fill="#1a73e8"/>
+            <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        {# Email address constructed via JS to avoid Cloudflare obfuscation #}
+        <div class="email-sender-addr">&lt;<span id="sender-email"></span>&gt;</div>
+        <div class="email-to">to me</div>
+      </div>
+      <div class="email-time-header">
+        {{ email_time | default("10:42 AM (1 hour ago)") }}
+      </div>
+    </div>
+
+    <div class="email-body">
+      {% if email_body %}
+        {{ email_body | safe }}
+      {% else %}
+        <p>Hi there,</p>
+        <p>
+          We're writing to let you know about recent updates to the {{ company }} platform
+          that may affect how you use our {{ industry | lower }} services. As part of our ongoing
+          commitment to security and reliability, we've made several enhancements to our
+          infrastructure.
+        </p>
+        <p>
+          If you have any questions about these changes, please don't hesitate to reach out
+          to our support team. We're here to help.
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="email-signature">
+      Best regards,<br>
+      The {{ company }} Team<br>
+      <span id="sig-email"></span>
+    </div>
+  </div>
+
+  {# ================================================================== #}
+  {# LLM content generation note                                        #}
+  {# ================================================================== #}
+  <div class="llm-banner">
+    The email content above was generated by a language model for preview purposes only
+    and does not represent real correspondence.
+    <a href="{{ url_for('prompt_page') }}">View the prompt used to generate it.</a>
+  </div>
+
+  <a href="{{ url_for('index') }}" class="back-link">&larr; Generate another preview</a>
+</div>
+
+{# Construct email addresses in JS to prevent Cloudflare obfuscation #}
+<script>
+  (function() {
+    var parts = {{ sender_email_parts | tojson }};
+    var addr = parts.join('');
+    document.getElementById('sender-email').textContent = addr;
+    document.getElementById('sig-email').textContent = addr;
+
+    // Auto-download the BIMI SVG
+    var a = document.createElement('a');
+    a.href = {{ url_for('download', job_id=job_id) | tojson }};
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  })();
+</script>
+</body>
+</html>

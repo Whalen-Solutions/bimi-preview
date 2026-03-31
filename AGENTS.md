@@ -1,0 +1,67 @@
+# Agents
+
+## Project Overview
+
+BIMI Preview Generator -- a Flask web app that converts logos into BIMI-compliant SVG Tiny-PS files and renders realistic Gmail inbox mockups showing how a verified sender avatar appears.
+
+## Architecture
+
+- **app.py** -- Flask routes and request handling. The `/preview` POST endpoint validates input, runs BIMI conversion and LLM content generation in parallel via `ThreadPoolExecutor`, then renders the preview template.
+- **bimi.py** -- Image-to-BIMI SVG conversion. Handles raster images (PNG, JPG, etc.) and SVG input. Outputs SVG Tiny-PS with square viewBox, solid background, circle-crop clearance, and forbidden elements stripped. Uses Pillow, CairoSVG, scikit-image, and optionally `potrace`.
+- **llm.py** -- LLM provider abstraction supporting Anthropic, OpenAI, and Google Gemini. Generates realistic email content (subject lines, body, inbox neighbors) as structured JSON. Returns `{}` on any failure so Jinja `| default()` filters activate gracefully.
+- **templates/** -- Jinja2 templates:
+  - `index.jinja2.html` -- Upload form (company, domain, industry, logo file)
+  - `preview.jinja2.html` -- Gmail inbox + open email mockup with BIMI avatar
+  - `prompt.jinja2.html` -- LLM prompt documentation page
+
+## Key Design Decisions
+
+- LLM content generation is optional. If no API key is configured or the LLM call fails (including credit exhaustion), the preview renders with hardcoded default text via Jinja `| default()` filters -- no crash, no broken page.
+- Email addresses are constructed in client-side JS (not rendered in HTML) to prevent Cloudflare email obfuscation from mangling them.
+- The BIMI SVG is auto-downloaded on preview page load via a temporary JS-created anchor click.
+- Uploaded files are cleaned up immediately after conversion; only the generated BIMI SVG is retained temporarily for download.
+- The `email_body` field from LLM output is sanitized server-side -- only `<p>`, `<br>`, `<strong>`, and `<em>` tags are allowed.
+
+## Tech Stack
+
+- Python 3.11+, Flask, Jinja2
+- Pillow, CairoSVG, NumPy, SciPy, scikit-image (image processing)
+- anthropic / openai / google-genai SDKs (LLM providers)
+- Waitress (production WSGI server)
+- nginx (reverse proxy with rate limiting)
+
+## Development
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+cp .env.example .env  # add your API key
+python app.py          # runs on http://localhost:5000
+```
+
+## Testing
+
+```bash
+pip install -e ".[test]"
+pytest
+```
+
+## CI Requirements
+
+After every Python code change, run linting and tests before committing to avoid CI failures:
+
+```bash
+ruff check .
+ruff format --check .
+pytest -v
+```
+
+If `ruff format --check` fails, run `ruff format .` to auto-fix, then re-stage the changed files.
+
+## Style Conventions
+
+- No type stubs or `.pyi` files -- type hints go inline.
+- HTML templates use Jinja2 with `.jinja2.html` double extension.
+- Environment variables for all configuration (see `.env.example`).
+- Keep LLM provider implementations self-contained in `llm.py` -- each provider is a private `_call_<provider>()` function.

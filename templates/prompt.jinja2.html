@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Prompt &mdash; BIMI Preview Email Content</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f8;
+    color: #202124;
+    padding: 32px 16px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .subtitle {
+    color: #5f6368;
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #dadce0;
+    background: #fff;
+    color: #202124;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .copy-btn:hover { background: #f1f3f4; }
+  code {
+    background: #f1f3f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+  .note {
+    font-size: 13px;
+    color: #5f6368;
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+  .back-link {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .json-example {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 6px;
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>LLM Prompt for Email Content</h1>
+  <p class="subtitle">
+    Copy this prompt and send it to any small language model (Haiku, Gemma, Phi, Mistral, etc.)
+    along with the company name, domain, and industry. The model will return structured JSON
+    that you can pass directly to the preview template.
+  </p>
+
+  <div class="card">
+    <h2>Prompt</h2>
+    <button class="copy-btn" onclick="copyBlock('prompt-text', this)">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Copy to clipboard
+    </button>
+    <pre id="prompt-text">You are generating realistic email preview content for a BIMI (Brand Indicators for Message Identification) inbox mockup. This mockup demonstrates how a company's verified logo appears in a Gmail inbox.
+
+Given the following inputs:
+- Company name: {company_name}
+- Email domain: {domain}
+- Industry: {industry}
+
+Generate realistic, professional email content that this company might plausibly send. Return ONLY a JSON object with exactly these fields:
+
+{
+  "inbox_subject": "Subject line as it appears in the inbox list (50-80 chars)",
+  "inbox_preview": "Preview text snippet shown after the subject in the inbox (60-100 chars)",
+  "inbox_time": "A realistic time like '10:42 AM' or '2:15 PM'",
+
+  "email_subject": "Full subject line for the open email view (can match inbox_subject)",
+  "email_body": "2-3 short paragraphs of HTML. Use &lt;p&gt; tags. Write in a professional but warm tone appropriate for the industry. Reference the company by name. Include a specific, plausible reason for the email (product update, security notice, appointment reminder, order confirmation, etc.) that fits the industry.",
+  "email_time": "Timestamp like '10:42 AM (1 hour ago)'",
+
+  "other_sender_1_name": "A plausible colleague or contact name",
+  "other_sender_1_initial": "First letter of their name",
+  "other_sender_1_subject": "A realistic personal/work email subject",
+  "other_sender_1_preview": "Preview text for this email",
+  "other_sender_1_time": "Time like '9:15 AM'",
+
+  "other_sender_2_name": "Another plausible contact name",
+  "other_sender_2_initial": "First letter",
+  "other_sender_2_subject": "Another realistic subject",
+  "other_sender_2_preview": "Preview text",
+  "other_sender_2_time": "Time like 'Yesterday'",
+
+  "other_sender_3_name": "A lesser-known service, internal tool, or noreply sender that would NOT have its own logo in Gmail (e.g. Teamwork, Gusto, DocuSign)",
+  "other_sender_3_initial": "First letter",
+  "other_sender_3_subject": "A notification-style subject",
+  "other_sender_3_preview": "Preview text",
+  "other_sender_3_time": "A date like 'Mar 28'"
+}
+
+Rules:
+- The main email (from the company) should be industry-appropriate and specific
+- The other senders should look like normal inbox neighbors -- a mix of personal messages and notifications
+- The email body HTML should use only &lt;p&gt; tags, no other HTML elements
+- Do not include any email addresses as literal text in the output (they will be constructed separately)
+- Keep all text professional and realistic
+- Return ONLY valid JSON, no markdown fences, no explanation</pre>
+  </div>
+
+  <div class="card">
+    <h2>How to Use</h2>
+    <p class="note">
+      1. Replace <code>{company_name}</code>, <code>{domain}</code>, and <code>{industry}</code> with your values.<br><br>
+      2. Send the prompt to your preferred LLM.<br><br>
+      3. Parse the returned JSON and pass each field as a template variable when rendering <code>preview.jinja2.html</code>.<br><br>
+      For example, in the Flask app you would add the parsed JSON fields to the <code>render_template()</code> call:
+    </p>
+    <button class="copy-btn" onclick="copyBlock('code-example', this)">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Copy to clipboard
+    </button>
+    <pre class="json-example" id="code-example">
+import json
+
+# llm_response = call_your_llm(prompt)
+content = json.loads(llm_response)
+
+return render_template(
+    "preview.jinja2.html",
+    company=company,
+    domain=domain,
+    industry=industry,
+    bimi_svg=bimi_svg,
+    job_id=job_id,
+    sender_email_parts=sender_email_parts,
+    **content,   # spreads all the LLM-generated fields into the template
+)</pre>
+  </div>
+
+  <div class="card">
+    <h2>Example Output</h2>
+    <button class="copy-btn" onclick="copyBlock('json-example', this)">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Copy to clipboard
+    </button>
+    <pre class="json-example" id="json-example">{
+  "inbox_subject": "Your March security digest is ready",
+  "inbox_preview": "We've compiled your monthly threat summary and platform activity report...",
+  "inbox_time": "10:42 AM",
+  "email_subject": "Your March security digest is ready",
+  "email_body": "&lt;p&gt;Hi there,&lt;/p&gt;&lt;p&gt;Your monthly security digest for March 2026 is now available. This month we detected and blocked 1,247 suspicious login attempts across your organization's accounts, a 12% decrease from February.&lt;/p&gt;&lt;p&gt;We've also rolled out enhanced phishing detection for your domain. No action is required on your part — these protections are active immediately. If you'd like to review the full report, visit your dashboard.&lt;/p&gt;",
+  "email_time": "10:42 AM (1 hour ago)",
+  "other_sender_1_name": "Sarah Chen",
+  "other_sender_1_initial": "S",
+  "other_sender_1_subject": "Re: Q2 planning doc",
+  "other_sender_1_preview": "Looks good to me. I added a few comments on the timeline section...",
+  "other_sender_1_time": "9:15 AM",
+  "other_sender_2_name": "Mike Torres",
+  "other_sender_2_initial": "M",
+  "other_sender_2_subject": "Lunch Thursday?",
+  "other_sender_2_preview": "Hey, are you free Thursday around noon? There's a new place on 5th...",
+  "other_sender_2_time": "Yesterday",
+  "other_sender_3_name": "Teamwork",
+  "other_sender_3_initial": "T",
+  "other_sender_3_subject": "New comment on Project Atlas task #204",
+  "other_sender_3_preview": "Jamie left a comment: 'Updated the wireframes, ready for review...'",
+  "other_sender_3_time": "Mar 28"
+}</pre>
+  </div>
+
+  <a href="{{ url_for('index') }}" class="back-link">&larr; Back to generator</a>
+</div>
+
+<script>
+  var copyIcon = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="currentColor" stroke-width="1.5"/></svg> Copy to clipboard';
+
+  function copyBlock(id, btn) {
+    var text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      setTimeout(function() { btn.innerHTML = copyIcon; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
