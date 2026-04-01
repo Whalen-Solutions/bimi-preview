@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Added note about BIMI multi-provider support on form and preview pages with link to BIMI Group
 - LLM prompt now includes today's date so generated emails reference current time periods
 - LLM prompt uses company's fiscal quarter/year for financial content when known, calendar dates for events and meetings
 

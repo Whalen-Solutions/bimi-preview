@@ -96,6 +96,11 @@ def index():
     return render_template("index.jinja2.html")
 
 
+@app.route("/preview", methods=["GET"])
+def preview_redirect():
+    return redirect(url_for("index"), 302)
+
+
 @app.route("/preview", methods=["POST"])
 def preview():
     # --- Validate inputs ---
