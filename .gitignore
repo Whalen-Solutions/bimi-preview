@@ -7,3 +7,19 @@ __pycache__/
 dist/
 build/
 docker-compose.override.yml
+
+# Local user config
+.local/
+.config/
+
+# Docker
+.docker/
+
+# bash
+.bashrc
+.bash_history
+
+# zsh
+.zshrc
+.zsh_history
+.histfile
