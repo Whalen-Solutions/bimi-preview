@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - LLM prompt now includes today's date so generated emails reference current time periods
-- LLM prompt uses company's fiscal quarter/year when known instead of calendar quarter
+- LLM prompt uses company's fiscal quarter/year for financial content when known, calendar dates for events and meetings
 
 ## [0.3.0] - 2026-03-31
 

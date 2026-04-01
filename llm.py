@@ -70,8 +70,8 @@ constructed separately)
 - Keep all text professional and realistic
 - Today's date is {today}. If referencing a time period (quarter, month, year), it must be \
 current — do NOT reference a past quarter, month, or year unless today is near its end. \
-If you know the company's fiscal calendar, use their fiscal quarter/year instead of the \
-calendar quarter
+If you know the company's fiscal calendar, use their fiscal quarter/year for financial \
+content (earnings, reports, billing), but use calendar dates for events and meetings
 - Return ONLY valid JSON, no markdown fences, no explanation"""
 
 EXPECTED_KEYS = {
