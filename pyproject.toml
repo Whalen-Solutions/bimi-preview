@@ -1,6 +1,6 @@
 [project]
 name = "bimi-preview"
-version = "0.2.1"
+version = "0.3.0"
 requires-python = ">=3.11"
 dependencies = [
     "flask>=3.1",
@@ -13,7 +13,7 @@ dependencies = [
     "openai>=1.50",
     "google-genai>=1.0",
     "python-dotenv>=1.0",
-    "gunicorn>=23.0",
+    "waitress>=3.0",
 ]
 
 [project.optional-dependencies]

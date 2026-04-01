@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-03-31
+
+### Added
+
+- Gmail mobile inbox preview with realistic phone frame, Dynamic Island, search bar, and bottom navigation
+- Gmail mobile open email preview with toolbar, sender header, BIMI verified checkmark, email body, and reply bar
+- Side-by-side responsive layout for mobile phone previews on desktop
+- VSCode task for running Flask dev server with auto-reload
+
+### Changed
+
+- Replaced Gunicorn with Waitress in project dependencies
+- Removed light blue background from unread desktop inbox rows to match current Gmail styling
+- Renamed "Gmail Inbox" section to "Gmail Desktop"
+- Removed "Open Email" heading above the desktop email view
+- Renamed download button to "Download BIMI SVG"
+- Added spacing between desktop inbox and open email sections
+
 ## [0.2.1] - 2026-03-31
 
 ### Changed
