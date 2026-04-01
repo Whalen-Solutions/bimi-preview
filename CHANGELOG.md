@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-04-01
+
+### Changed
+
+- LLM prompt now includes today's date so generated emails reference current time periods
+- LLM prompt uses company's fiscal quarter/year when known instead of calendar quarter
+
 ## [0.3.0] - 2026-03-31
 
 ### Added

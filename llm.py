@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,10 @@ messages and notifications
 - Do not include any email addresses as literal text in the output (they will be \
 constructed separately)
 - Keep all text professional and realistic
-- If referencing a time the emails should be timely (e.g., do NOT promote an event for a prior year) 
+- Today's date is {today}. If referencing a time period (quarter, month, year), it must be \
+current — do NOT reference a past quarter, month, or year unless today is near its end. \
+If you know the company's fiscal calendar, use their fiscal quarter/year instead of the \
+calendar quarter
 - Return ONLY valid JSON, no markdown fences, no explanation"""
 
 EXPECTED_KEYS = {
@@ -214,6 +218,7 @@ def generate_email_content(company: str, domain: str, industry: str) -> dict:
         company_name=company,
         domain=domain,
         industry=industry,
+        today=date.today().strftime("%B %-d, %Y"),
     )
 
     try:
