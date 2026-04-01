@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Flask Dev Server",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/flask",
+      "args": [
+        "run",
+        "--debug",
+        "--port", "5000"
+      ],
+      "options": {
+        "env": {
+          "FLASK_APP": "app.py"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}
