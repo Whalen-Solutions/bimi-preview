@@ -2,11 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.1] - 2026-04-01
+## [0.3.2] - 2026-04-01
 
 ### Changed
 
 - Added note about BIMI multi-provider support on form and preview pages with link to BIMI Group
+- GET requests to `/preview` now redirect to `/` instead of returning a 405 error
+
+## [0.3.1] - 2026-04-01
+
+### Changed
+
 - LLM prompt now includes today's date so generated emails reference current time periods
 - LLM prompt uses company's fiscal quarter/year for financial content when known, calendar dates for events and meetings
 
