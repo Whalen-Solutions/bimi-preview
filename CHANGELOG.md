@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Replaced Gunicorn with Waitress in project dependencies
+- Replaced Gunicorn with Waitress in project dependencies and Dockerfile
 - Removed light blue background from unread desktop inbox rows to match current Gmail styling
 - Renamed "Gmail Inbox" section to "Gmail Desktop"
 - Removed "Open Email" heading above the desktop email view
