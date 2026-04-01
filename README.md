@@ -124,29 +124,32 @@ sudo systemctl status bimi-preview
 
 #### 3. Configure nginx as a reverse proxy
 
-Install nginx and create `/etc/nginx/sites-available/bimi-preview`:
+Create `/etc/nginx/sites-available/bimi-preview`:
 
 ```nginx
-# Rate limiting zone — 5 requests/second per IP, shared across workers
+# Rate limiting zones — above all server blocks, so they're in the http context
 limit_req_zone $binary_remote_addr zone=bimi_limit:10m rate=5r/s;
-
-# Stricter zone for the preview endpoint (triggers LLM calls)
-limit_req_zone $binary_remote_addr zone=bimi_llm:10m rate=1r/s;
+limit_req_zone $binary_remote_addr zone=bimi_llm:10m   rate=1r/s;
 
 server {
     listen 80;
+    listen [::]:80;
     server_name bimi.example.com;
 
-    # Redirect to HTTPS
     return 301 https://$host$request_uri;
 }
 
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name bimi.example.com;
 
     ssl_certificate     /etc/letsencrypt/live/bimi.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bimi.example.com/privkey.pem;
+    # certbot manages TLS protocol and cipher settings in this file
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     # --- Upload and body limits ---
     client_max_body_size 16m;
@@ -163,20 +166,18 @@ server {
     proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
 
-    # --- Global rate limit ---
-    limit_req zone=bimi_limit burst=10 nodelay;
+    # Return 429 for all rate-limited requests
     limit_req_status 429;
 
     # --- Stricter rate limit on the preview endpoint (LLM cost) ---
     location = /preview {
         limit_req zone=bimi_llm burst=3 nodelay;
-        limit_req_status 429;
-
         proxy_pass http://127.0.0.1:8000;
     }
 
-    # --- Default proxy ---
+    # --- Default proxy with general rate limit ---
     location / {
+        limit_req zone=bimi_limit burst=10 nodelay;
         proxy_pass http://127.0.0.1:8000;
     }
 }
