@@ -106,58 +106,44 @@
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="currentColor" stroke-width="1.5"/></svg>
       Copy to clipboard
     </button>
-    <pre id="prompt-text">You are generating realistic email preview content for a BIMI (Brand Indicators for Message Identification) inbox mockup. This mockup demonstrates how a company's verified logo appears in a Gmail inbox.
+    <pre id="prompt-text">Generate realistic email preview content for a BIMI inbox mockup showing how a company's verified logo appears in Gmail.
 
-Given the following inputs:
+Inputs:
 - Company name: {company_name}
 - Email domain: {domain}
 - Industry: {industry}
 
-Generate realistic, professional email content that this company might plausibly send. Return ONLY a JSON object with exactly these fields:
+Return ONLY a JSON object with these fields:
 
 {
-  "inbox_subject": "Subject line as it appears in the inbox list (50-80 chars)",
-  "inbox_preview": "Preview text snippet shown after the subject in the inbox (60-100 chars)",
-  "inbox_time": "A realistic time like '10:42 AM' or '2:15 PM'",
-
-  "email_subject": "Full subject line for the open email view (can match inbox_subject)",
-  "email_body": "2-3 short paragraphs of HTML. Use &lt;p&gt; tags. Write in a professional but warm tone appropriate for the industry. Reference the company by name. Include a specific, plausible reason for the email (product update, security notice, appointment reminder, order confirmation, etc.) that fits the industry.",
-  "email_time": "Timestamp like '10:42 AM (1 hour ago)'",
-
-  "other_sender_1_name": "A plausible colleague or contact name",
-  "other_sender_1_initial": "First letter of their name",
-  "other_sender_1_subject": "A realistic personal/work email subject",
-  "other_sender_1_preview": "Preview text for this email",
-  "other_sender_1_time": "Time like '9:15 AM'",
-
-  "other_sender_2_name": "Another plausible contact name",
-  "other_sender_2_initial": "First letter",
-  "other_sender_2_subject": "Another realistic subject",
-  "other_sender_2_preview": "Preview text",
-  "other_sender_2_time": "Time like 'Yesterday'",
-
-  "other_sender_3_name": "A lesser-known service, internal tool, or noreply sender that would NOT have its own logo in Gmail (e.g. Teamwork, Gusto, DocuSign)",
-  "other_sender_3_initial": "First letter",
-  "other_sender_3_subject": "A notification-style subject",
-  "other_sender_3_preview": "Preview text",
-  "other_sender_3_time": "A date like 'Mar 28'"
+  "inbox_subject": "Subject line for the inbox list (50-80 chars)",
+  "inbox_preview": "Preview snippet shown after the subject (60-100 chars)",
+  "email_body": "2-3 short paragraphs of HTML using only &lt;p&gt; tags. Professional, warm tone. Reference the company by name. Include a specific, plausible reason for the email that fits what this company actually does.",
+  "other_senders": [
+    {"name": "A plausible colleague or contact", "subject": "Realistic subject", "preview": "Preview text", "time": "e.g. 9:15 AM"},
+    {"name": "Another contact", "subject": "Subject", "preview": "Preview", "time": "e.g. Yesterday"},
+    {"name": "A lesser-known service or noreply sender without its own Gmail logo (e.g. Teamwork, Gusto, DocuSign)", "subject": "Notification-style subject", "preview": "Preview", "time": "e.g. Mar 28"}
+  ]
 }
 
 Rules:
-- The main email (from the company) should be industry-appropriate and specific
-- The other senders should look like normal inbox neighbors -- a mix of personal messages and notifications
-- The email body HTML should use only &lt;p&gt; tags, no other HTML elements
-- Do not include any email addresses as literal text in the output (they will be constructed separately)
-- Keep all text professional and realistic
+- Reflect what {company_name} actually does — not generic industry stereotypes
+- other_senders should look like normal inbox neighbors (personal + notifications)
+- email_body HTML: only &lt;p&gt; tags, no other elements
+- No email addresses as literal text in the output
+- Today is {today}. Time references must be current — no past quarters, months, or years unless today is near their end. Use the company's fiscal calendar for financial content if known, calendar dates for events
 - Return ONLY valid JSON, no markdown fences, no explanation</pre>
   </div>
 
   <div class="card">
     <h2>How to Use</h2>
     <p class="note">
-      1. Replace <code>{company_name}</code>, <code>{domain}</code>, and <code>{industry}</code> with your values.<br><br>
+      1. Replace <code>{company_name}</code>, <code>{domain}</code>, <code>{industry}</code>, and <code>{today}</code> with your values.<br><br>
       2. Send the prompt to your preferred LLM.<br><br>
-      3. Parse the returned JSON and pass each field as a template variable when rendering <code>preview.jinja2.html</code>.<br><br>
+      3. Parse the returned JSON. The server flattens <code>other_senders</code> into numbered template keys
+         (e.g. <code>other_sender_1_name</code>) and derives each sender's initial from their name.
+         Email times (<code>inbox_time</code>, <code>email_time</code>) and the phone status bar time
+         are computed server-side in the user's timezone.<br><br>
       For example, in the Flask app you would add the parsed JSON fields to the <code>render_template()</code> call:
     </p>
     <button class="copy-btn" onclick="copyBlock('code-example', this)">
@@ -191,25 +177,12 @@ return render_template(
     <pre class="json-example" id="json-example">{
   "inbox_subject": "Your March security digest is ready",
   "inbox_preview": "We've compiled your monthly threat summary and platform activity report...",
-  "inbox_time": "10:42 AM",
-  "email_subject": "Your March security digest is ready",
   "email_body": "&lt;p&gt;Hi there,&lt;/p&gt;&lt;p&gt;Your monthly security digest for March 2026 is now available. This month we detected and blocked 1,247 suspicious login attempts across your organization's accounts, a 12% decrease from February.&lt;/p&gt;&lt;p&gt;We've also rolled out enhanced phishing detection for your domain. No action is required on your part — these protections are active immediately. If you'd like to review the full report, visit your dashboard.&lt;/p&gt;",
-  "email_time": "10:42 AM (1 hour ago)",
-  "other_sender_1_name": "Sarah Chen",
-  "other_sender_1_initial": "S",
-  "other_sender_1_subject": "Re: Q2 planning doc",
-  "other_sender_1_preview": "Looks good to me. I added a few comments on the timeline section...",
-  "other_sender_1_time": "9:15 AM",
-  "other_sender_2_name": "Mike Torres",
-  "other_sender_2_initial": "M",
-  "other_sender_2_subject": "Lunch Thursday?",
-  "other_sender_2_preview": "Hey, are you free Thursday around noon? There's a new place on 5th...",
-  "other_sender_2_time": "Yesterday",
-  "other_sender_3_name": "Teamwork",
-  "other_sender_3_initial": "T",
-  "other_sender_3_subject": "New comment on Project Atlas task #204",
-  "other_sender_3_preview": "Jamie left a comment: 'Updated the wireframes, ready for review...'",
-  "other_sender_3_time": "Mar 28"
+  "other_senders": [
+    {"name": "Sarah Chen", "subject": "Re: Q2 planning doc", "preview": "Looks good to me. I added a few comments on the timeline section...", "time": "9:15 AM"},
+    {"name": "Mike Torres", "subject": "Lunch Thursday?", "preview": "Hey, are you free Thursday around noon? There's a new place on 5th...", "time": "Yesterday"},
+    {"name": "Teamwork", "subject": "New comment on Project Atlas task #204", "preview": "Jamie left a comment: 'Updated the wireframes, ready for review...'", "time": "Mar 28"}
+  ]
 }</pre>
   </div>
 

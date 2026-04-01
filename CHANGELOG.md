@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2026-04-01
+
+### Changed
+
+- Reduced LLM prompt token usage (~45%) by consolidating other senders into an array, dropping `email_subject` (template already falls back to `inbox_subject`), removing `_initial` fields (derived server-side from sender name), and trimming verbose rule descriptions
+- Updated default OpenAI model from `gpt-4o-mini` to `gpt-5.4-nano`
+- Updated default Gemini model from `gemini-2.0-flash-lite` to `gemini-2.5-flash-lite`
+- Switched Anthropic default to model alias `claude-haiku-4-5` for automatic minor version updates
+
 ## [0.3.3] - 2026-04-01
 
 ### Changed

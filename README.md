@@ -206,7 +206,7 @@ All configuration is via environment variables (or a `.env` file):
 | --- | --- | --- |
 | `SECRET_KEY` | Random | Flask session secret key |
 | `LLM_PROVIDER` | Auto-detect | `"anthropic"`, `"openai"`, or `"gemini"` |
-| `LLM_MODEL` | `claude-haiku-4-5-20251001` / `gpt-4o-mini` / `gemini-2.0-flash-lite` | Model ID for the chosen provider |
+| `LLM_MODEL` | `claude-haiku-4-5` / `gpt-5.4-nano` / `gemini-2.5-flash-lite` | Model ID for the chosen provider |
 | `ANTHROPIC_API_KEY` | -- | Anthropic API key |
 | `OPENAI_API_KEY` | -- | OpenAI API key |
 | `GEMINI_API_KEY` | -- | Google Gemini API key (also accepts `GOOGLE_API_KEY`) |
@@ -232,7 +232,7 @@ The generated SVG conforms to the SVG Tiny-PS profile required by BIMI:
 bimi-preview/
   app.py              Flask routes and request handling
   bimi.py             Image-to-BIMI SVG conversion (raster + SVG input)
-  llm.py              LLM provider abstraction (Anthropic / OpenAI)
+  llm.py              LLM provider abstraction (Anthropic / OpenAI / Gemini)
   templates/
     index.jinja2.html        Upload form
     preview.jinja2.html      Gmail inbox mockup (Jinja2)

@@ -6,9 +6,9 @@ BIMI Preview Generator -- a Flask web app that converts logos into BIMI-complian
 
 ## Architecture
 
-- **app.py** -- Flask routes and request handling. The `/preview` POST endpoint validates input, runs BIMI conversion and LLM content generation in parallel via `ThreadPoolExecutor`, then renders the preview template.
+- **app.py** -- Flask routes and request handling. The `/preview` POST endpoint validates input, runs BIMI conversion and LLM content generation in parallel via `ThreadPoolExecutor`, computes timezone-aware email times (`status_bar_time`, `inbox_time`, `email_time`) from a hidden `tz` form field, then renders the preview template. GET `/preview` redirects to `/`.
 - **bimi.py** -- Image-to-BIMI SVG conversion. Handles raster images (PNG, JPG, etc.) and SVG input. Outputs SVG Tiny-PS with square viewBox, solid background, circle-crop clearance, and forbidden elements stripped. Uses Pillow, CairoSVG, scikit-image, and optionally `potrace`.
-- **llm.py** -- LLM provider abstraction supporting Anthropic, OpenAI, and Google Gemini. Generates realistic email content (subject lines, body, inbox neighbors) as structured JSON. Returns `{}` on any failure so Jinja `| default()` filters activate gracefully.
+- **llm.py** -- LLM provider abstraction supporting Anthropic, OpenAI, and Google Gemini. Generates realistic email content (subject line, body, and an `other_senders` array of inbox neighbors) as structured JSON. `_parse_response` flattens the array into numbered template keys (`other_sender_1_name`, etc.) and derives `_initial` from each sender's name. Email times and `email_subject` are not in the prompt -- times are computed server-side in `app.py` and `email_subject` falls back to `inbox_subject` in the template. Returns `{}` on any failure so Jinja `| default()` filters activate gracefully.
 - **templates/** -- Jinja2 templates:
   - `index.jinja2.html` -- Upload form (company, domain, industry, logo file)
   - `preview.jinja2.html` -- Gmail inbox + open email mockup with BIMI avatar
