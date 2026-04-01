@@ -211,6 +211,7 @@
       </div>
     </div>
 
+    <input type="hidden" id="tz" name="tz" value="UTC">
     <button type="submit">Generate BIMI Preview</button>
   </form>
 
@@ -233,6 +234,7 @@
   });
 
   document.querySelector('form').addEventListener('submit', () => {
+    document.getElementById('tz').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
     document.getElementById('loadingOverlay').classList.add('active');
     var btn = document.querySelector('button[type="submit"]');
     btn.disabled = true;

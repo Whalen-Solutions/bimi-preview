@@ -1,12 +1,15 @@
 """Flask app for BIMI preview generation."""
 
 import os
+import random
 import re
 import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
@@ -171,6 +174,27 @@ def preview():
     # Infer sender address
     sender_email_parts = ["info", "@", clean_domain]
 
+    # --- Compute realistic times in user's timezone ---
+    tz_name = request.form.get("tz", "UTC")
+    try:
+        tz = ZoneInfo(tz_name)
+    except (KeyError, ValueError):
+        tz = ZoneInfo("UTC")
+
+    now = datetime.now(tz)
+    email_arrived = now - timedelta(minutes=random.randint(30, 90))
+
+    status_bar_time = now.strftime("%-I:%M")
+    inbox_time = email_arrived.strftime("%-I:%M %p")
+
+    delta_min = int((now - email_arrived).total_seconds() // 60)
+    if delta_min < 60:
+        relative = f"{delta_min} minutes ago"
+    else:
+        hours = delta_min // 60
+        relative = f"{hours} hour{'s' if hours != 1 else ''} ago"
+    email_time = f"{inbox_time} ({relative})"
+
     return render_template(
         "preview.jinja2.html",
         company=company,
@@ -178,6 +202,9 @@ def preview():
         industry=industry,
         job_id=job_id,
         sender_email_parts=sender_email_parts,
+        status_bar_time=status_bar_time,
+        inbox_time=inbox_time,
+        email_time=email_time,
         **llm_content,
     )
 

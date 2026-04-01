@@ -28,14 +28,12 @@ plausibly send. Return ONLY a JSON object with exactly these fields:
 {{
   "inbox_subject": "Subject line as it appears in the inbox list (50-80 chars)",
   "inbox_preview": "Preview text snippet shown after the subject in the inbox (60-100 chars)",
-  "inbox_time": "A realistic time like '10:42 AM' or '2:15 PM'",
 
   "email_subject": "Full subject line for the open email view (can match inbox_subject)",
   "email_body": "2-3 short paragraphs of HTML. Use <p> tags. Write in a professional \
 but warm tone appropriate for the industry. Reference the company by name. Include a \
 specific, plausible reason for the email (product update, security notice, appointment \
 reminder, order confirmation, etc.) that fits the industry.",
-  "email_time": "Timestamp like '10:42 AM (1 hour ago)'",
 
   "other_sender_1_name": "A plausible colleague or contact name",
   "other_sender_1_initial": "First letter of their name",
@@ -77,10 +75,8 @@ content (earnings, reports, billing), but use calendar dates for events and meet
 EXPECTED_KEYS = {
     "inbox_subject",
     "inbox_preview",
-    "inbox_time",
     "email_subject",
     "email_body",
-    "email_time",
     "other_sender_1_name",
     "other_sender_1_initial",
     "other_sender_1_subject",

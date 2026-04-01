@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2026-04-01
+
+### Changed
+
+- Phone mockup status bars now show the actual time the page was loaded in the user's timezone
+- Main email inbox and open email times are computed server-side with accurate relative timestamps
+- Removed `inbox_time` and `email_time` from LLM prompt (now computed server-side)
+
 ## [0.3.2] - 2026-04-01
 
 ### Changed
