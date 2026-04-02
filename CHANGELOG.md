@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2026-04-01
+
+### Fixed
+
+- Palette-mode images (GIF, indexed PNG) with transparency now correctly detected and converted using alpha channel instead of Otsu thresholding
+- Multi-frame formats (GIF, WebP, TIFF) now select the largest frame by pixel area instead of silently using the first frame
+- ICO multi-frame selection no longer returns the wrong frame when no frame is larger than the first
+
 ## [0.4.0] - 2026-04-01
 
 ### Added

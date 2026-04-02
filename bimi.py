@@ -81,6 +81,8 @@ def _has_transparency(img: Image.Image) -> bool:
     if img.mode in ("RGBA", "LA", "PA"):
         alpha = np.array(img.split()[-1])
         return bool((alpha < 255).any())
+    if img.mode == "P" and "transparency" in img.info:
+        return True
     return False
 
 
@@ -112,15 +114,21 @@ def preprocess_raster(path: str) -> tuple[np.ndarray, np.ndarray, int]:
     img = Image.open(path)
     fmt = _detect_format(path)
 
-    # ICO files contain multiple sizes — use the largest frame
-    if fmt == "ico" and hasattr(img, "n_frames") and img.n_frames > 1:
-        best, best_size = img, img.size[0] * img.size[1]
+    # Multi-frame formats: ICO has multiple sizes, GIF/WebP/TIFF can be
+    # animated or multi-page.  Select the largest frame by pixel area.
+    if hasattr(img, "n_frames") and img.n_frames > 1:
+        best, best_size = img.copy(), img.size[0] * img.size[1]
         for i in range(img.n_frames):
             img.seek(i)
             px = img.size[0] * img.size[1]
             if px > best_size:
                 best, best_size = img.copy(), px
         img = best
+
+    # Convert palette-with-transparency to RGBA so the alpha channel
+    # is available for _has_transparency and the tracing pipeline.
+    if img.mode == "P" and "transparency" in img.info:
+        img = img.convert("RGBA")
 
     transparent = _has_transparency(img)
     upsample = _upsample_factor(img)

@@ -478,6 +478,37 @@ class TestRasterToBimiSvg:
         assert "<title>Fav Co</title>" in svg
         assert 'version="1.2"' in svg
 
+    def test_palette_transparency_png(self, tmp_path):
+        """Palette-mode PNG with transparency should use alpha-based tracing."""
+        img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([20, 20, 80, 80], fill=(255, 0, 0, 255))
+        # Convert to palette mode, preserving transparency
+        img_p = img.convert("P")
+        p = tmp_path / "palette.png"
+        img_p.save(p, transparency=0)
+        svg = convert_to_bimi(str(p), "Palette Co")
+        assert "<title>Palette Co</title>" in svg
+        assert 'version="1.2"' in svg
+
+    def test_animated_gif(self, tmp_path):
+        """Animated GIFs should produce valid output (not crash)."""
+        from PIL import ImageDraw
+
+        frames = []
+        for color in [(255, 0, 0), (0, 255, 0)]:
+            frame = Image.new("RGB", (100, 100), (255, 255, 255))
+            draw = ImageDraw.Draw(frame)
+            draw.ellipse([20, 20, 80, 80], fill=color)
+            frames.append(frame)
+        p = tmp_path / "anim.gif"
+        frames[0].save(p, save_all=True, append_images=frames[1:], duration=100)
+        svg = convert_to_bimi(str(p), "Anim Co")
+        assert "<title>Anim Co</title>" in svg
+        assert 'version="1.2"' in svg
+
 
 # ---------------------------------------------------------------------------
 # Potrace integration
