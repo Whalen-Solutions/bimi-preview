@@ -256,6 +256,43 @@
   }
   .llm-banner a { color: #1a73e8; }
 
+  /* Dark mode toggle */
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #5f6368;
+    cursor: pointer;
+    user-select: none;
+  }
+  .theme-toggle-track {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    background: #dadce0;
+    border-radius: 11px;
+    transition: background .2s;
+  }
+  .theme-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .theme-toggle.active .theme-toggle-track {
+    background: #8ab4f8;
+  }
+  .theme-toggle.active .theme-toggle-thumb {
+    transform: translateX(18px);
+  }
+
   /* ---- Gmail Mobile Phone Frame ---- */
   .mobile-phone {
     width: 375px;
@@ -531,6 +568,171 @@
     color: #5f6368;
     flex-shrink: 0;
   }
+
+  /* ======================================== */
+  /* DARK MODE OVERRIDES                      */
+  /* ======================================== */
+
+  /* Desktop inbox & email view */
+  .dark-mode .inbox {
+    background: #292929;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  .dark-mode .inbox-row {
+    border-bottom-color: #3c4043;
+  }
+  .dark-mode .sender-name {
+    color: #e8eaed;
+  }
+  .dark-mode .subject {
+    color: #e8eaed;
+  }
+  .dark-mode .inbox-row.unread .subject {
+    color: #e8eaed;
+  }
+  .dark-mode .preview-text {
+    color: #9aa0a6;
+  }
+  .dark-mode .subject-sep {
+    color: #9aa0a6;
+  }
+  .dark-mode .inbox-time {
+    color: #9aa0a6;
+  }
+  .dark-mode .unread-dot-fill {
+    background: #8ab4f8;
+  }
+
+  .dark-mode .email-view {
+    background: #292929;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  .dark-mode .email-subject-line {
+    color: #e8eaed;
+  }
+  .dark-mode .email-sender-name {
+    color: #e8eaed;
+  }
+  .dark-mode .email-sender-addr {
+    color: #9aa0a6;
+  }
+  .dark-mode .email-to {
+    color: #9aa0a6;
+  }
+  .dark-mode .email-time-header {
+    color: #9aa0a6;
+  }
+  .dark-mode .email-body {
+    color: #bdc1c6;
+  }
+  .dark-mode .email-signature {
+    color: #9aa0a6;
+    border-top-color: #3c4043;
+  }
+
+  /* Mobile phone frames */
+  .dark-mode .mobile-screen {
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-status-bar {
+    background: #1f1f1f;
+    color: #e8eaed;
+  }
+  .dark-mode .mobile-status-bar svg rect,
+  .dark-mode .mobile-status-bar svg path {
+    fill: #e8eaed;
+    stroke: #e8eaed;
+  }
+  .dark-mode .mobile-gmail-bar {
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-search-pill {
+    background: #303134;
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-hamburger {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-user-circle {
+    background: #5e97d0;
+  }
+
+  .dark-mode .mobile-inbox-row {
+    border-bottom-color: #3c4043;
+  }
+  .dark-mode .mobile-sender-name {
+    color: #e8eaed;
+  }
+  .dark-mode .mobile-inbox-row.mobile-unread .mobile-subject {
+    color: #e8eaed;
+  }
+  .dark-mode .mobile-subject {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-preview {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-time {
+    color: #9aa0a6;
+  }
+
+  .dark-mode .mobile-bottom-nav {
+    background: #1f1f1f;
+    border-top-color: #3c4043;
+  }
+  .dark-mode .mobile-nav-item {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-nav-item.mobile-nav-active .mobile-nav-pill {
+    background: #004a77;
+  }
+  .dark-mode .mobile-nav-item.mobile-nav-active {
+    color: #8ab4f8;
+  }
+
+  /* Mobile email view */
+  .dark-mode .mobile-email-toolbar {
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-toolbar-icon {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-email-subject {
+    color: #e8eaed;
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-email-header {
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-email-sender-name {
+    color: #e8eaed;
+  }
+  .dark-mode .mobile-email-detail {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-email-time {
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-email-body {
+    color: #bdc1c6;
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-email-signature {
+    color: #9aa0a6;
+    border-top-color: #3c4043;
+    background: #1f1f1f;
+  }
+  .dark-mode .mobile-reply-bar {
+    background: #1f1f1f;
+    border-top-color: #3c4043;
+  }
+  .dark-mode .mobile-reply-pill {
+    background: #3c4043;
+    color: #9aa0a6;
+  }
+  .dark-mode .mobile-reply-icon {
+    color: #9aa0a6;
+  }
 </style>
 </head>
 <body>
@@ -539,6 +741,10 @@
   <div class="header">
     <h1>BIMI Preview</h1>
     <div class="actions">
+      <label class="theme-toggle" id="dark-toggle" title="Toggle dark mode">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+        <div class="theme-toggle-track"><div class="theme-toggle-thumb"></div></div>
+      </label>
       <a href="{{ url_for('index') }}" class="btn">&larr; New Preview</a>
       <a href="{{ url_for('download', job_id=job_id) }}" class="btn btn-primary">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -976,6 +1182,14 @@
     if (screens.length >= 2) {
       screens[1].style.height = screens[0].offsetHeight + 'px';
     }
+
+    // Dark mode toggle — applied to .container so all children inherit
+    var toggle = document.getElementById('dark-toggle');
+    var container = document.querySelector('.container');
+    toggle.addEventListener('click', function() {
+      toggle.classList.toggle('active');
+      container.classList.toggle('dark-mode');
+    });
   })();
 </script>
 </body>

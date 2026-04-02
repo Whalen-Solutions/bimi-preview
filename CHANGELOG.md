@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2] - 2026-04-01
+
+### Added
+
+- Dark mode toggle on the preview page that switches mobile and desktop Gmail mockups to Gmail's dark theme colors
+
 ## [0.4.1] - 2026-04-01
 
 ### Fixed
