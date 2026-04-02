@@ -20,7 +20,7 @@
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0,0,0,.08);
-    max-width: 520px;
+    max-width: 580px;
     width: 100%;
     padding: 40px;
   }
@@ -136,6 +136,33 @@
   }
   .prompt-link a:hover { text-decoration: underline; }
 
+  /* Radio group */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #202124;
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+  .radio-option input[type="radio"] {
+    width: auto;
+    margin: 0;
+    accent-color: #1a73e8;
+  }
+  .radio-label { font-weight: 500; }
+  .radio-detail {
+    font-weight: 400;
+    color: #5f6368;
+  }
+
   /* Loading overlay */
   .loading-overlay {
     display: none;
@@ -209,6 +236,21 @@
         <p class="hint">PNG, JPG, SVG, WebP, GIF, BMP, TIFF, or ICO &mdash; max 16 MB</p>
         <p class="file-name" id="fileName"></p>
       </div>
+    </div>
+
+    <div class="field">
+      <label>BIMI Certificate Type</label>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="cert_type" value="vmc" checked>
+          <span class="radio-label">VMC <span class="radio-detail">&mdash; Verified Mark Certificate (registered trademark)</span></span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="cert_type" value="cmc">
+          <span class="radio-label">CMC <span class="radio-detail">&mdash; Common Mark Certificate (no registered trademark required)</span></span>
+        </label>
+      </div>
+      <p class="hint">VMC senders display a verified checkmark next to their name in Gmail. CMC senders show only the logo avatar.</p>
     </div>
 
     <input type="hidden" id="tz" name="tz" value="UTC">

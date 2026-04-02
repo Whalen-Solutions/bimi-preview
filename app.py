@@ -182,6 +182,9 @@ def preview():
     # Store job_id in session for download
     session["job_id"] = job_id
 
+    cert_type = request.form.get("cert_type", "vmc")
+    show_checkmark = cert_type == "vmc"
+
     # Infer sender address
     sender_email_parts = ["info", "@", clean_domain]
 
@@ -213,6 +216,7 @@ def preview():
         industry=industry,
         job_id=job_id,
         sender_email_parts=sender_email_parts,
+        show_checkmark=show_checkmark,
         status_bar_time=status_bar_time,
         inbox_time=inbox_time,
         email_time=email_time,

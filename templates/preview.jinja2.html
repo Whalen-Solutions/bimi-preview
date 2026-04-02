@@ -80,45 +80,32 @@
     align-items: center;
     padding: 10px 16px;
     border-bottom: 1px solid #f1f3f4;
-    gap: 12px;
-    min-height: 52px;
+    gap: 8px;
+    min-height: 44px;
   }
   .inbox-row:last-child { border-bottom: none; }
   .inbox-row.unread { }
   .inbox-row.unread .sender-name { font-weight: 700; }
   .inbox-row.unread .subject { font-weight: 600; }
 
-  /* Unread dot */
-  .unread-dot {
-    width: 8px;
-    height: 8px;
+  /* Desktop inbox row controls */
+  .inbox-checkbox {
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
+    color: #5f6368;
   }
-  .unread-dot-fill {
-    width: 8px;
-    height: 8px;
-    background: #1a73e8;
-    border-radius: 50%;
-  }
-
-  /* Avatar */
-  .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+  .inbox-star {
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 500;
-    color: #fff;
-    overflow: hidden;
+    color: #5f6368;
   }
-  .avatar img, .avatar svg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .inbox-important {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: #dadce0;
   }
 
   .inbox-content {
@@ -169,11 +156,22 @@
     margin-top: 24px;
   }
   .email-subject-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
     font-size: 20px;
     font-weight: 400;
     color: #202124;
     margin-bottom: 20px;
     line-height: 1.3;
+  }
+  .email-subject-text { flex: 1; }
+  .email-subject-star {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #5f6368;
+    margin-top: 4px;
   }
   .email-header {
     display: flex;
@@ -439,6 +437,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .mobile-star {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #5f6368;
+    align-self: center;
+    margin-left: auto;
+  }
 
   /* Bottom nav bar */
   .mobile-bottom-nav {
@@ -570,6 +576,637 @@
   }
 
   /* ======================================== */
+  /* YAHOO MAIL iOS                           */
+  /* ======================================== */
+
+  .yahoo-phone {
+    width: 375px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    border-radius: 40px;
+    padding: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.18);
+  }
+  .yahoo-screen {
+    background: #fff;
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  }
+
+  /* Yahoo top bar */
+  .yahoo-top-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #fff;
+  }
+  .yahoo-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #4db8db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .yahoo-top-title {
+    flex: 1;
+  }
+  .yahoo-top-title-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1d1d1f;
+    display: block;
+    line-height: 1.2;
+  }
+  .yahoo-top-title-sub {
+    font-size: 12px;
+    color: #6e6e73;
+    display: block;
+  }
+  .yahoo-top-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .yahoo-top-icon {
+    width: 22px;
+    height: 22px;
+    color: #1d1d1f;
+  }
+
+  /* Category pills */
+  .yahoo-categories {
+    display: flex;
+    gap: 8px;
+    padding: 4px 16px 10px;
+    background: #fff;
+  }
+  .yahoo-cat-pill {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d1d1f;
+    background: #f0f0f0;
+    white-space: nowrap;
+  }
+  .yahoo-cat-pill.yahoo-cat-active {
+    background: #1565f9;
+    color: #fff;
+  }
+
+  /* Section header */
+  .yahoo-section-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 10px;
+    background: #fff;
+  }
+  .yahoo-section-circle {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid #c7c7cc;
+    border-radius: 50%;
+  }
+  .yahoo-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6e6e73;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+  .yahoo-section-edit {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1565f9;
+  }
+
+  /* Yahoo inbox rows */
+  .yahoo-inbox-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+    border-top: 0.5px solid #e5e5ea;
+    background: #fff;
+  }
+  .yahoo-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    overflow: hidden;
+  }
+  .yahoo-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .yahoo-row-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .yahoo-row-top {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .yahoo-unread-dot {
+    width: 8px;
+    height: 8px;
+    background: #1565f9;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .yahoo-sender-name {
+    font-size: 15px;
+    font-weight: 400;
+    color: #1d1d1f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+  .yahoo-inbox-row.yahoo-unread .yahoo-sender-name {
+    font-weight: 700;
+  }
+  .yahoo-time {
+    font-size: 13px;
+    color: #6e6e73;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .yahoo-subject {
+    font-size: 14px;
+    font-weight: 400;
+    color: #1d1d1f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .yahoo-preview {
+    font-size: 14px;
+    color: #6e6e73;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .yahoo-star {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #c7c7cc;
+    align-self: center;
+  }
+
+  /* Yahoo bottom nav */
+  .yahoo-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0 14px;
+    border-top: 0.5px solid #e5e5ea;
+    background: #fff;
+  }
+  .yahoo-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: #6e6e73;
+  }
+  .yahoo-nav-item.yahoo-nav-active {
+    color: #1565f9;
+  }
+  .yahoo-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Yahoo open email */
+  .yahoo-email-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #fff;
+  }
+  .yahoo-email-nav-icon {
+    width: 22px;
+    height: 22px;
+    color: #1d1d1f;
+  }
+  .yahoo-email-nav-right {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .yahoo-email-scroll {
+    flex: 1;
+    overflow: hidden;
+    background: #fff;
+  }
+  .yahoo-email-subject {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1d1d1f;
+    padding: 4px 16px 12px;
+    line-height: 1.3;
+  }
+  .yahoo-email-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 16px 12px;
+  }
+  .yahoo-email-meta {
+    flex: 1;
+    min-width: 0;
+  }
+  .yahoo-email-sender-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;
+  }
+  .yahoo-email-detail {
+    font-size: 13px;
+    color: #6e6e73;
+  }
+  .yahoo-email-time-star {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .yahoo-email-time {
+    font-size: 13px;
+    color: #6e6e73;
+  }
+  .yahoo-email-body {
+    padding: 4px 16px 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1d1d1f;
+    background: #fff;
+  }
+  .yahoo-email-body p { margin-bottom: 10px; }
+  .yahoo-email-signature {
+    font-size: 14px;
+    color: #6e6e73;
+    margin: 0 16px;
+    padding: 12px 0;
+    border-top: 0.5px solid #e5e5ea;
+    line-height: 1.4;
+    background: #fff;
+  }
+
+  /* Yahoo bottom toolbar */
+  .yahoo-toolbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0 14px;
+    border-top: 0.5px solid #e5e5ea;
+    background: #fff;
+  }
+  .yahoo-toolbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: #6e6e73;
+  }
+  .yahoo-toolbar-icon {
+    width: 22px;
+    height: 22px;
+    color: #6e6e73;
+  }
+
+  /* ======================================== */
+  /* YAHOO MAIL DESKTOP                       */
+  /* ======================================== */
+
+  .yahoo-desktop-inbox {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+  .yahoo-desktop-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid #f1f3f4;
+    gap: 8px;
+    min-height: 40px;
+  }
+  .yahoo-desktop-row:last-child { border-bottom: none; }
+  .yahoo-desktop-checkbox {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #5f6368;
+  }
+  .yahoo-desktop-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+  .yahoo-desktop-dot-fill {
+    width: 8px;
+    height: 8px;
+    background: #1565f9;
+    border-radius: 50%;
+  }
+  .yahoo-desktop-sender {
+    font-size: 14px;
+    font-weight: 400;
+    color: #202124;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 120px;
+  }
+  .yahoo-desktop-row.yahoo-desktop-unread .yahoo-desktop-sender {
+    font-weight: 700;
+  }
+  .yahoo-desktop-star {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: #c7c7cc;
+  }
+  .yahoo-desktop-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    overflow: hidden;
+  }
+  .yahoo-desktop-subject {
+    font-size: 14px;
+    color: #202124;
+    white-space: nowrap;
+    font-weight: 400;
+  }
+  .yahoo-desktop-row.yahoo-desktop-unread .yahoo-desktop-subject {
+    font-weight: 700;
+  }
+  .yahoo-desktop-preview-text {
+    font-size: 14px;
+    color: #5f6368;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .yahoo-desktop-time {
+    font-size: 12px;
+    color: #5f6368;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Yahoo desktop open email */
+  .yahoo-desktop-email {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    margin-top: 24px;
+    overflow: hidden;
+  }
+  .yahoo-desktop-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-bottom: 1px solid #e8eaed;
+    font-size: 13px;
+    color: #5f6368;
+  }
+  .yahoo-desktop-toolbar-icon {
+    width: 20px;
+    height: 20px;
+    color: #5f6368;
+    flex-shrink: 0;
+  }
+  .yahoo-desktop-toolbar-label {
+    font-size: 13px;
+    color: #5f6368;
+    margin-right: 10px;
+  }
+  .yahoo-desktop-toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #e8eaed;
+    margin: 0 6px;
+  }
+
+  /* Brand banner */
+  .yahoo-brand-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e8eaed;
+  }
+  .yahoo-brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .yahoo-brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .yahoo-brand-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .yahoo-brand-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #202124;
+  }
+  .yahoo-brand-url {
+    font-size: 13px;
+    color: #1a73e8;
+  }
+  .yahoo-brand-visit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 18px;
+    background: #1565f9;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  /* Subject area */
+  .yahoo-desktop-subject-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px 8px;
+    font-size: 18px;
+    color: #202124;
+  }
+  .yahoo-desktop-subject-dot {
+    width: 8px;
+    height: 8px;
+    background: #5f6368;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .yahoo-desktop-subject-text {
+    flex: 1;
+  }
+  .yahoo-desktop-subject-folder {
+    font-size: 12px;
+    color: #5f6368;
+    flex-shrink: 0;
+  }
+  .yahoo-desktop-subject-star {
+    width: 20px;
+    height: 20px;
+    color: #c7c7cc;
+    flex-shrink: 0;
+  }
+
+  /* Sender details */
+  .yahoo-desktop-sender-area {
+    padding: 10px 20px 16px;
+    border-bottom: 1px solid #e8eaed;
+  }
+  .yahoo-desktop-sender-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .yahoo-desktop-sender-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .yahoo-desktop-sender-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .yahoo-desktop-sender-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .yahoo-desktop-sender-name-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+  }
+  .yahoo-desktop-sender-name-bold {
+    font-weight: 600;
+    color: #202124;
+  }
+  .yahoo-desktop-verified-badge {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .yahoo-desktop-sender-url {
+    font-size: 13px;
+    color: #1a73e8;
+  }
+  .yahoo-desktop-sender-from {
+    font-size: 13px;
+    color: #5f6368;
+  }
+  .yahoo-desktop-sender-to {
+    font-size: 13px;
+    color: #5f6368;
+  }
+  .yahoo-desktop-sender-date {
+    font-size: 13px;
+    color: #5f6368;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  /* Email body & signature */
+  .yahoo-desktop-body {
+    padding: 20px 24px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3c4043;
+  }
+  .yahoo-desktop-body p { margin-bottom: 12px; }
+  .yahoo-desktop-sig {
+    font-size: 13px;
+    color: #5f6368;
+    border-top: 1px solid #e8eaed;
+    margin: 0 24px;
+    padding: 16px 0;
+    line-height: 1.5;
+  }
+
+  /* Bottom reply icons */
+  .yahoo-desktop-reply-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-top: 1px solid #e8eaed;
+  }
+  .yahoo-desktop-reply-icon {
+    width: 24px;
+    height: 24px;
+    color: #5f6368;
+  }
+
+  /* ======================================== */
   /* DARK MODE OVERRIDES                      */
   /* ======================================== */
 
@@ -599,10 +1236,18 @@
   .dark-mode .inbox-time {
     color: #9aa0a6;
   }
-  .dark-mode .unread-dot-fill {
-    background: #8ab4f8;
+  .dark-mode .inbox-checkbox {
+    color: #9aa0a6;
   }
-
+  .dark-mode .inbox-star {
+    color: #9aa0a6;
+  }
+  .dark-mode .inbox-important {
+    color: #5f6368;
+  }
+  .dark-mode .email-subject-star {
+    color: #9aa0a6;
+  }
   .dark-mode .email-view {
     background: #292929;
     box-shadow: 0 1px 3px rgba(0,0,0,.3);
@@ -675,6 +1320,9 @@
   .dark-mode .mobile-time {
     color: #9aa0a6;
   }
+  .dark-mode .mobile-star {
+    color: #9aa0a6;
+  }
 
   .dark-mode .mobile-bottom-nav {
     background: #1f1f1f;
@@ -731,6 +1379,214 @@
     color: #9aa0a6;
   }
   .dark-mode .mobile-reply-icon {
+    color: #9aa0a6;
+  }
+
+  /* Yahoo desktop dark mode */
+  .dark-mode .yahoo-desktop-inbox {
+    background: #292929;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  .dark-mode .yahoo-desktop-row {
+    border-bottom-color: #3c4043;
+  }
+  .dark-mode .yahoo-desktop-sender {
+    color: #e8eaed;
+  }
+  .dark-mode .yahoo-desktop-subject {
+    color: #e8eaed;
+  }
+  .dark-mode .yahoo-desktop-preview-text {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-time {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-checkbox {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-star {
+    color: #5f6368;
+  }
+  .dark-mode .yahoo-desktop-email {
+    background: #292929;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  .dark-mode .yahoo-desktop-toolbar {
+    border-bottom-color: #3c4043;
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-toolbar-icon {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-toolbar-label {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-toolbar-sep {
+    background: #3c4043;
+  }
+  .dark-mode .yahoo-brand-banner {
+    border-bottom-color: #3c4043;
+  }
+  .dark-mode .yahoo-brand-name {
+    color: #e8eaed;
+  }
+  .dark-mode .yahoo-brand-url {
+    color: #8ab4f8;
+  }
+  .dark-mode .yahoo-desktop-subject-line {
+    color: #e8eaed;
+  }
+  .dark-mode .yahoo-desktop-subject-folder {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-subject-star {
+    color: #5f6368;
+  }
+  .dark-mode .yahoo-desktop-sender-area {
+    border-bottom-color: #3c4043;
+  }
+  .dark-mode .yahoo-desktop-sender-name-bold {
+    color: #e8eaed;
+  }
+  .dark-mode .yahoo-desktop-sender-url {
+    color: #8ab4f8;
+  }
+  .dark-mode .yahoo-desktop-sender-from {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-sender-to {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-sender-date {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-desktop-body {
+    color: #bdc1c6;
+  }
+  .dark-mode .yahoo-desktop-sig {
+    color: #9aa0a6;
+    border-top-color: #3c4043;
+  }
+  .dark-mode .yahoo-desktop-reply-bar {
+    border-top-color: #3c4043;
+  }
+  .dark-mode .yahoo-desktop-reply-icon {
+    color: #9aa0a6;
+  }
+
+  /* Yahoo Mail mobile dark mode */
+  .dark-mode .yahoo-screen {
+    background: #101518;
+  }
+  .dark-mode .yahoo-top-bar {
+    background: #101518;
+  }
+  .dark-mode .yahoo-top-title-text {
+    color: #fff;
+  }
+  .dark-mode .yahoo-top-title-sub {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-top-icon {
+    color: #fff;
+  }
+  .dark-mode .yahoo-categories {
+    background: #101518;
+  }
+  .dark-mode .yahoo-cat-pill {
+    background: #1e2328;
+    color: #ccc;
+  }
+  .dark-mode .yahoo-cat-pill.yahoo-cat-active {
+    background: #1565f9;
+    color: #fff;
+  }
+  .dark-mode .yahoo-section-header {
+    background: #101518;
+  }
+  .dark-mode .yahoo-section-circle {
+    border-color: #4a5568;
+  }
+  .dark-mode .yahoo-section-label {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-section-edit {
+    color: #6ea8fe;
+  }
+  .dark-mode .yahoo-inbox-row {
+    background: #101518;
+    border-top-color: #1e2328;
+  }
+  .dark-mode .yahoo-sender-name {
+    color: #fff;
+  }
+  .dark-mode .yahoo-subject {
+    color: #e0e0e0;
+  }
+  .dark-mode .yahoo-preview {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-time {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-star {
+    color: #4a5568;
+  }
+  .dark-mode .yahoo-unread-dot {
+    background: #6ea8fe;
+  }
+  .dark-mode .yahoo-bottom-nav {
+    background: #0c0f12;
+    border-top-color: #1e2328;
+  }
+  .dark-mode .yahoo-nav-item {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-nav-item.yahoo-nav-active {
+    color: #6ea8fe;
+  }
+  .dark-mode .yahoo-email-nav {
+    background: #101518;
+  }
+  .dark-mode .yahoo-email-nav-icon {
+    color: #fff;
+  }
+  .dark-mode .yahoo-email-scroll {
+    background: #101518;
+  }
+  .dark-mode .yahoo-email-subject {
+    color: #fff;
+  }
+  .dark-mode .yahoo-email-header {
+    background: #101518;
+  }
+  .dark-mode .yahoo-email-sender-name {
+    color: #fff;
+  }
+  .dark-mode .yahoo-email-detail {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-email-time {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-email-body {
+    color: #e0e0e0;
+    background: #101518;
+  }
+  .dark-mode .yahoo-email-signature {
+    color: #9aa0a6;
+    border-top-color: #1e2328;
+    background: #101518;
+  }
+  .dark-mode .yahoo-toolbar {
+    background: #0c0f12;
+    border-top-color: #1e2328;
+  }
+  .dark-mode .yahoo-toolbar-item {
+    color: #9aa0a6;
+  }
+  .dark-mode .yahoo-toolbar-icon {
     color: #9aa0a6;
   }
 </style>
@@ -810,16 +1666,19 @@
         <div class="mobile-row-content">
           <div class="mobile-row-top">
             <span class="mobile-sender-name">{{ company }}</span>
+            {% if show_checkmark %}
             <svg width="14" height="14" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
               <circle cx="8" cy="8" r="8" fill="#1a73e8"/>
               <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white"
                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
+            {% endif %}
             <span class="mobile-time">{{ inbox_time | default("10:42 AM") }}</span>
           </div>
           <div class="mobile-subject">{{ inbox_subject | default("Your account security update for " + domain) }}</div>
           <div class="mobile-preview">{{ inbox_preview | default("We wanted to let you know about important changes to our platform that affect your account...") }}</div>
         </div>
+        <svg class="mobile-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
       </div>
 
       {# Row 2: Generic sender #}
@@ -835,6 +1694,7 @@
           <div class="mobile-subject">{{ other_sender_1_subject | default("Re: Q2 planning doc") }}</div>
           <div class="mobile-preview">{{ other_sender_1_preview | default("Looks good to me. I added a few comments on the timeline section...") }}</div>
         </div>
+        <svg class="mobile-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
       </div>
 
       {# Row 3: Generic sender #}
@@ -850,6 +1710,7 @@
           <div class="mobile-subject">{{ other_sender_2_subject | default("Lunch Thursday?") }}</div>
           <div class="mobile-preview">{{ other_sender_2_preview | default("Hey, are you free Thursday around noon? There's a new place on 5th...") }}</div>
         </div>
+        <svg class="mobile-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
       </div>
 
       {# Row 4: Generic sender #}
@@ -865,6 +1726,7 @@
           <div class="mobile-subject">{{ other_sender_3_subject | default("New comment on Project Atlas task #204") }}</div>
           <div class="mobile-preview">{{ other_sender_3_preview | default("Jamie left a comment: 'Updated the wireframes, ready for review...'") }}</div>
         </div>
+        <svg class="mobile-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
       </div>
 
       {# -- Bottom navigation bar -- #}
@@ -934,18 +1796,25 @@
         </div>
       </div>
 
-      {# -- Email toolbar (back, archive, delete, more) -- #}
+      {# -- Email toolbar (back, archive, delete, mark-unread, more) -- #}
       <div class="mobile-email-toolbar">
         <svg class="mobile-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
         </svg>
         <div class="mobile-toolbar-spacer"></div>
+        {# Archive #}
+        <svg class="mobile-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/>
+        </svg>
+        {# Delete #}
         <svg class="mobile-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/>
         </svg>
+        {# Mark unread #}
         <svg class="mobile-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
         </svg>
+        {# More (three dots) #}
         <svg class="mobile-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
         </svg>
@@ -965,11 +1834,13 @@
           <div class="mobile-email-meta">
             <div class="mobile-email-sender-row">
               <span class="mobile-email-sender-name">{{ company }}</span>
+              {% if show_checkmark %}
               <svg width="14" height="14" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
                 <circle cx="8" cy="8" r="8" fill="#1a73e8"/>
                 <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white"
                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
+              {% endif %}
               <span class="mobile-email-time">{{ email_time | default("10:42 AM (1 hour ago)") }}</span>
             </div>
             <div class="mobile-email-detail">&lt;<span id="mobile-sender-email"></span>&gt;</div>
@@ -1022,6 +1893,316 @@
   </div>{# /.mobile-phones #}
 
   {# ================================================================== #}
+  {# YAHOO MAIL iOS                                                      #}
+  {# ================================================================== #}
+  <div class="section-label">Yahoo Mail</div>
+  <div class="mobile-phones">
+
+  {# ---- Phone 1: Inbox ---- #}
+  <div class="yahoo-phone">
+    <div class="yahoo-screen">
+
+      {# -- Status bar -- #}
+      <div class="mobile-status-bar">
+        <span>{{ status_bar_time }}</span>
+        <div class="mobile-dynamic-island"></div>
+        <div class="mobile-status-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <rect x="0" y="9" width="3" height="3" rx="0.5" fill="#202124"/>
+            <rect x="4" y="6" width="3" height="6" rx="0.5" fill="#202124"/>
+            <rect x="8" y="3" width="3" height="9" rx="0.5" fill="#202124"/>
+            <rect x="12" y="0" width="3" height="12" rx="0.5" fill="#202124"/>
+          </svg>
+          <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
+            <path d="M7 11a1 1 0 100-2 1 1 0 000 2z" fill="#202124"/>
+            <path d="M3.5 7.5a5 5 0 017 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M1 5a8 8 0 0112 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none">
+            <rect x="0.5" y="0.5" width="19" height="11" rx="2" stroke="#202124" fill="none" stroke-width="1"/>
+            <rect x="20" y="3.5" width="2" height="5" rx="1" fill="#202124"/>
+            <rect x="2" y="2" width="14" height="8" rx="1" fill="#202124"/>
+          </svg>
+        </div>
+      </div>
+
+      {# -- Top bar -- #}
+      <div class="yahoo-top-bar">
+        <div class="yahoo-user-avatar">SW</div>
+        <div class="yahoo-top-title">
+          <span class="yahoo-top-title-text">Inbox</span>
+          <span class="yahoo-top-title-sub">1 unread</span>
+        </div>
+        <div class="yahoo-top-actions">
+          {# Filter #}
+          <svg class="yahoo-top-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M3 6h18M7 12h10M10 18h4"/>
+          </svg>
+          {# Pen/compose #}
+          <svg class="yahoo-top-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3l4 4L7 21H3v-4L17 3z"/>
+          </svg>
+          {# Search #}
+          <svg class="yahoo-top-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="10.5" cy="10.5" r="7"/>
+            <path d="M15.5 15.5L21 21"/>
+          </svg>
+        </div>
+      </div>
+
+      {# -- Category pills -- #}
+      <div class="yahoo-categories">
+        <div class="yahoo-cat-pill">All</div>
+        <div class="yahoo-cat-pill yahoo-cat-active">Primary</div>
+        <div class="yahoo-cat-pill">Offers</div>
+        <div class="yahoo-cat-pill">Other</div>
+      </div>
+
+      {# -- Section header -- #}
+      <div class="yahoo-section-header">
+        <div class="yahoo-section-circle"></div>
+        <span class="yahoo-section-label">Today</span>
+        <span class="yahoo-section-edit">Edit</span>
+      </div>
+
+      {# -- Inbox rows -- #}
+
+      {# Row 1: BIMI sender (unread) #}
+      <div class="yahoo-inbox-row yahoo-unread">
+        <div class="yahoo-avatar">
+          {% if show_checkmark %}
+          <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+          {% else %}
+          <div style="width:100%;height:100%;background:#e8a030;display:flex;align-items:center;justify-content:center;">
+            {{ company[0] | upper }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="yahoo-row-content">
+          <div class="yahoo-row-top">
+            <div class="yahoo-unread-dot"></div>
+            <span class="yahoo-sender-name">{{ company }}</span>
+            <span class="yahoo-time">{{ inbox_time | default("10:42 AM") }}</span>
+          </div>
+          <div class="yahoo-subject">{{ inbox_subject | default("Your account security update for " + domain) }}</div>
+          <div class="yahoo-preview">{{ inbox_preview | default("We wanted to let you know about important changes to our platform that affect your account...") }}</div>
+        </div>
+        <svg class="yahoo-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      </div>
+
+      {# Row 2: Generic sender #}
+      <div class="yahoo-inbox-row">
+        <div class="yahoo-avatar" style="background:#7b68ee;">
+          {{ other_sender_1_initial | default("S") }}
+        </div>
+        <div class="yahoo-row-content">
+          <div class="yahoo-row-top">
+            <span class="yahoo-sender-name">{{ other_sender_1_name | default("Sarah Chen") }}</span>
+            <span class="yahoo-time">{{ other_sender_1_time | default("9:15 AM") }}</span>
+          </div>
+          <div class="yahoo-subject">{{ other_sender_1_subject | default("Re: Q2 planning doc") }}</div>
+          <div class="yahoo-preview">{{ other_sender_1_preview | default("Looks good to me. I added a few comments on the timeline section...") }}</div>
+        </div>
+        <svg class="yahoo-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      </div>
+
+      {# Row 3: Generic sender #}
+      <div class="yahoo-inbox-row">
+        <div class="yahoo-avatar" style="background:#e8a030;">
+          {{ other_sender_2_initial | default("M") }}
+        </div>
+        <div class="yahoo-row-content">
+          <div class="yahoo-row-top">
+            <span class="yahoo-sender-name">{{ other_sender_2_name | default("Mike Torres") }}</span>
+            <span class="yahoo-time">{{ other_sender_2_time | default("Yesterday") }}</span>
+          </div>
+          <div class="yahoo-subject">{{ other_sender_2_subject | default("Lunch Thursday?") }}</div>
+          <div class="yahoo-preview">{{ other_sender_2_preview | default("Hey, are you free Thursday around noon? There's a new place on 5th...") }}</div>
+        </div>
+        <svg class="yahoo-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      </div>
+
+      {# Row 4: Generic sender #}
+      <div class="yahoo-inbox-row">
+        <div class="yahoo-avatar" style="background:#aaa;">
+          {{ other_sender_3_initial | default("T") }}
+        </div>
+        <div class="yahoo-row-content">
+          <div class="yahoo-row-top">
+            <span class="yahoo-sender-name">{{ other_sender_3_name | default("Teamwork") }}</span>
+            <span class="yahoo-time">{{ other_sender_3_time | default("Mar 28") }}</span>
+          </div>
+          <div class="yahoo-subject">{{ other_sender_3_subject | default("New comment on Project Atlas task #204") }}</div>
+          <div class="yahoo-preview">{{ other_sender_3_preview | default("Jamie left a comment: 'Updated the wireframes, ready for review...'") }}</div>
+        </div>
+        <svg class="yahoo-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      </div>
+
+      {# -- Bottom nav -- #}
+      <div class="yahoo-bottom-nav">
+        <div class="yahoo-nav-item yahoo-nav-active">
+          <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+          <span>Inbox</span>
+        </div>
+        <div class="yahoo-nav-item">
+          <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+          </svg>
+          <span>Contacts</span>
+        </div>
+        <div class="yahoo-nav-item">
+          <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zm-8-2l4-4-1.41-1.41L13 12.17V8h-2v4.17l-1.59-1.58L8 12l4 4z"/>
+          </svg>
+          <span>Unsubscribe</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {# ---- Phone 2: Open Email ---- #}
+  <div class="yahoo-phone">
+    <div class="yahoo-screen">
+
+      {# -- Status bar -- #}
+      <div class="mobile-status-bar">
+        <span>{{ status_bar_time }}</span>
+        <div class="mobile-dynamic-island"></div>
+        <div class="mobile-status-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <rect x="0" y="9" width="3" height="3" rx="0.5" fill="#202124"/>
+            <rect x="4" y="6" width="3" height="6" rx="0.5" fill="#202124"/>
+            <rect x="8" y="3" width="3" height="9" rx="0.5" fill="#202124"/>
+            <rect x="12" y="0" width="3" height="12" rx="0.5" fill="#202124"/>
+          </svg>
+          <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
+            <path d="M7 11a1 1 0 100-2 1 1 0 000 2z" fill="#202124"/>
+            <path d="M3.5 7.5a5 5 0 017 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M1 5a8 8 0 0112 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none">
+            <rect x="0.5" y="0.5" width="19" height="11" rx="2" stroke="#202124" fill="none" stroke-width="1"/>
+            <rect x="20" y="3.5" width="2" height="5" rx="1" fill="#202124"/>
+            <rect x="2" y="2" width="14" height="8" rx="1" fill="#202124"/>
+          </svg>
+        </div>
+      </div>
+
+      {# -- Email nav bar -- #}
+      <div class="yahoo-email-nav">
+        <svg class="yahoo-email-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        <div class="yahoo-email-nav-right">
+          {# Share #}
+          <svg class="yahoo-email-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/>
+          </svg>
+          {# Text size #}
+          <svg class="yahoo-email-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/>
+          </svg>
+        </div>
+      </div>
+
+      {# -- Scrollable email content -- #}
+      <div class="yahoo-email-scroll">
+
+        {# -- Subject -- #}
+        <div class="yahoo-email-subject">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
+
+        {# -- Sender header -- #}
+        <div class="yahoo-email-header">
+          <div class="yahoo-avatar">
+            {% if show_checkmark %}
+            <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+            {% else %}
+            <div style="width:100%;height:100%;background:#e8a030;display:flex;align-items:center;justify-content:center;">
+              {{ company[0] | upper }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="yahoo-email-meta">
+            <span class="yahoo-email-sender-name">{{ company }}</span>
+            <div class="yahoo-email-detail">To: Me &#x25BE;</div>
+          </div>
+          <div class="yahoo-email-time-star">
+            <span class="yahoo-email-time">{{ inbox_time | default("10:42 AM") }}</span>
+            <svg class="yahoo-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+          </div>
+        </div>
+
+        {# -- Email body -- #}
+        <div class="yahoo-email-body">
+          {% if email_body %}
+            {{ email_body | safe }}
+          {% else %}
+            <p>Hi there,</p>
+            <p>
+              We're writing to let you know about recent updates to the {{ company }} platform
+              that may affect how you use our {{ industry | lower }} services. As part of our ongoing
+              commitment to security and reliability, we've made several enhancements to our
+              infrastructure.
+            </p>
+            <p>
+              If you have any questions about these changes, please don't hesitate to reach out
+              to our support team. We're here to help.
+            </p>
+          {% endif %}
+        </div>
+
+        {# -- Signature -- #}
+        <div class="yahoo-email-signature">
+          Best regards,<br>
+          The {{ company }} Team<br>
+          <span class="yahoo-sig-email"></span>
+        </div>
+
+      </div>{# /.yahoo-email-scroll #}
+
+      {# -- Bottom toolbar -- #}
+      <div class="yahoo-toolbar">
+        <div class="yahoo-toolbar-item">
+          <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14"/>
+          </svg>
+          <span>Delete</span>
+        </div>
+        <div class="yahoo-toolbar-item">
+          <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/>
+          </svg>
+          <span>Reply</span>
+        </div>
+        <div class="yahoo-toolbar-item">
+          <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 9V5l7 7-7 7v-4c-5 0-8.5 1.6-11 5 1-5 4-10 11-11z"/>
+          </svg>
+          <span>Forward</span>
+        </div>
+        <div class="yahoo-toolbar-item">
+          <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18v13H3V6zM3 6l3-3h4l3 3M13 11l4 4m0-4l-4 4"/>
+          </svg>
+          <span>Move</span>
+        </div>
+        <div class="yahoo-toolbar-item">
+          <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+          <span>More</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  </div>{# /.mobile-phones (yahoo) #}
+
+  {# ================================================================== #}
   {# GMAIL INBOX LIST VIEW                                               #}
   {# ================================================================== #}
   <div class="section-label">Gmail Desktop</div>
@@ -1029,10 +2210,9 @@
 
     {# --- Row 1: The BIMI-verified sender (unread, top row) --- #}
     <div class="inbox-row unread">
-      <div class="unread-dot"><div class="unread-dot-fill"></div></div>
-      <div class="avatar">
-        <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
-      </div>
+      <svg class="inbox-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <svg class="inbox-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <svg class="inbox-important" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 21V3l11 9L1 21z"/></svg>
       <div class="inbox-content">
         <span class="sender-name">{{ company }}</span>
         <span class="subject-sep">&mdash;</span>
@@ -1050,10 +2230,9 @@
 
     {# --- Row 2: Generic sender --- #}
     <div class="inbox-row">
-      <div class="unread-dot"></div>
-      <div class="avatar" style="background:#7baaf7;">
-        {{ other_sender_1_initial | default("S") }}
-      </div>
+      <svg class="inbox-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <svg class="inbox-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <svg class="inbox-important" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 21V3l11 9L1 21z"/></svg>
       <div class="inbox-content">
         <span class="sender-name">{{ other_sender_1_name | default("Sarah Chen") }}</span>
         <span class="subject-sep">&mdash;</span>
@@ -1066,10 +2245,9 @@
 
     {# --- Row 3: Generic sender --- #}
     <div class="inbox-row">
-      <div class="unread-dot"></div>
-      <div class="avatar" style="background:#f5a623;">
-        {{ other_sender_2_initial | default("M") }}
-      </div>
+      <svg class="inbox-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <svg class="inbox-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <svg class="inbox-important" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 21V3l11 9L1 21z"/></svg>
       <div class="inbox-content">
         <span class="sender-name">{{ other_sender_2_name | default("Mike Torres") }}</span>
         <span class="subject-sep">&mdash;</span>
@@ -1082,10 +2260,9 @@
 
     {# --- Row 4: Generic sender --- #}
     <div class="inbox-row">
-      <div class="unread-dot"></div>
-      <div class="avatar" style="background:#aaa;">
-        {{ other_sender_3_initial | default("T") }}
-      </div>
+      <svg class="inbox-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <svg class="inbox-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <svg class="inbox-important" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 21V3l11 9L1 21z"/></svg>
       <div class="inbox-content">
         <span class="sender-name">{{ other_sender_3_name | default("Teamwork") }}</span>
         <span class="subject-sep">&mdash;</span>
@@ -1102,7 +2279,10 @@
   {# OPEN EMAIL VIEW                                                     #}
   {# ================================================================== #}
   <div class="email-view">
-    <div class="email-subject-line">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
+    <div class="email-subject-line">
+      <span class="email-subject-text">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</span>
+      <svg class="email-subject-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+    </div>
     <div class="email-header">
       <div class="email-avatar">
         <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
@@ -1110,12 +2290,14 @@
       <div class="email-meta">
         <div class="email-sender-row">
           <span class="email-sender-name">{{ company }}</span>
-          {# Gmail blue verified checkmark #}
+          {% if show_checkmark %}
+          {# Gmail blue verified checkmark (VMC only) #}
           <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
             <circle cx="8" cy="8" r="8" fill="#1a73e8"/>
             <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white"
               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          {% endif %}
         </div>
         {# Email address constructed via JS to avoid Cloudflare obfuscation #}
         <div class="email-sender-addr">&lt;<span id="sender-email"></span>&gt;</div>
@@ -1152,6 +2334,177 @@
   </div>
 
   {# ================================================================== #}
+  {# YAHOO MAIL DESKTOP                                                  #}
+  {# ================================================================== #}
+  <div class="section-label">Yahoo Mail Desktop</div>
+  <div class="yahoo-desktop-inbox">
+
+    {# --- Row 1: BIMI sender (unread) --- #}
+    <div class="yahoo-desktop-row yahoo-desktop-unread">
+      <svg class="yahoo-desktop-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <div class="yahoo-desktop-dot"><div class="yahoo-desktop-dot-fill"></div></div>
+      <span class="yahoo-desktop-sender">{{ company }}</span>
+      <svg class="yahoo-desktop-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <div class="yahoo-desktop-content">
+        <span class="yahoo-desktop-subject">{{ inbox_subject | default("Your account security update for " + domain) }}</span>
+        <span class="yahoo-desktop-preview-text">{{ inbox_preview | default("We wanted to let you know about important changes to our platform that affect your account...") }}</span>
+      </div>
+      <span class="yahoo-desktop-time">{{ inbox_time | default("10:42 AM") }}</span>
+    </div>
+
+    {# --- Row 2 --- #}
+    <div class="yahoo-desktop-row">
+      <svg class="yahoo-desktop-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <div class="yahoo-desktop-dot"></div>
+      <span class="yahoo-desktop-sender">{{ other_sender_1_name | default("Sarah Chen") }}</span>
+      <svg class="yahoo-desktop-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <div class="yahoo-desktop-content">
+        <span class="yahoo-desktop-subject">{{ other_sender_1_subject | default("Re: Q2 planning doc") }}</span>
+        <span class="yahoo-desktop-preview-text">{{ other_sender_1_preview | default("Looks good to me. I added a few comments on the timeline section...") }}</span>
+      </div>
+      <span class="yahoo-desktop-time">{{ other_sender_1_time | default("9:15 AM") }}</span>
+    </div>
+
+    {# --- Row 3 --- #}
+    <div class="yahoo-desktop-row">
+      <svg class="yahoo-desktop-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <div class="yahoo-desktop-dot"></div>
+      <span class="yahoo-desktop-sender">{{ other_sender_2_name | default("Mike Torres") }}</span>
+      <svg class="yahoo-desktop-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <div class="yahoo-desktop-content">
+        <span class="yahoo-desktop-subject">{{ other_sender_2_subject | default("Lunch Thursday?") }}</span>
+        <span class="yahoo-desktop-preview-text">{{ other_sender_2_preview | default("Hey, are you free Thursday around noon? There's a new place on 5th...") }}</span>
+      </div>
+      <span class="yahoo-desktop-time">{{ other_sender_2_time | default("Yesterday") }}</span>
+    </div>
+
+    {# --- Row 4 --- #}
+    <div class="yahoo-desktop-row">
+      <svg class="yahoo-desktop-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <div class="yahoo-desktop-dot"></div>
+      <span class="yahoo-desktop-sender">{{ other_sender_3_name | default("Teamwork") }}</span>
+      <svg class="yahoo-desktop-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <div class="yahoo-desktop-content">
+        <span class="yahoo-desktop-subject">{{ other_sender_3_subject | default("New comment on Project Atlas task #204") }}</span>
+        <span class="yahoo-desktop-preview-text">{{ other_sender_3_preview | default("Jamie left a comment: 'Updated the wireframes, ready for review...'") }}</span>
+      </div>
+      <span class="yahoo-desktop-time">{{ other_sender_3_time | default("Mar 28") }}</span>
+    </div>
+
+  </div>
+
+  {# ================================================================== #}
+  {# YAHOO DESKTOP OPEN EMAIL                                            #}
+  {# ================================================================== #}
+  <div class="yahoo-desktop-email">
+
+    {# -- Toolbar -- #}
+    <div class="yahoo-desktop-toolbar">
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      <span class="yahoo-desktop-toolbar-label">Back</span>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/></svg>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6zM17 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6z"/></svg>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5l7 7-7 7v-4c-5 0-8.5 1.6-11 5 1-5 4-10 11-11z"/></svg>
+      <div class="yahoo-desktop-toolbar-sep"></div>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+      <span class="yahoo-desktop-toolbar-label">Archive</span>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H5v2h4v-2zm10 0h-4v2h4v-2zM5 14v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6H5zm4 6H7v-4h2v4zm4 0h-2v-4h2v4zm4 0h-2v-4h2v4z"/></svg>
+      <span class="yahoo-desktop-toolbar-label">Move</span>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
+      <span class="yahoo-desktop-toolbar-label">Delete</span>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1.41-1.41L13.17 12 9.59 8.41 11 7l5 5-5 5z"/></svg>
+      <span class="yahoo-desktop-toolbar-label">Spam</span>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    </div>
+
+    {# -- Brand banner (VMC only) -- #}
+    {% if show_checkmark %}
+    <div class="yahoo-brand-banner">
+      <div class="yahoo-brand-logo">
+        <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+      </div>
+      <div class="yahoo-brand-info">
+        <div class="yahoo-brand-name">{{ company }}</div>
+        <div class="yahoo-brand-url">www.{{ domain }}</div>
+      </div>
+      <a class="yahoo-brand-visit" href="#">Visit site &rarr;</a>
+    </div>
+    {% endif %}
+
+    {# -- Subject line -- #}
+    <div class="yahoo-desktop-subject-line">
+      <div class="yahoo-desktop-subject-dot"></div>
+      <span class="yahoo-desktop-subject-text">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</span>
+      <span class="yahoo-desktop-subject-folder">Yahoo/Inbox</span>
+      <svg class="yahoo-desktop-subject-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+    </div>
+
+    {# -- Sender details -- #}
+    <div class="yahoo-desktop-sender-area">
+      <div class="yahoo-desktop-sender-row">
+        <div class="yahoo-desktop-sender-logo">
+          {% if show_checkmark %}
+          <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+          {% else %}
+          <div style="width:100%;height:100%;background:#e8a030;display:flex;align-items:center;justify-content:center;">
+            {{ company[0] | upper }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="yahoo-desktop-sender-info">
+          <div class="yahoo-desktop-sender-name-row">
+            <span class="yahoo-desktop-sender-name-bold">{{ company }}</span>
+            {% if show_checkmark %}
+            <svg class="yahoo-desktop-verified-badge" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="8" r="8" fill="#6c63ff"/>
+              <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {% endif %}
+            <span class="yahoo-desktop-sender-url">www.{{ domain }} &#x203A;</span>
+          </div>
+          <div class="yahoo-desktop-sender-from">From: <span class="yahoo-desktop-from-email"></span></div>
+          <div class="yahoo-desktop-sender-to">To: <span class="yahoo-desktop-to-email"></span></div>
+        </div>
+        <div class="yahoo-desktop-sender-date">{{ email_time | default("10:42 AM (1 hour ago)") }}</div>
+      </div>
+    </div>
+
+    {# -- Email body -- #}
+    <div class="yahoo-desktop-body">
+      {% if email_body %}
+        {{ email_body | safe }}
+      {% else %}
+        <p>Hi there,</p>
+        <p>
+          We're writing to let you know about recent updates to the {{ company }} platform
+          that may affect how you use our {{ industry | lower }} services. As part of our ongoing
+          commitment to security and reliability, we've made several enhancements to our
+          infrastructure.
+        </p>
+        <p>
+          If you have any questions about these changes, please don't hesitate to reach out
+          to our support team. We're here to help.
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="yahoo-desktop-sig">
+      Best regards,<br>
+      The {{ company }} Team<br>
+      <span class="yahoo-desktop-sig-email"></span>
+    </div>
+
+    {# -- Bottom reply icons -- #}
+    <div class="yahoo-desktop-reply-bar">
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6zM17 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5l7 7-7 7v-4c-5 0-8.5 1.6-11 5 1-5 4-10 11-11z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    </div>
+
+  </div>
+
+  {# ================================================================== #}
   {# LLM content generation note                                        #}
   {# ================================================================== #}
   <div class="llm-banner">
@@ -1160,7 +2513,7 @@
     <a href="{{ url_for('prompt_page') }}">View the prompt used to generate it.</a>
   </div>
   <div class="llm-banner">
-    This preview shows Gmail's rendering. A BIMI SVG works with any
+    This preview shows Gmail and Yahoo Mail rendering. A BIMI SVG works with any
     <a href="https://bimigroup.org/bimi-infographic/" target="_blank" rel="noopener">supporting mailbox provider</a>.
   </div>
 
@@ -1177,10 +2530,24 @@
     document.getElementById('mobile-sender-email').textContent = addr;
     document.getElementById('mobile-sig-email').textContent = addr;
 
+    // Yahoo Mail email addresses
+    var yahooSigs = document.querySelectorAll('.yahoo-sig-email');
+    for (var i = 0; i < yahooSigs.length; i++) yahooSigs[i].textContent = addr;
+    var yahooDesktopSigs = document.querySelectorAll('.yahoo-desktop-sig-email');
+    for (var i = 0; i < yahooDesktopSigs.length; i++) yahooDesktopSigs[i].textContent = addr;
+    var yahooFromEmails = document.querySelectorAll('.yahoo-desktop-from-email');
+    for (var i = 0; i < yahooFromEmails.length; i++) yahooFromEmails[i].textContent = addr;
+    var yahooToEmails = document.querySelectorAll('.yahoo-desktop-to-email');
+    for (var i = 0; i < yahooToEmails.length; i++) yahooToEmails[i].textContent = 'you@yahoo.com';
+
     // Sync email phone screen height to inbox phone screen height
-    var screens = document.querySelectorAll('.mobile-screen');
-    if (screens.length >= 2) {
-      screens[1].style.height = screens[0].offsetHeight + 'px';
+    var gmailScreens = document.querySelectorAll('.mobile-screen');
+    if (gmailScreens.length >= 2) {
+      gmailScreens[1].style.height = gmailScreens[0].offsetHeight + 'px';
+    }
+    var yahooScreens = document.querySelectorAll('.yahoo-screen');
+    if (yahooScreens.length >= 2) {
+      yahooScreens[1].style.height = yahooScreens[0].offsetHeight + 'px';
     }
 
     // Dark mode toggle — applied to .container so all children inherit
