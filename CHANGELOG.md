@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-04-01
+
+### Added
+
+- Proper SVG Tiny-PS compliance conversion that preserves visual appearance: inlines CSS `<style>` blocks and `style` attributes as presentation attributes, resolves `<use>` references into inline content, strips forbidden elements (`clipPath`, `filter`, `pattern`, `symbol`, `marker`, `image`, `foreignObject`, animations), removes non-SVG namespace elements/attributes (Inkscape, Sodipodi, etc.), and cleans forbidden attributes (`clip-path`, `mask`, `filter`, `data-*`, event handlers)
+- Rasterize-and-retrace fallback for SVGs containing `<text>` elements or malformed XML, using CairoSVG rendering at 1024px
+- ICO file format support — selects the largest embedded frame from multi-size favicon files
+
+### Changed
+
+- Rewrote `svg_to_bimi_svg` from regex-based string manipulation to `xml.etree.ElementTree`-based parsing for reliable XML handling
+
 ## [0.3.4] - 2026-04-01
 
 ### Changed

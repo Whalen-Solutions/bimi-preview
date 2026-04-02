@@ -57,7 +57,7 @@ threading.Thread(
     daemon=True,
 ).start()
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff", "tif", "svg"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff", "tif", "ico", "svg"}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
