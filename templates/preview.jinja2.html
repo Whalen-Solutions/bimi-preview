@@ -147,17 +147,53 @@
     flex-shrink: 0;
   }
 
+  /* Gmail desktop toolbar (above open email) */
+  .gmail-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    margin-top: 24px;
+    border-bottom: 1px solid #e8eaed;
+    font-size: 12px;
+    color: #5f6368;
+  }
+  .gmail-toolbar-icon {
+    width: 20px;
+    height: 20px;
+    color: #5f6368;
+    flex-shrink: 0;
+  }
+  .gmail-toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #dadce0;
+    margin: 0 4px;
+  }
+  .gmail-toolbar-spacer { flex: 1; }
+  .gmail-toolbar-pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #5f6368;
+    white-space: nowrap;
+  }
+  .gmail-toolbar-pagination .gmail-toolbar-icon {
+    width: 18px;
+    height: 18px;
+  }
+
   /* Open email view */
   .email-view {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,.08);
     padding: 28px 24px;
-    margin-top: 24px;
   }
   .email-subject-line {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
     font-size: 20px;
     font-weight: 400;
@@ -166,12 +202,36 @@
     line-height: 1.3;
   }
   .email-subject-text { flex: 1; }
-  .email-subject-star {
+  .email-subject-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #dde4ea;
+    color: #5f6368;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .email-subject-badge-x {
+    font-size: 14px;
+    line-height: 1;
+    cursor: default;
+    color: #80868b;
+  }
+  .email-subject-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .email-subject-action-icon {
     width: 20px;
     height: 20px;
-    flex-shrink: 0;
     color: #5f6368;
-    margin-top: 4px;
   }
   .email-header {
     display: flex;
@@ -207,8 +267,34 @@
     font-size: 12px;
     color: #5f6368;
   }
+  .email-unsubscribe {
+    font-size: 12px;
+    color: #1a73e8;
+    margin-left: 8px;
+  }
   .email-to {
     font-size: 12px;
+    color: #5f6368;
+  }
+  .email-to-arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #5f6368;
+    margin-left: 2px;
+    vertical-align: middle;
+  }
+  .email-header-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .email-header-action-icon {
+    width: 20px;
+    height: 20px;
     color: #5f6368;
   }
   .email-time-header {
@@ -1024,6 +1110,13 @@
     background: #e8eaed;
     margin: 0 6px;
   }
+  .yahoo-desktop-toolbar-spacer { flex: 1; }
+  .yahoo-desktop-toolbar-nav-icon {
+    width: 20px;
+    height: 20px;
+    color: #5f6368;
+    flex-shrink: 0;
+  }
 
   /* Brand banner */
   .yahoo-brand-banner {
@@ -1086,13 +1179,6 @@
     padding: 16px 20px 8px;
     font-size: 18px;
     color: #202124;
-  }
-  .yahoo-desktop-subject-dot {
-    width: 8px;
-    height: 8px;
-    background: #5f6368;
-    border-radius: 50%;
-    flex-shrink: 0;
   }
   .yahoo-desktop-subject-text {
     flex: 1;
@@ -1245,34 +1331,19 @@
   .dark-mode .inbox-important {
     color: #5f6368;
   }
-  .dark-mode .email-subject-star {
-    color: #9aa0a6;
-  }
-  .dark-mode .email-view {
+  .dark-mode .gmail-toolbar {
     background: #292929;
-    box-shadow: 0 1px 3px rgba(0,0,0,.3);
-  }
-  .dark-mode .email-subject-line {
-    color: #e8eaed;
-  }
-  .dark-mode .email-sender-name {
-    color: #e8eaed;
-  }
-  .dark-mode .email-sender-addr {
+    border-bottom-color: #3c4043;
     color: #9aa0a6;
   }
-  .dark-mode .email-to {
+  .dark-mode .gmail-toolbar-icon {
     color: #9aa0a6;
   }
-  .dark-mode .email-time-header {
-    color: #9aa0a6;
+  .dark-mode .gmail-toolbar-sep {
+    background: #3c4043;
   }
-  .dark-mode .email-body {
-    color: #bdc1c6;
-  }
-  .dark-mode .email-signature {
+  .dark-mode .gmail-toolbar-pagination {
     color: #9aa0a6;
-    border-top-color: #3c4043;
   }
 
   /* Mobile phone frames */
@@ -1283,9 +1354,14 @@
     background: #1f1f1f;
     color: #e8eaed;
   }
-  .dark-mode .mobile-status-bar svg rect,
+  .dark-mode .mobile-status-bar svg rect:not([fill="none"]),
   .dark-mode .mobile-status-bar svg path {
     fill: #e8eaed;
+  }
+  .dark-mode .mobile-status-bar svg rect[fill="none"] {
+    stroke: #e8eaed;
+  }
+  .dark-mode .mobile-status-bar svg path {
     stroke: #e8eaed;
   }
   .dark-mode .mobile-gmail-bar {
@@ -1384,95 +1460,55 @@
 
   /* Yahoo desktop dark mode */
   .dark-mode .yahoo-desktop-inbox {
-    background: #292929;
+    background: #261447;
     box-shadow: 0 1px 3px rgba(0,0,0,.3);
   }
   .dark-mode .yahoo-desktop-row {
-    border-bottom-color: #3c4043;
+    border-bottom-color: #362060;
+  }
+  .dark-mode .yahoo-desktop-row.yahoo-desktop-unread {
+    background: #3a1d6e;
   }
   .dark-mode .yahoo-desktop-sender {
-    color: #e8eaed;
+    color: #d5cde0;
+  }
+  .dark-mode .yahoo-desktop-row.yahoo-desktop-unread .yahoo-desktop-sender {
+    color: #fff;
   }
   .dark-mode .yahoo-desktop-subject {
-    color: #e8eaed;
+    color: #e0dae8;
+  }
+  .dark-mode .yahoo-desktop-row.yahoo-desktop-unread .yahoo-desktop-subject {
+    color: #fff;
   }
   .dark-mode .yahoo-desktop-preview-text {
-    color: #9aa0a6;
+    color: #9688a8;
   }
   .dark-mode .yahoo-desktop-time {
-    color: #9aa0a6;
+    color: #9688a8;
   }
   .dark-mode .yahoo-desktop-checkbox {
-    color: #9aa0a6;
+    color: #7a6b94;
   }
   .dark-mode .yahoo-desktop-star {
-    color: #5f6368;
-  }
-  .dark-mode .yahoo-desktop-email {
-    background: #292929;
-    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    color: #7a6b94;
   }
   .dark-mode .yahoo-desktop-toolbar {
-    border-bottom-color: #3c4043;
-    color: #9aa0a6;
+    background: #1a0a2e;
+    border-bottom-color: #2d1654;
+    color: #c8c0d0;
   }
   .dark-mode .yahoo-desktop-toolbar-icon {
-    color: #9aa0a6;
+    color: #c8c0d0;
   }
   .dark-mode .yahoo-desktop-toolbar-label {
-    color: #9aa0a6;
+    color: #c8c0d0;
   }
   .dark-mode .yahoo-desktop-toolbar-sep {
-    background: #3c4043;
+    background: #3d2560;
   }
-  .dark-mode .yahoo-brand-banner {
-    border-bottom-color: #3c4043;
-  }
-  .dark-mode .yahoo-brand-name {
-    color: #e8eaed;
-  }
-  .dark-mode .yahoo-brand-url {
-    color: #8ab4f8;
-  }
-  .dark-mode .yahoo-desktop-subject-line {
-    color: #e8eaed;
-  }
-  .dark-mode .yahoo-desktop-subject-folder {
-    color: #9aa0a6;
-  }
-  .dark-mode .yahoo-desktop-subject-star {
-    color: #5f6368;
-  }
-  .dark-mode .yahoo-desktop-sender-area {
-    border-bottom-color: #3c4043;
-  }
-  .dark-mode .yahoo-desktop-sender-name-bold {
-    color: #e8eaed;
-  }
-  .dark-mode .yahoo-desktop-sender-url {
-    color: #8ab4f8;
-  }
-  .dark-mode .yahoo-desktop-sender-from {
-    color: #9aa0a6;
-  }
-  .dark-mode .yahoo-desktop-sender-to {
-    color: #9aa0a6;
-  }
-  .dark-mode .yahoo-desktop-sender-date {
-    color: #9aa0a6;
-  }
-  .dark-mode .yahoo-desktop-body {
-    color: #bdc1c6;
-  }
-  .dark-mode .yahoo-desktop-sig {
-    color: #9aa0a6;
-    border-top-color: #3c4043;
-  }
-  .dark-mode .yahoo-desktop-reply-bar {
-    border-top-color: #3c4043;
-  }
-  .dark-mode .yahoo-desktop-reply-icon {
-    color: #9aa0a6;
+  .dark-mode .yahoo-desktop-toolbar-nav-icon {
+    color: #c8c0d0;
   }
 
   /* Yahoo Mail mobile dark mode */
@@ -1595,7 +1631,7 @@
 <div class="container">
 
   <div class="header">
-    <h1>BIMI Preview</h1>
+    <h1><a href="{{ url_for('index') }}" style="color:inherit;text-decoration:none">BIMI Preview</a></h1>
     <div class="actions">
       <label class="theme-toggle" id="dark-toggle" title="Toggle dark mode">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
@@ -1816,7 +1852,7 @@
         </svg>
         {# More (three dots) #}
         <svg class="mobile-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
         </svg>
       </div>
 
@@ -1895,7 +1931,7 @@
   {# ================================================================== #}
   {# YAHOO MAIL iOS                                                      #}
   {# ================================================================== #}
-  <div class="section-label">Yahoo Mail</div>
+  <div class="section-label">Yahoo Mail Mobile</div>
   <div class="mobile-phones">
 
   {# ---- Phone 1: Inbox ---- #}
@@ -2101,10 +2137,8 @@
           <svg class="yahoo-email-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/>
           </svg>
-          {# Text size #}
-          <svg class="yahoo-email-nav-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/>
-          </svg>
+          {# Text size (AA) #}
+          <span class="yahoo-email-nav-icon" style="display:inline-flex;align-items:baseline;width:24px;height:24px;justify-content:center;color:#5f6368;font-weight:700;line-height:24px"><span style="font-size:13px">A</span><span style="font-size:18px">A</span></span>
         </div>
       </div>
 
@@ -2191,7 +2225,7 @@
         </div>
         <div class="yahoo-toolbar-item">
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
           </svg>
           <span>More</span>
         </div>
@@ -2278,10 +2312,48 @@
   {# ================================================================== #}
   {# OPEN EMAIL VIEW                                                     #}
   {# ================================================================== #}
+
+  {# -- Gmail toolbar -- #}
+  <div class="gmail-toolbar">
+    {# Back arrow #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    {# Archive #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+    {# Report spam #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+    {# Delete #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
+    <div class="gmail-toolbar-sep"></div>
+    {# Mark as read/unread #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    {# Snooze #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+    {# Move to #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H5v2h4v-2zm10 0h-4v2h4v-2zM5 14v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6H5zm4 6H7v-4h2v4zm4 0h-2v-4h2v4zm4 0h-2v-4h2v4z"/></svg>
+    {# More (three dots) #}
+    <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    <div class="gmail-toolbar-spacer"></div>
+    <div class="gmail-toolbar-pagination">
+      <span>1 of 52</span>
+      {# Previous #}
+      <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      {# Next #}
+      <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      {# Keyboard shortcut icon #}
+      <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+    </div>
+  </div>
+
   <div class="email-view">
     <div class="email-subject-line">
       <span class="email-subject-text">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</span>
-      <svg class="email-subject-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+      <span class="email-subject-badge">Inbox <span class="email-subject-badge-x">&times;</span></span>
+      <div class="email-subject-actions">
+        {# Print #}
+        <svg class="email-subject-action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+        {# Open in new window #}
+        <svg class="email-subject-action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+      </div>
     </div>
     <div class="email-header">
       <div class="email-avatar">
@@ -2298,13 +2370,24 @@
               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           {% endif %}
+          {# Email address constructed via JS to avoid Cloudflare obfuscation #}
+          <span class="email-sender-addr">&lt;<span id="sender-email"></span>&gt;</span>
+          <span class="email-unsubscribe">Unsubscribe</span>
         </div>
-        {# Email address constructed via JS to avoid Cloudflare obfuscation #}
-        <div class="email-sender-addr">&lt;<span id="sender-email"></span>&gt;</div>
-        <div class="email-to">to me</div>
+        <div class="email-to">to me <span class="email-to-arrow"></span></div>
       </div>
-      <div class="email-time-header">
-        {{ email_time | default("10:42 AM (1 hour ago)") }}
+      <div class="email-header-actions">
+        <div class="email-time-header">
+          {{ email_time | default("10:42 AM (1 hour ago)") }}
+        </div>
+        {# Star #}
+        <svg class="email-header-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+        {# Smiley/emoji #}
+        <svg class="email-header-action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+        {# Reply #}
+        <svg class="email-header-action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+        {# More (three dots vertical) #}
+        <svg class="email-header-action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
       </div>
     </div>
 
@@ -2402,9 +2485,9 @@
     <div class="yahoo-desktop-toolbar">
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
       <span class="yahoo-desktop-toolbar-label">Back</span>
-      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/></svg>
-      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6zM17 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6z"/></svg>
-      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5l7 7-7 7v-4c-5 0-8.5 1.6-11 5 1-5 4-10 11-11z"/></svg>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
       <div class="yahoo-desktop-toolbar-sep"></div>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
       <span class="yahoo-desktop-toolbar-label">Archive</span>
@@ -2414,7 +2497,14 @@
       <span class="yahoo-desktop-toolbar-label">Delete</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1.41-1.41L13.17 12 9.59 8.41 11 7l5 5-5 5z"/></svg>
       <span class="yahoo-desktop-toolbar-label">Spam</span>
-      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <div class="yahoo-desktop-toolbar-spacer"></div>
+      {# Up arrow (previous) #}
+      <svg class="yahoo-desktop-toolbar-nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+      {# Down arrow (next) #}
+      <svg class="yahoo-desktop-toolbar-nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+      {# Close (X) #}
+      <svg class="yahoo-desktop-toolbar-nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
     </div>
 
     {# -- Brand banner (VMC only) -- #}
@@ -2433,7 +2523,6 @@
 
     {# -- Subject line -- #}
     <div class="yahoo-desktop-subject-line">
-      <div class="yahoo-desktop-subject-dot"></div>
       <span class="yahoo-desktop-subject-text">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</span>
       <span class="yahoo-desktop-subject-folder">Yahoo/Inbox</span>
       <svg class="yahoo-desktop-subject-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
@@ -2456,7 +2545,7 @@
             <span class="yahoo-desktop-sender-name-bold">{{ company }}</span>
             {% if show_checkmark %}
             <svg class="yahoo-desktop-verified-badge" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="8" cy="8" r="8" fill="#6c63ff"/>
+              <circle cx="8" cy="8" r="8" fill="#6001d2"/>
               <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             {% endif %}
@@ -2496,10 +2585,10 @@
 
     {# -- Bottom reply icons -- #}
     <div class="yahoo-desktop-reply-bar">
-      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/></svg>
-      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6zM17 9V5l-5 5 5 5v-3c3 0 5 .8 7 3-.6-3-2.5-6-7-6z"/></svg>
-      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5l7 7-7 7v-4c-5 0-8.5 1.6-11 5 1-5 4-10 11-11z"/></svg>
-      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
+      <svg class="yahoo-desktop-reply-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
     </div>
 
   </div>

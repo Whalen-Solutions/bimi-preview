@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.3] - 2026-04-02
+
+### Added
+
+- Gmail desktop toolbar with action icons (back, archive, spam, delete, mark read, snooze, move, more), "1 of 52" pagination, and keyboard shortcut icon
+- Gmail desktop email subject line now shows "Inbox x" label badge, print, and open-in-new-window icons
+- Gmail desktop email header now shows sender address and "Unsubscribe" link inline, "to me" dropdown arrow, and action icons (star, emoji, reply, more)
+- Yahoo desktop toolbar now includes previous/next navigation arrows and close button
+- Yahoo desktop inbox unread row highlight in dark mode (brighter purple background with white text)
+- Clickable "BIMI Preview" heading linking to home page
+
+### Changed
+
+- Gmail desktop dark mode now only darkens the toolbar chrome; email content stays light, matching real Gmail behavior
+- Yahoo desktop dark mode switched from gray to Yahoo's signature purple palette for both inbox and toolbar
+- Yahoo Mail section label renamed to "Yahoo Mail Mobile" for clarity
+- Yahoo desktop open email checkmark color updated to Yahoo brand purple
+- Yahoo reply/reply-all/forward icons switched from stroked outlines to filled icons matching the real Yahoo UI
+- Yahoo mobile text-size icon changed from "TT" to stacked "AA" matching the real Yahoo UI
+- All vertical three-dot (more) icons replaced with horizontal three-dot icons across Gmail and Yahoo mockups
+- Removed unread dot from Yahoo desktop open email subject line
+
+### Fixed
+
+- Dark mode no longer fills the entire phone battery icon by excluding `fill="none"` outline rects from the dark mode fill override
+
 ## [0.4.2] - 2026-04-01
 
 ### Added
