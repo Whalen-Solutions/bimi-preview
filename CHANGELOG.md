@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.4] - 2026-04-02
+
+### Changed
+
+- Clarified BIMI certificate type hint: VMC shows checkmarks in Gmail and Yahoo, CMC shows logo only in Gmail, Yahoo does not support CMC
+
 ## [0.4.3] - 2026-04-02
 
 ### Added
