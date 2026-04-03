@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.5] - 2026-04-02
+
+### Fixed
+
+- Yahoo mobile text-size (AA) icon now turns white in dark mode instead of staying gray
+
 ## [0.4.4] - 2026-04-02
 
 ### Changed
