@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2026-04-04
+
+### Fixed
+
+- Email subjects in Apple Mail desktop message list are no longer bold, matching the real macOS Mail UI
+
+### Changed
+
+- Updated README with plain-language VMC/CMC explanation and DMARC guide link
+
 ## [0.5.0] - 2026-04-04
 
 ### Added
