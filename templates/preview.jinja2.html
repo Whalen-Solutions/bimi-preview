@@ -1293,6 +1293,559 @@
   }
 
   /* ======================================== */
+  /* APPLE MAIL iOS                           */
+  /* ======================================== */
+  /* Built from iOS 18 Apple Mail screenshots */
+
+  .apple-phone {
+    width: 375px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    border-radius: 40px;
+    padding: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.18);
+  }
+  .apple-screen {
+    background: #fff;
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .apple-email-scroll {
+    flex: 1;
+    overflow: hidden;
+  }
+  .apple-screen .mobile-status-bar {
+    background: #fff;
+  }
+
+  /* Inbox header — white rounded-rect pills with subtle shadow */
+  .apple-inbox-header {
+    padding: 8px 16px 4px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .apple-pill-btn {
+    height: 36px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0 12px;
+  }
+  .apple-pill-btn svg {
+    width: 16px;
+    height: 16px;
+    color: #000;
+  }
+  .apple-pill-btn.apple-pill-icon {
+    width: 36px;
+    padding: 0;
+  }
+  .apple-inbox-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .apple-inbox-action-text {
+    font-size: 15px;
+    color: #000;
+    font-weight: 400;
+  }
+
+  /* Title area */
+  .apple-inbox-title {
+    padding: 4px 16px 0;
+    background: #fff;
+  }
+  .apple-inbox-title h2 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+  .apple-inbox-subtitle {
+    font-size: 11px;
+    color: #8e8e93;
+    padding: 0 16px 8px;
+    background: #fff;
+  }
+
+  /* Category pills */
+  .apple-categories {
+    display: flex;
+    gap: 8px;
+    padding: 4px 16px 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .apple-cat-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border-radius: 18px;
+    background: #e5e5ea;
+    font-size: 13px;
+    font-weight: 500;
+    color: #3c3c43;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .apple-cat-pill.apple-cat-active {
+    background: #007aff;
+    color: #fff;
+  }
+  .apple-cat-pill svg {
+    width: 16px;
+    height: 16px;
+  }
+  .apple-cat-pill .apple-cat-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #007aff;
+  }
+
+  /* Inbox rows — screenshot 6: dot, rounded-rect avatar, sender+time>chevron, subject, preview, badge */
+  .apple-inbox-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 10px 10px 16px;
+    gap: 10px;
+    background: #fff;
+    border-bottom: 0.5px solid #c6c6c8;
+  }
+  .apple-inbox-row:last-of-type { border-bottom: none; }
+  .apple-unread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #007aff;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+  .apple-unread-dot.apple-dot-hidden {
+    visibility: hidden;
+  }
+  /* screenshot 6: avatars are rounded rectangles, ~8px radius */
+  .apple-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    overflow: hidden;
+    background: #a0a0a8;
+  }
+  .apple-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .apple-row-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .apple-row-top {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .apple-sender-name {
+    font-size: 15px;
+    font-weight: 400;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .apple-inbox-row.apple-unread .apple-sender-name {
+    font-weight: 700;
+  }
+  /* screenshot 6: time + small > chevron, right-aligned */
+  .apple-row-time {
+    font-size: 14px;
+    color: #8e8e93;
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .apple-row-chevron {
+    width: 12px;
+    height: 12px;
+    color: #c7c7cc;
+  }
+  .apple-subject {
+    font-size: 13px;
+    font-weight: 500;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .apple-inbox-row.apple-unread .apple-subject {
+    font-weight: 600;
+  }
+  .apple-preview {
+    font-size: 13px;
+    color: #8e8e93;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  /* screenshot 6: small badge icon at far right of row */
+  .apple-row-badge {
+    width: 20px;
+    flex-shrink: 0;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .apple-row-badge svg {
+    width: 18px;
+    height: 18px;
+    color: #8e8e93;
+  }
+
+  /* Bottom nav — individual white pills with shadow, same style as header */
+  .apple-bottom-nav {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px 14px;
+    background: #fff;
+    gap: 8px;
+  }
+  .apple-nav-pill {
+    height: 36px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0 12px;
+  }
+  .apple-nav-pill svg {
+    width: 18px;
+    height: 18px;
+    color: #000;
+  }
+  .apple-nav-pill.apple-nav-pill-icon {
+    width: 36px;
+    padding: 0;
+  }
+  /* Search pill — wider, with search text */
+  .apple-search-pill {
+    flex: 1;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    border-radius: 20px;
+    padding: 0 12px;
+    font-size: 15px;
+    color: #8e8e93;
+  }
+  .apple-search-pill svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #8e8e93;
+  }
+
+  /* Open email top nav — back pill on left, combined up/down pill on right */
+  .apple-email-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #fff;
+  }
+  /* Back — wider pill, not just a circle */
+  .apple-email-back-pill {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .apple-email-back-pill svg {
+    width: 18px;
+    height: 18px;
+    color: #000;
+  }
+  /* Up+down arrows combined in one oblong pill */
+  .apple-email-nav-pill {
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .apple-email-nav-pill svg {
+    width: 16px;
+    height: 16px;
+    color: #000;
+  }
+  .apple-email-nav-pill .apple-nav-disabled {
+    color: #c7c7cc;
+  }
+
+  .apple-email-msg-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 16px;
+    background: #fff;
+  }
+  .apple-email-msg-label {
+    font-size: 13px;
+    color: #8e8e93;
+  }
+  .apple-email-summarize {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #007aff;
+    font-weight: 500;
+  }
+  .apple-email-summarize svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Mailing list unsubscribe banner */
+  .apple-mailing-banner {
+    margin: 8px 16px;
+    padding: 12px 14px;
+    background: #f2f2f7;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #000;
+  }
+  .apple-mailing-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .apple-mailing-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .apple-mailing-icon svg {
+    width: 28px;
+    height: 28px;
+    color: #007aff;
+  }
+  .apple-mailing-icon .apple-mailing-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #34c759;
+    border: 2px solid #f2f2f7;
+  }
+  .apple-mailing-text {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: #000;
+  }
+  .apple-mailing-dismiss {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #c7c7cc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .apple-mailing-dismiss svg {
+    width: 10px;
+    height: 10px;
+    color: #fff;
+  }
+  .apple-mailing-unsub {
+    display: block;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    background: #e5e5ea;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #007aff;
+  }
+
+  /* screenshot 1: avatar, sender name (bold) + time, "To:" line, divider */
+  .apple-email-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #fff;
+  }
+  .apple-email-meta {
+    flex: 1;
+    min-width: 0;
+  }
+  .apple-email-sender-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+  .apple-email-sender-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+  }
+  .apple-email-time {
+    font-size: 13px;
+    color: #8e8e93;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .apple-email-detail {
+    font-size: 13px;
+    color: #8e8e93;
+  }
+  .apple-email-divider {
+    height: 0.5px;
+    background: #c6c6c8;
+    margin: 0 16px;
+  }
+
+  /* screenshot 1: large bold subject, body text, signature */
+  .apple-email-subject {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.3;
+    padding: 12px 16px 8px;
+    background: #fff;
+  }
+  .apple-email-body {
+    padding: 4px 16px 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #000;
+    background: #fff;
+  }
+  .apple-email-body p { margin-bottom: 12px; }
+  .apple-email-signature {
+    font-size: 13px;
+    color: #8e8e93;
+    border-top: 0.5px solid #c6c6c8;
+    margin: 0 16px;
+    padding: 12px 0;
+    line-height: 1.5;
+    background: #fff;
+  }
+
+  /* Bottom toolbar — floating pills overlapping email content */
+  .apple-email-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .apple-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px 14px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .apple-toolbar > * {
+    pointer-events: auto;
+  }
+  /* Left pill: trash + folder + reply grouped together */
+  .apple-toolbar-group {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .apple-toolbar-group svg {
+    width: 22px;
+    height: 22px;
+    color: #000;
+    flex-shrink: 0;
+  }
+  /* Right pill: compose alone */
+  .apple-toolbar-single {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .apple-toolbar-single svg {
+    width: 22px;
+    height: 22px;
+    color: #000;
+  }
+
+  /* ======================================== */
   /* DARK MODE OVERRIDES                      */
   /* ======================================== */
 
@@ -1625,6 +2178,165 @@
   .dark-mode .yahoo-toolbar-icon {
     color: #9aa0a6;
   }
+
+  /* Apple Mail iOS dark mode — from screenshots 3, 2, 4 */
+  .dark-mode .apple-screen {
+    background: #000;
+  }
+  .dark-mode .apple-screen .mobile-status-bar {
+    background: #000;
+    color: #fff;
+  }
+  .dark-mode .apple-inbox-header {
+    background: #000;
+  }
+  .dark-mode .apple-pill-btn {
+    background: #1c1c1e;
+    box-shadow: none;
+  }
+  .dark-mode .apple-pill-btn svg {
+    color: #fff;
+  }
+  .dark-mode .apple-inbox-action-text {
+    color: #fff;
+  }
+  .dark-mode .apple-inbox-title {
+    background: #000;
+  }
+  .dark-mode .apple-inbox-title h2 {
+    color: #fff;
+  }
+  .dark-mode .apple-inbox-subtitle {
+    background: #000;
+  }
+  .dark-mode .apple-categories {
+    background: #000;
+  }
+  .dark-mode .apple-cat-pill {
+    background: #1c1c1e;
+    color: #ebebf5;
+  }
+  .dark-mode .apple-cat-pill.apple-cat-active {
+    background: #0a84ff;
+    color: #fff;
+  }
+  .dark-mode .apple-inbox-row {
+    background: #000;
+    border-bottom-color: #38383a;
+  }
+  .dark-mode .apple-sender-name {
+    color: #fff;
+  }
+  .dark-mode .apple-subject {
+    color: #fff;
+  }
+  .dark-mode .apple-row-chevron {
+    color: #48484a;
+  }
+  .dark-mode .apple-bottom-nav {
+    background: #000;
+    border-top-color: #38383a;
+  }
+  .dark-mode .apple-nav-pill {
+    background: #1c1c1e;
+    box-shadow: none;
+  }
+  .dark-mode .apple-nav-pill svg {
+    color: #fff;
+  }
+  .dark-mode .apple-search-pill {
+    background: #1c1c1e;
+    box-shadow: none;
+  }
+
+  /* Apple email dark — from screenshots 2, 4 */
+  .dark-mode .apple-email-top {
+    background: #000;
+  }
+  .dark-mode .apple-email-back {
+    color: #0a84ff;
+  }
+  .dark-mode .apple-email-back-pill {
+    background: #1c1c1e;
+    box-shadow: none;
+  }
+  .dark-mode .apple-email-back-pill svg {
+    color: #fff;
+  }
+  .dark-mode .apple-email-nav-pill {
+    background: #1c1c1e;
+    box-shadow: none;
+  }
+  .dark-mode .apple-email-nav-pill svg {
+    color: #fff;
+  }
+  .dark-mode .apple-email-nav-pill .apple-nav-disabled {
+    color: #636366;
+  }
+  .dark-mode .apple-email-msg-bar {
+    background: #000;
+  }
+  .dark-mode .apple-email-scroll {
+    background: #1c1c1e;
+  }
+  .dark-mode .apple-email-summarize {
+    color: #0a84ff;
+  }
+  .dark-mode .apple-mailing-banner {
+    background: #2c2c2e;
+  }
+  .dark-mode .apple-mailing-text {
+    color: #fff;
+  }
+  .dark-mode .apple-mailing-dismiss {
+    background: #636366;
+  }
+  .dark-mode .apple-mailing-unsub {
+    background: #3a3a3c;
+    color: #0a84ff;
+  }
+  .dark-mode .apple-mailing-badge {
+    border-color: #2c2c2e;
+  }
+  .dark-mode .apple-email-header {
+    background: #1c1c1e;
+  }
+  .dark-mode .apple-email-sender-name {
+    color: #fff;
+  }
+  .dark-mode .apple-email-detail {
+    color: #8e8e93;
+  }
+  .dark-mode .apple-email-divider {
+    background: #38383a;
+  }
+  .dark-mode .apple-email-subject {
+    color: #fff;
+    background: #1c1c1e;
+  }
+  .dark-mode .apple-email-body {
+    color: #fff;
+    background: #1c1c1e;
+  }
+  .dark-mode .apple-email-signature {
+    color: #8e8e93;
+    border-top-color: #38383a;
+    background: #1c1c1e;
+  }
+  .dark-mode .apple-toolbar-group {
+    background: #2c2c2e;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+  }
+  .dark-mode .apple-toolbar-group svg {
+    color: #fff;
+  }
+  .dark-mode .apple-toolbar-single {
+    background: #2c2c2e;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+  }
+  .dark-mode .apple-toolbar-single svg {
+    color: #fff;
+  }
 </style>
 </head>
 <body>
@@ -1927,6 +2639,344 @@
   </div>
 
   </div>{# /.mobile-phones #}
+
+  {# ================================================================== #}
+  {# APPLE MAIL iOS — built from iOS 18 screenshots                      #}
+  {# ================================================================== #}
+  <div class="section-label">Apple Mail Mobile</div>
+  <div class="mobile-phones">
+
+  {# ---- Phone 1: Inbox (screenshots 3 & 6) ---- #}
+  <div class="apple-phone">
+    <div class="apple-screen">
+
+      {# -- Status bar -- #}
+      <div class="mobile-status-bar">
+        <span>{{ status_bar_time }}</span>
+        <div class="mobile-dynamic-island"></div>
+        <div class="mobile-status-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <rect x="0" y="9" width="3" height="3" rx="0.5" fill="#202124"/>
+            <rect x="4" y="6" width="3" height="6" rx="0.5" fill="#202124"/>
+            <rect x="8" y="3" width="3" height="9" rx="0.5" fill="#202124"/>
+            <rect x="12" y="0" width="3" height="12" rx="0.5" fill="#202124"/>
+          </svg>
+          <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
+            <path d="M7 11a1 1 0 100-2 1 1 0 000 2z" fill="#202124"/>
+            <path d="M3.5 7.5a5 5 0 017 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M1 5a8 8 0 0112 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none">
+            <rect x="0.5" y="0.5" width="19" height="11" rx="2" stroke="#202124" fill="none" stroke-width="1"/>
+            <rect x="20" y="3.5" width="2" height="5" rx="1" fill="#202124"/>
+            <rect x="2" y="2" width="14" height="8" rx="1" fill="#202124"/>
+          </svg>
+        </div>
+      </div>
+
+      {# -- Inbox header: white rounded pills with shadow -- #}
+      <div class="apple-inbox-header">
+        <div class="apple-pill-btn apple-pill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="apple-inbox-actions">
+          <div class="apple-pill-btn">
+            <span class="apple-inbox-action-text">Select</span>
+          </div>
+          <div class="apple-pill-btn apple-pill-icon">
+            <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12" cy="8" r="1.5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      {# -- Title -- #}
+      <div class="apple-inbox-title"><h2>Inbox</h2></div>
+      <div class="apple-inbox-subtitle">iCloud &middot; Updated Just Now</div>
+
+      {# -- Category pills: "Primary" (blue+icon+text), then icon-only pills -- #}
+      <div class="apple-categories">
+        <div class="apple-cat-pill apple-cat-active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Primary
+        </div>
+        <div class="apple-cat-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 4l-1-2H2v2h2l3.6 7.59-1.35 2.44C5.52 15.37 6.48 17 8 17h12v-2H8l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0021.02 4H7.17z"/></svg>
+        </div>
+        <div class="apple-cat-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+          <span class="apple-cat-badge"></span>
+        </div>
+        <div class="apple-cat-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4z"/></svg>
+        </div>
+      </div>
+
+      {# Row 1: BIMI sender (unread) — dot, avatar, name+time>, subject, preview, badge #}
+      <div class="apple-inbox-row apple-unread">
+        <div class="apple-unread-dot"></div>
+        <div class="apple-avatar">
+          {% if show_checkmark %}
+          <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+          {% else %}
+          <div style="width:100%;height:100%;background:#a0a0a8;display:flex;align-items:center;justify-content:center;">
+            {{ company[0] | upper }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="apple-row-content">
+          <div class="apple-row-top">
+            <span class="apple-sender-name">{{ company }}</span>
+            <span class="apple-row-time">
+              {{ inbox_time | default("10:42 AM") }}
+              <svg class="apple-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="apple-subject">{{ inbox_subject | default("Your account security update for " + domain) }}</div>
+          <div class="apple-preview">{{ inbox_preview | default("We wanted to let you know about important changes to our platform that affect your account...") }}</div>
+        </div>
+        {# Screenshot 6: small notification badge icon at far right #}
+        <div class="apple-row-badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" opacity="0.5"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/><circle cx="19" cy="5" r="4" fill="#007aff"/></svg>
+        </div>
+      </div>
+
+      {# Row 2 #}
+      <div class="apple-inbox-row">
+        <div class="apple-unread-dot apple-dot-hidden"></div>
+        <div class="apple-avatar" style="background:#7b68ee;">
+          {{ other_sender_1_initial | default("S") }}
+        </div>
+        <div class="apple-row-content">
+          <div class="apple-row-top">
+            <span class="apple-sender-name">{{ other_sender_1_name | default("Sarah Chen") }}</span>
+            <span class="apple-row-time">
+              {{ other_sender_1_time | default("9:15 AM") }}
+              <svg class="apple-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="apple-subject">{{ other_sender_1_subject | default("Re: Q2 planning doc") }}</div>
+          <div class="apple-preview">{{ other_sender_1_preview | default("Looks good to me. I added a few comments on the timeline section...") }}</div>
+        </div>
+      </div>
+
+      {# Row 3 #}
+      <div class="apple-inbox-row">
+        <div class="apple-unread-dot apple-dot-hidden"></div>
+        <div class="apple-avatar" style="background:#e8a030;">
+          {{ other_sender_2_initial | default("M") }}
+        </div>
+        <div class="apple-row-content">
+          <div class="apple-row-top">
+            <span class="apple-sender-name">{{ other_sender_2_name | default("Mike Torres") }}</span>
+            <span class="apple-row-time">
+              {{ other_sender_2_time | default("Yesterday") }}
+              <svg class="apple-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="apple-subject">{{ other_sender_2_subject | default("Lunch Thursday?") }}</div>
+          <div class="apple-preview">{{ other_sender_2_preview | default("Hey, are you free Thursday around noon? There's a new place on 5th...") }}</div>
+        </div>
+      </div>
+
+      {# Row 4 #}
+      <div class="apple-inbox-row">
+        <div class="apple-unread-dot apple-dot-hidden"></div>
+        <div class="apple-avatar" style="background:#aaa;">
+          {{ other_sender_3_initial | default("T") }}
+        </div>
+        <div class="apple-row-content">
+          <div class="apple-row-top">
+            <span class="apple-sender-name">{{ other_sender_3_name | default("Teamwork") }}</span>
+            <span class="apple-row-time">
+              {{ other_sender_3_time | default("Mar 28") }}
+              <svg class="apple-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="apple-subject">{{ other_sender_3_subject | default("New comment on Project Atlas task #204") }}</div>
+          <div class="apple-preview">{{ other_sender_3_preview | default("Jamie left a comment: 'Updated the wireframes, ready for review...'") }}</div>
+        </div>
+      </div>
+
+      {# -- Bottom nav: white rounded pills with shadow -- #}
+      <div class="apple-bottom-nav">
+        {# Filter lines #}
+        <div class="apple-nav-pill apple-nav-pill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 7h16M7 12h10M10 17h4"/>
+          </svg>
+        </div>
+        {# Search pill — magnifying glass + "Search" text #}
+        <div class="apple-search-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <span>Search</span>
+        </div>
+        {# Microphone #}
+        <div class="apple-nav-pill apple-nav-pill-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+        {# Compose #}
+        <div class="apple-nav-pill apple-nav-pill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1v12a1 1 0 001 1z"/>
+            <path d="M14.5 3.5l3 3L10 14H7v-3l7.5-7.5z"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {# ---- Phone 2: Open Email (screenshots 1 & 4) ---- #}
+  <div class="apple-phone">
+    <div class="apple-screen">
+
+      {# -- Status bar -- #}
+      <div class="mobile-status-bar">
+        <span>{{ status_bar_time }}</span>
+        <div class="mobile-dynamic-island"></div>
+        <div class="mobile-status-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <rect x="0" y="9" width="3" height="3" rx="0.5" fill="#202124"/>
+            <rect x="4" y="6" width="3" height="6" rx="0.5" fill="#202124"/>
+            <rect x="8" y="3" width="3" height="9" rx="0.5" fill="#202124"/>
+            <rect x="12" y="0" width="3" height="12" rx="0.5" fill="#202124"/>
+          </svg>
+          <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
+            <path d="M7 11a1 1 0 100-2 1 1 0 000 2z" fill="#202124"/>
+            <path d="M3.5 7.5a5 5 0 017 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M1 5a8 8 0 0112 0" stroke="#202124" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none">
+            <rect x="0.5" y="0.5" width="19" height="11" rx="2" stroke="#202124" fill="none" stroke-width="1"/>
+            <rect x="20" y="3.5" width="2" height="5" rx="1" fill="#202124"/>
+            <rect x="2" y="2" width="14" height="8" rx="1" fill="#202124"/>
+          </svg>
+        </div>
+      </div>
+
+      {# -- Top nav: back pill on left, combined ˆˇ pill on right -- #}
+      <div class="apple-email-top">
+        <div class="apple-email-back-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="apple-email-nav-pill">
+          <svg class="apple-nav-disabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      {# -- "1 Message" / "✦ Summarize" -- #}
+      <div class="apple-email-msg-bar">
+        <span class="apple-email-msg-label">1 Message</span>
+        <div class="apple-email-summarize">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
+          Summarize
+        </div>
+      </div>
+
+      {# -- Email content + floating toolbar wrapper -- #}
+      <div class="apple-email-wrapper">
+      <div class="apple-email-scroll">
+
+        {# -- Mailing list unsubscribe banner -- #}
+        <div class="apple-mailing-banner">
+          <div class="apple-mailing-top">
+            <div class="apple-mailing-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 4 12 13 2 4"/></svg>
+              <span class="apple-mailing-badge"></span>
+            </div>
+            <span class="apple-mailing-text">This message is from a mailing list.</span>
+            <div class="apple-mailing-dismiss">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </div>
+          </div>
+          <div class="apple-mailing-unsub">Unsubscribe</div>
+        </div>
+
+        {# -- Sender: avatar, name (bold) + time, "To:" line -- #}
+        <div class="apple-email-header">
+          <div class="apple-avatar">
+            {% if show_checkmark %}
+            <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+            {% else %}
+            <div style="width:100%;height:100%;background:#a0a0a8;display:flex;align-items:center;justify-content:center;">
+              {{ company[0] | upper }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="apple-email-meta">
+            <div class="apple-email-sender-row">
+              <span class="apple-email-sender-name">{{ company }}</span>
+              <span class="apple-email-time">{{ inbox_time | default("10:42 AM") }}</span>
+            </div>
+            <div class="apple-email-detail">To: <span class="apple-to-email"></span> &#x25B8;</div>
+          </div>
+        </div>
+
+        <div class="apple-email-divider"></div>
+
+        {# -- Subject (large bold) -- #}
+        <div class="apple-email-subject">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
+
+        {# -- Body -- #}
+        <div class="apple-email-body">
+          {% if email_body %}
+            {{ email_body | safe }}
+          {% else %}
+            <p>Hi there,</p>
+            <p>
+              We're writing to let you know about recent updates to the {{ company }} platform
+              that may affect how you use our {{ industry | lower }} services. As part of our ongoing
+              commitment to security and reliability, we've made several enhancements to our
+              infrastructure.
+            </p>
+            <p>
+              If you have any questions about these changes, please don't hesitate to reach out
+              to our support team. We're here to help.
+            </p>
+          {% endif %}
+        </div>
+
+        {# -- Signature -- #}
+        <div class="apple-email-signature">
+          Best regards,<br>
+          The {{ company }} Team<br>
+          <span class="apple-sig-email"></span>
+        </div>
+
+      </div>{# /.apple-email-scroll #}
+
+      {# -- Floating toolbar over content -- #}
+      <div class="apple-toolbar">
+        {# Left pill: trash + folder + reply grouped #}
+        <div class="apple-toolbar-group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 17 4 12 9 7"/>
+            <path d="M20 18v-2a4 4 0 00-4-4H4"/>
+          </svg>
+        </div>
+        {# Right pill: compose alone #}
+        <div class="apple-toolbar-single">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1v12a1 1 0 001 1z"/>
+            <path d="M14.5 3.5l3 3L10 14H7v-3l7.5-7.5z"/>
+          </svg>
+        </div>
+      </div>
+
+      </div>{# /.apple-email-wrapper #}
+
+    </div>
+  </div>
+
+  </div>{# /.mobile-phones (apple) #}
 
   {# ================================================================== #}
   {# YAHOO MAIL iOS                                                      #}
@@ -2602,7 +3652,7 @@
     <a href="{{ url_for('prompt_page') }}">View the prompt used to generate it.</a>
   </div>
   <div class="llm-banner">
-    This preview shows Gmail and Yahoo Mail rendering. A BIMI SVG works with any
+    This preview shows Gmail, Yahoo Mail, and Apple Mail rendering. A BIMI SVG works with any
     <a href="https://bimigroup.org/bimi-infographic/" target="_blank" rel="noopener">supporting mailbox provider</a>.
   </div>
 
@@ -2629,6 +3679,12 @@
     var yahooToEmails = document.querySelectorAll('.yahoo-desktop-to-email');
     for (var i = 0; i < yahooToEmails.length; i++) yahooToEmails[i].textContent = 'you@yahoo.com';
 
+    // Apple Mail email addresses
+    var appleSigs = document.querySelectorAll('.apple-sig-email');
+    for (var i = 0; i < appleSigs.length; i++) appleSigs[i].textContent = addr;
+    var appleToEmails = document.querySelectorAll('.apple-to-email');
+    for (var i = 0; i < appleToEmails.length; i++) appleToEmails[i].textContent = 'me@icloud.com';
+
     // Sync email phone screen height to inbox phone screen height
     var gmailScreens = document.querySelectorAll('.mobile-screen');
     if (gmailScreens.length >= 2) {
@@ -2637,6 +3693,10 @@
     var yahooScreens = document.querySelectorAll('.yahoo-screen');
     if (yahooScreens.length >= 2) {
       yahooScreens[1].style.height = yahooScreens[0].offsetHeight + 'px';
+    }
+    var appleScreens = document.querySelectorAll('.apple-screen');
+    if (appleScreens.length >= 2) {
+      appleScreens[1].style.height = appleScreens[0].offsetHeight + 'px';
     }
 
     // Dark mode toggle — applied to .container so all children inherit
