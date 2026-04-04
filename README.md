@@ -4,7 +4,10 @@ A Flask web app that converts a logo into a BIMI-compliant SVG Tiny-PS file and 
 
 ## What is BIMI?
 
-[Brand Indicators for Message Identification (BIMI)](https://bimigroup.org/) is an email standard that lets organizations display their verified logo next to authenticated messages in supporting email clients.
+[Brand Indicators for Message Identification (BIMI)](https://bimigroup.org/) is an email standard that lets organizations display their verified logo next to authenticated messages in supporting email clients. BIMI requires [DMARC alignment](https://seanthegeek.net/459/demystifying-dmarc/) and one of two certificate types:
+
+- **VMC (Verified Mark Certificate)**: Requires a registered trademark. Shows the logo with a verified checkmark in most desktop clients.
+- **CMC (Common Mark Certificate)**: No trademark required. Shows the logo in Gmail only, without a checkmark. Yahoo Mail and Apple Mail do not display CMC logos.
 
 | Client | VMC Logo | VMC Checkmark | CMC Logo |
 | --- | --- | --- | --- |
