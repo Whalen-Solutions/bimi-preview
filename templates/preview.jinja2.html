@@ -1846,6 +1846,377 @@
   }
 
   /* ======================================== */
+  /* APPLE MAIL macOS (desktop)               */
+  /* ======================================== */
+
+  .amd-container {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: #000;
+    background: #fff;
+    max-width: 860px;
+  }
+
+  /* -- Sidebar -- */
+  .amd-sidebar {
+    width: 180px;
+    background: #f5f5f7;
+    border-right: 0.5px solid #d1d1d6;
+    padding: 10px 0;
+    flex-shrink: 0;
+  }
+  .amd-sidebar-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px 8px;
+  }
+  .amd-traffic-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .amd-sidebar-section {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8e8e93;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 12px 12px 4px;
+  }
+  .amd-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: #000;
+    border-radius: 6px;
+    margin: 0 6px;
+  }
+  .amd-sidebar-item.amd-active {
+    background: #007aff;
+    color: #fff;
+  }
+  .amd-sidebar-item svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+  .amd-sidebar-item.amd-active svg {
+    color: #fff;
+  }
+
+  /* -- Message list (middle column) -- */
+  .amd-msglist {
+    width: 300px;
+    border-right: 0.5px solid #d1d1d6;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    background: #fff;
+  }
+  .amd-msglist-header {
+    padding: 8px 12px 4px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .amd-msglist-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+  }
+  .amd-msglist-subtitle {
+    font-size: 11px;
+    color: #8e8e93;
+    font-weight: 400;
+  }
+  .amd-msglist-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .amd-msglist-actions svg {
+    width: 16px;
+    height: 16px;
+    color: #8e8e93;
+  }
+
+  /* Category pills */
+  .amd-categories {
+    display: flex;
+    gap: 6px;
+    padding: 4px 12px 8px;
+    overflow: hidden;
+  }
+  .amd-cat-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    background: #e5e5ea;
+    font-size: 12px;
+    font-weight: 500;
+    color: #3c3c43;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .amd-cat-pill.amd-cat-active {
+    background: #007aff;
+    color: #fff;
+  }
+  .amd-cat-pill svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Message rows */
+  .amd-msg-row {
+    padding: 8px 12px;
+    border-bottom: 0.5px solid #e5e5ea;
+    cursor: default;
+  }
+  .amd-msg-row.amd-selected {
+    background: #007aff;
+    color: #fff;
+    border-radius: 6px;
+    margin: 0 6px;
+    border-bottom: none;
+  }
+  .amd-msg-top {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 1px;
+  }
+  .amd-msg-sender {
+    font-size: 13px;
+    font-weight: 700;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .amd-msg-time {
+    font-size: 12px;
+    color: #8e8e93;
+    flex-shrink: 0;
+  }
+  .amd-msg-row.amd-selected .amd-msg-time {
+    color: rgba(255,255,255,.7);
+  }
+  .amd-msg-subject {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1px;
+  }
+  .amd-msg-preview {
+    font-size: 12px;
+    color: #8e8e93;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .amd-msg-row.amd-selected .amd-msg-preview {
+    color: rgba(255,255,255,.7);
+  }
+
+  /* -- Reading pane (right) -- */
+  .amd-reading {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  /* Toolbar — icons across top of reading pane */
+  .amd-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-bottom: 0.5px solid #e5e5ea;
+  }
+  .amd-toolbar svg {
+    width: 18px;
+    height: 18px;
+    color: #8e8e93;
+    flex-shrink: 0;
+    padding: 2px;
+  }
+  .amd-toolbar-spacer { flex: 1; }
+  .amd-toolbar-search {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #8e8e93;
+  }
+
+  /* Mailing list banner in reading pane */
+  .amd-mailing-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #000;
+    border-bottom: 0.5px solid #e5e5ea;
+  }
+  .amd-mailing-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .amd-mailing-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #007aff;
+  }
+  .amd-mailing-icon .amd-mailing-badge {
+    position: absolute;
+    bottom: -1px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #34c759;
+    border: 2px solid #fff;
+  }
+  .amd-mailing-text {
+    flex: 1;
+    font-weight: 400;
+  }
+  .amd-mailing-unsub {
+    font-size: 12px;
+    font-weight: 500;
+    color: #007aff;
+    background: #e5e5ea;
+    padding: 4px 14px;
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+  .amd-mailing-x {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e5e5ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .amd-mailing-x svg {
+    width: 10px;
+    height: 10px;
+    color: #8e8e93;
+  }
+
+  /* Sender header */
+  .amd-sender-area {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .amd-sender-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    background: #a0a0a8;
+  }
+  .amd-sender-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .amd-sender-meta {
+    flex: 1;
+    min-width: 0;
+  }
+  .amd-sender-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+  }
+  .amd-sender-domain {
+    font-size: 12px;
+    color: #8e8e93;
+  }
+  .amd-sender-domain .amd-verified-check {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 3px;
+    vertical-align: middle;
+  }
+  .amd-sender-subject {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    margin-top: 2px;
+  }
+  .amd-sender-detail {
+    font-size: 12px;
+    color: #8e8e93;
+  }
+  .amd-sender-right {
+    text-align: right;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #8e8e93;
+  }
+  .amd-sender-folder {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+    margin-bottom: 2px;
+  }
+  .amd-sender-folder svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Email body in reading pane */
+  .amd-body {
+    flex: 1;
+    padding: 8px 16px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #000;
+    overflow: hidden;
+    border-top: 0.5px solid #e5e5ea;
+  }
+  .amd-body p { margin-bottom: 10px; }
+  .amd-sig {
+    font-size: 12px;
+    color: #8e8e93;
+    padding: 10px 16px;
+    border-top: 0.5px solid #e5e5ea;
+  }
+
+  /* ======================================== */
   /* DARK MODE OVERRIDES                      */
   /* ======================================== */
 
@@ -2336,6 +2707,92 @@
   }
   .dark-mode .apple-toolbar-single svg {
     color: #fff;
+  }
+
+  /* Apple Mail macOS dark mode */
+  .dark-mode .amd-container {
+    background: #1e1e1e;
+    color: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.4);
+  }
+  .dark-mode .amd-sidebar {
+    background: #2c2c2e;
+    border-right-color: #38383a;
+  }
+  .dark-mode .amd-sidebar-item {
+    color: #fff;
+  }
+  .dark-mode .amd-sidebar-item.amd-active {
+    background: #0a84ff;
+  }
+  .dark-mode .amd-msglist {
+    background: #1e1e1e;
+    border-right-color: #38383a;
+  }
+  .dark-mode .amd-msglist-title {
+    color: #fff;
+  }
+  .dark-mode .amd-msg-row {
+    border-bottom-color: #38383a;
+  }
+  .dark-mode .amd-msg-row.amd-selected {
+    background: #0a84ff;
+  }
+  .dark-mode .amd-msg-sender {
+    color: #fff;
+  }
+  .dark-mode .amd-msg-subject {
+    color: #fff;
+  }
+  .dark-mode .amd-msg-row:not(.amd-selected) .amd-msg-sender {
+    color: #fff;
+  }
+  .dark-mode .amd-categories {
+    border-bottom-color: #38383a;
+  }
+  .dark-mode .amd-cat-pill {
+    background: #38383a;
+    color: #ebebf5;
+  }
+  .dark-mode .amd-cat-pill.amd-cat-active {
+    background: #0a84ff;
+    color: #fff;
+  }
+  .dark-mode .amd-reading {
+    background: #1e1e1e;
+  }
+  .dark-mode .amd-toolbar {
+    border-bottom-color: #38383a;
+  }
+  .dark-mode .amd-toolbar svg {
+    color: #9a9a9e;
+  }
+  .dark-mode .amd-mailing-banner {
+    border-bottom-color: #38383a;
+    color: #fff;
+  }
+  .dark-mode .amd-mailing-unsub {
+    color: #0a84ff;
+    background: #38383a;
+  }
+  .dark-mode .amd-mailing-x {
+    background: #38383a;
+  }
+  .dark-mode .amd-mailing-badge {
+    border-color: #1e1e1e;
+  }
+  .dark-mode .amd-sender-name {
+    color: #fff;
+  }
+  .dark-mode .amd-sender-subject {
+    color: #fff;
+  }
+  .dark-mode .amd-body {
+    color: #fff;
+    border-top-color: #38383a;
+  }
+  .dark-mode .amd-sig {
+    border-top-color: #38383a;
   }
 </style>
 </head>
@@ -3467,6 +3924,201 @@
   </div>
 
   {# ================================================================== #}
+  {# APPLE MAIL macOS                                                    #}
+  {# ================================================================== #}
+  <div class="section-label">Apple Mail Desktop</div>
+  <div class="amd-container">
+
+    {# -- Sidebar -- #}
+    <div class="amd-sidebar">
+      <div class="amd-sidebar-title-bar">
+        <div class="amd-traffic-dot" style="background:#ff5f57;"></div>
+        <div class="amd-traffic-dot" style="background:#ffbd2e;"></div>
+        <div class="amd-traffic-dot" style="background:#28c840;"></div>
+      </div>
+      <div class="amd-sidebar-section">Favorites</div>
+      <div class="amd-sidebar-item amd-active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        Inbox
+      </div>
+      <div class="amd-sidebar-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        Sent
+      </div>
+      <div class="amd-sidebar-section">Smart Mailboxes</div>
+      <div class="amd-sidebar-section">iCloud</div>
+      <div class="amd-sidebar-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        Inbox
+      </div>
+      <div class="amd-sidebar-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
+        Trash
+      </div>
+    </div>
+
+    {# -- Message list -- #}
+    <div class="amd-msglist">
+      <div class="amd-msglist-header">
+        <div>
+          <div class="amd-msglist-title">Inbox</div>
+          <div class="amd-msglist-subtitle">Primary &middot; 4 messages</div>
+        </div>
+        <div class="amd-msglist-actions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+          <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12" cy="8" r="1.5"/></svg>
+        </div>
+      </div>
+      <div class="amd-categories">
+        <div class="amd-cat-pill amd-cat-active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Primary
+        </div>
+        <div class="amd-cat-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 4l-1-2H2v2h2l3.6 7.59-1.35 2.44C5.52 15.37 6.48 17 8 17h12v-2H8l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0021.02 4H7.17z"/></svg>
+        </div>
+        <div class="amd-cat-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+        </div>
+        <div class="amd-cat-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4z"/></svg>
+        </div>
+      </div>
+
+      {# Row 1: BIMI sender (selected) #}
+      <div class="amd-msg-row amd-selected">
+        <div class="amd-msg-top">
+          <span class="amd-msg-sender">{{ company }}</span>
+          <span class="amd-msg-time">{{ inbox_time | default("10:42 AM") }}</span>
+        </div>
+        <div class="amd-msg-subject">{{ inbox_subject | default("Your account security update for " + domain) }}</div>
+        <div class="amd-msg-preview">{{ inbox_preview | default("We wanted to let you know about important changes to our platform that affect your account...") }}</div>
+      </div>
+
+      {# Row 2 #}
+      <div class="amd-msg-row">
+        <div class="amd-msg-top">
+          <span class="amd-msg-sender">{{ other_sender_1_name | default("Sarah Chen") }}</span>
+          <span class="amd-msg-time">{{ other_sender_1_time | default("9:15 AM") }}</span>
+        </div>
+        <div class="amd-msg-subject">{{ other_sender_1_subject | default("Re: Q2 planning doc") }}</div>
+        <div class="amd-msg-preview">{{ other_sender_1_preview | default("Looks good to me. I added a few comments on the timeline section...") }}</div>
+      </div>
+
+      {# Row 3 #}
+      <div class="amd-msg-row">
+        <div class="amd-msg-top">
+          <span class="amd-msg-sender">{{ other_sender_2_name | default("Mike Torres") }}</span>
+          <span class="amd-msg-time">{{ other_sender_2_time | default("Yesterday") }}</span>
+        </div>
+        <div class="amd-msg-subject">{{ other_sender_2_subject | default("Lunch Thursday?") }}</div>
+        <div class="amd-msg-preview">{{ other_sender_2_preview | default("Hey, are you free Thursday around noon? There's a new place on 5th...") }}</div>
+      </div>
+
+      {# Row 4 #}
+      <div class="amd-msg-row">
+        <div class="amd-msg-top">
+          <span class="amd-msg-sender">{{ other_sender_3_name | default("Teamwork") }}</span>
+          <span class="amd-msg-time">{{ other_sender_3_time | default("Mar 28") }}</span>
+        </div>
+        <div class="amd-msg-subject">{{ other_sender_3_subject | default("New comment on Project Atlas task #204") }}</div>
+        <div class="amd-msg-preview">{{ other_sender_3_preview | default("Jamie left a comment: 'Updated the wireframes, ready for review...'") }}</div>
+      </div>
+    </div>
+
+    {# -- Reading pane -- #}
+    <div class="amd-reading">
+
+      {# Toolbar icons #}
+      <div class="amd-toolbar">
+        {# Compose #}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1v12a1 1 0 001 1z"/><path d="M14.5 3.5l3 3L10 14H7v-3l7.5-7.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" style="margin-left:8px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" style="margin-left:8px;"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6H12l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+        <div class="amd-toolbar-spacer"></div>
+        <div class="amd-toolbar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          Search
+        </div>
+      </div>
+
+      {# Mailing list banner #}
+      <div class="amd-mailing-banner">
+        <div class="amd-mailing-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 4 12 13 2 4"/></svg>
+          <span class="amd-mailing-badge"></span>
+        </div>
+        <span class="amd-mailing-text">This message is from a mailing list.</span>
+        <span class="amd-mailing-unsub">Unsubscribe</span>
+        <div class="amd-mailing-x">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        </div>
+      </div>
+
+      {# Sender header #}
+      <div class="amd-sender-area">
+        <div class="amd-sender-avatar">
+          {% if show_checkmark %}
+          <img src="{{ url_for('bimi_svg_inline', job_id=job_id) }}" alt="{{ company }} logo">
+          {% else %}
+          <div style="width:100%;height:100%;background:#a0a0a8;display:flex;align-items:center;justify-content:center;">
+            {{ company[0] | upper }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="amd-sender-meta">
+          <div class="amd-sender-name">{{ company }}</div>
+          {% if show_checkmark %}
+          <div class="amd-sender-domain"><svg class="amd-verified-check" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#c7c7cc"/><polyline points="4.5 8 7 10.5 11.5 5.5" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ domain }}</div>
+          {% endif %}
+          <div class="amd-sender-subject">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
+          <div class="amd-sender-detail">To: <span class="amd-to-email"></span></div>
+        </div>
+        <div class="amd-sender-right">
+          <div class="amd-sender-folder">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6H12l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+            Inbox &ndash; iCloud
+          </div>
+          <div>{{ inbox_time | default("10:42 AM") }}</div>
+        </div>
+      </div>
+
+      {# Email body #}
+      <div class="amd-body">
+        {% if email_body %}
+          {{ email_body | safe }}
+        {% else %}
+          <p>Hi there,</p>
+          <p>
+            We're writing to let you know about recent updates to the {{ company }} platform
+            that may affect how you use our {{ industry | lower }} services. As part of our ongoing
+            commitment to security and reliability, we've made several enhancements to our
+            infrastructure.
+          </p>
+          <p>
+            If you have any questions about these changes, please don't hesitate to reach out
+            to our support team. We're here to help.
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="amd-sig">
+        Best regards,<br>
+        The {{ company }} Team<br>
+        <span class="amd-sig-email"></span>
+      </div>
+
+    </div>{# /.amd-reading #}
+  </div>{# /.amd-container #}
+
+  {# ================================================================== #}
   {# YAHOO MAIL DESKTOP                                                  #}
   {# ================================================================== #}
   <div class="section-label">Yahoo Mail Desktop</div>
@@ -3565,7 +4217,7 @@
       </div>
       <div class="yahoo-brand-info">
         <div class="yahoo-brand-name">{{ company }}</div>
-        <div class="yahoo-brand-url">www.{{ domain }}</div>
+        <div class="yahoo-brand-url">{{ domain }}</div>
       </div>
       <a class="yahoo-brand-visit" href="#">Visit site &rarr;</a>
     </div>
@@ -3599,7 +4251,7 @@
               <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             {% endif %}
-            <span class="yahoo-desktop-sender-url">www.{{ domain }} &#x203A;</span>
+            <span class="yahoo-desktop-sender-url">{{ domain }} &#x203A;</span>
           </div>
           <div class="yahoo-desktop-sender-from">From: <span class="yahoo-desktop-from-email"></span></div>
           <div class="yahoo-desktop-sender-to">To: <span class="yahoo-desktop-to-email"></span></div>
@@ -3679,10 +4331,10 @@
     var yahooToEmails = document.querySelectorAll('.yahoo-desktop-to-email');
     for (var i = 0; i < yahooToEmails.length; i++) yahooToEmails[i].textContent = 'you@yahoo.com';
 
-    // Apple Mail email addresses
-    var appleSigs = document.querySelectorAll('.apple-sig-email');
+    // Apple Mail email addresses (mobile + desktop)
+    var appleSigs = document.querySelectorAll('.apple-sig-email, .amd-sig-email');
     for (var i = 0; i < appleSigs.length; i++) appleSigs[i].textContent = addr;
-    var appleToEmails = document.querySelectorAll('.apple-to-email');
+    var appleToEmails = document.querySelectorAll('.apple-to-email, .amd-to-email');
     for (var i = 0; i < appleToEmails.length; i++) appleToEmails[i].textContent = 'me@icloud.com';
 
     // Sync email phone screen height to inbox phone screen height

@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-04-04
+
+### Added
+
+- Apple Mail for iOS inbox and open email previews with iOS 26.4 UI: category filter pills, white floating pill buttons with shadow, mailing list unsubscribe banner, Summarize bar, and floating bottom toolbar overlaying email content
+- Apple Mail for macOS desktop preview with three-pane layout: sidebar (Favorites/iCloud mailboxes), message list with category pills, and reading pane with toolbar, mailing list banner, sender header with verified checkmark, and email body
+- VMC/CMC certificate handling for Apple Mail: VMC shows BIMI logo, CMC shows initial (Apple Mail does not display CMC logos)
+- Dark mode support for all Apple Mail previews (true black iOS backgrounds, dark gray macOS surfaces)
+- SEO meta tags on the index page: description, Open Graph, and Twitter Card tags for social sharing
+
+### Changed
+
+- Updated certificate hint to clarify VMC checkmark support varies by client (desktop only for Apple/Yahoo) and that Yahoo Mail and Apple Mail do not display CMC logos
+- Removed `www.` prefix from domain display in Apple Mail and Yahoo Mail desktop previews
+- Preview page footer now mentions Apple Mail alongside Gmail and Yahoo Mail
+
 ## [0.4.5] - 2026-04-02
 
 ### Fixed

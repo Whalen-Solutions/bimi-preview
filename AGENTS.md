@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-BIMI Preview Generator -- a Flask web app that converts logos into BIMI-compliant SVG Tiny-PS files and renders realistic Gmail inbox mockups showing how a verified sender avatar appears.
+BIMI Preview Generator -- a Flask web app that converts logos into BIMI-compliant SVG Tiny-PS files and renders realistic Gmail, Apple Mail, and Yahoo Mail inbox mockups showing how a verified sender avatar appears.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ BIMI Preview Generator -- a Flask web app that converts logos into BIMI-complian
 - **llm.py** -- LLM provider abstraction supporting Anthropic, OpenAI, and Google Gemini. Generates realistic email content (subject line, body, and an `other_senders` array of inbox neighbors) as structured JSON. `_parse_response` flattens the array into numbered template keys (`other_sender_1_name`, etc.) and derives `_initial` from each sender's name. Email times and `email_subject` are not in the prompt -- times are computed server-side in `app.py` and `email_subject` falls back to `inbox_subject` in the template. Returns `{}` on any failure so Jinja `| default()` filters activate gracefully.
 - **templates/** -- Jinja2 templates:
   - `index.jinja2.html` -- Upload form (company, domain, industry, logo file)
-  - `preview.jinja2.html` -- Gmail inbox + open email mockup with BIMI avatar
+  - `preview.jinja2.html` -- Gmail, Apple Mail, and Yahoo Mail inbox + open email mockups with BIMI avatar
   - `prompt.jinja2.html` -- LLM prompt documentation page
 
 ## Key Design Decisions

@@ -1,17 +1,25 @@
 # BIMI Preview Generator
 
-A Flask web app that converts a logo into a BIMI-compliant SVG and renders a realistic Gmail inbox preview showing how the verified sender avatar would appear.
+A Flask web app that converts a logo into a BIMI-compliant SVG Tiny-PS file and renders realistic Gmail, Apple Mail, and Yahoo Mail inbox previews showing how the verified sender avatar would appear.
 
 ## What is BIMI?
 
-[Brand Indicators for Message Identification (BIMI)](https://bimigroup.org/) is an email standard that lets organizations display their verified logo next to authenticated messages in supporting email clients. When configured with DMARC alignment and (optionally) a Verified Mark Certificate (VMC), the logo appears as a circular avatar in Gmail and other participating inboxes.
+[Brand Indicators for Message Identification (BIMI)](https://bimigroup.org/) is an email standard that lets organizations display their verified logo next to authenticated messages in supporting email clients.
+
+| Client | VMC Logo | VMC Checkmark | CMC Logo |
+| --- | --- | --- | --- |
+| Gmail (mobile & desktop) | Yes | Yes | Yes (no checkmark) |
+| Apple Mail (iOS) | Yes | No | No |
+| Apple Mail (macOS) | Yes | Yes | No |
+| Yahoo Mail (Mobile) | Yes | No | No |
+| Yahoo Mail (desktop) | Yes | Yes | No |
 
 ## How It Works
 
 1. **Upload** a logo image (PNG, JPG, SVG, WebP, GIF, BMP, or TIFF) along with your company name, email domain, and industry.
 2. **Convert** -- the app converts the image to a BIMI-compliant SVG Tiny-PS file with a square viewBox, solid background, circle-crop clearance, and all forbidden elements removed.
 3. **Generate** -- a small LLM (Claude Haiku or GPT-4o-mini) generates industry-appropriate email content: subject lines, preview text, email body, and realistic inbox neighbors.
-4. **Preview** -- see a pixel-accurate Gmail mockup with your BIMI avatar in the inbox list and the open email view (with the blue verified checkmark).
+4. **Preview** -- see pixel-accurate Gmail, Apple Mail, and Yahoo Mail mockups (mobile and desktop) with your BIMI avatar in the inbox list and the open email view.
 5. **Download** -- click the download button to grab the BIMI-compliant SVG to publish on your domain and configure in DNS. Files are automatically cleaned up after 10 minutes.
 
 ## Prerequisites
@@ -235,7 +243,7 @@ bimi-preview/
   llm.py              LLM provider abstraction (Anthropic / OpenAI / Gemini)
   templates/
     index.jinja2.html        Upload form
-    preview.jinja2.html      Gmail inbox mockup (Jinja2)
+    preview.jinja2.html      Gmail/Apple Mail/Yahoo Mail mockups (Jinja2)
     prompt.jinja2.html       LLM prompt documentation
   .env.example        Example environment configuration
   pyproject.toml      Python project metadata and dependencies
