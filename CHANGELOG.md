@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.2] - 2026-04-05
+
+### Changed
+
+- Added Yahoo Mail and Apple Mail the ihe index's intro text.
+
 ## [0.5.1] - 2026-04-04
 
 ### Fixed
