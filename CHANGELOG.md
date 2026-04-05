@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.3] - 2026-04-05
+
+### Added
+
+- GitHub source code link below the input form on the index page
+
 ## [0.5.2] - 2026-04-05
 
 ### Changed
