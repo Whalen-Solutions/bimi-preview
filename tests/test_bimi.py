@@ -16,14 +16,11 @@ from bimi import (
     _estimate_right_tangent,
     _fit_cubic_beziers,
     _fit_single_cubic,
-    _identify_background_index,
     _inline_styles,
     _local_name,
     _max_bezier_error,
-    _merge_similar_colors,
     _ns_tag,
     _parse_css_rules,
-    _quantize_colors,
     _resolve_use_refs,
     _selector_matches,
     _strip_forbidden_elements,
@@ -32,7 +29,6 @@ from bimi import (
     _upsample_factor,
     convert_to_bimi,
     otsu_threshold,
-    preprocess_raster_multicolor,
     raster_to_bimi_svg,
     svg_to_bimi_svg,
     trace_to_svg_paths,
@@ -366,14 +362,12 @@ class TestTraceToSvgPaths:
             assert "C" in p
             assert p.endswith("Z")
 
-    def test_uses_line_and_curve_commands(self):
+    def test_no_line_commands(self):
         mask = self._circle_mask()
         paths = trace_to_svg_paths(mask, 200, tolerance=2.0)
-        all_cmds = "".join(paths)
-        # Should have M (move), C (curve), Z (close), and possibly L (line)
-        assert "M" in all_cmds
-        assert "C" in all_cmds
-        assert "Z" in all_cmds
+        for p in paths:
+            # Should have no L commands — only M, C, Z
+            assert "L" not in p
 
     def test_empty_mask_no_paths(self):
         mask = np.zeros((100, 100), dtype=bool)
@@ -1040,123 +1034,3 @@ class TestSvgWithCssClasses:
         assert 'baseProfile="tiny-ps"' in result
         assert "<circle" in result
         assert "red" in result
-
-
-# ---------------------------------------------------------------------------
-# Multi-color quantization and tracing
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def multicolor_badge(tmp_path):
-    """300x300 PNG: light blue circle on white bg with dark blue center square."""
-    from PIL import ImageDraw
-
-    img = Image.new("RGB", (300, 300), (255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    # Light blue circle
-    draw.ellipse([20, 20, 280, 280], fill=(108, 185, 224))
-    # Dark blue square in center
-    draw.rectangle([100, 100, 200, 200], fill=(30, 60, 100))
-    p = tmp_path / "badge.png"
-    img.save(p)
-    return str(p)
-
-
-class TestQuantizeColors:
-    def test_basic_three_colors(self):
-        """Three distinct colors should produce 3 palette entries."""
-        img = Image.new("RGB", (90, 30), (255, 255, 255))
-        from PIL import ImageDraw
-
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([0, 0, 29, 29], fill=(255, 0, 0))
-        draw.rectangle([30, 0, 59, 29], fill=(0, 255, 0))
-        # Right third stays white
-        label_map, palette = _quantize_colors(img, max_colors=6)
-        assert len(palette) >= 3
-        assert label_map.shape == (30, 90)
-
-    def test_rgba_composited(self):
-        """RGBA input should be composited onto white."""
-        img = Image.new("RGBA", (50, 50), (255, 0, 0, 128))
-        label_map, palette = _quantize_colors(img, max_colors=4)
-        assert label_map.shape == (50, 50)
-        assert len(palette) >= 1
-
-
-class TestIdentifyBackgroundIndex:
-    def test_white_background(self):
-        """Background should be detected as white for white-bordered image."""
-        img = Image.new("RGB", (100, 100), (255, 255, 255))
-        from PIL import ImageDraw
-
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([30, 30, 70, 70], fill=(0, 0, 0))
-        label_map, palette = _quantize_colors(img, max_colors=4)
-        bg_idx = _identify_background_index(label_map, palette)
-        # Background color should be close to white
-        bg = palette[bg_idx]
-        assert bg[0] > 200 and bg[1] > 200 and bg[2] > 200
-
-
-class TestMergeSimilarColors:
-    def test_merge_close_colors(self):
-        """Colors within threshold should be merged."""
-        mask1 = np.ones((10, 10), dtype=bool)
-        mask2 = np.ones((10, 10), dtype=bool)
-        layers = [(mask1, (100, 100, 100)), (mask2, (110, 105, 95))]
-        merged = _merge_similar_colors(layers, threshold=30.0)
-        assert len(merged) == 1
-
-    def test_keep_distinct_colors(self):
-        """Colors far apart should not be merged."""
-        mask1 = np.ones((10, 10), dtype=bool)
-        mask2 = np.ones((10, 10), dtype=bool)
-        layers = [(mask1, (255, 0, 0)), (mask2, (0, 0, 255))]
-        merged = _merge_similar_colors(layers, threshold=30.0)
-        assert len(merged) == 2
-
-
-class TestPreprocessRasterMulticolor:
-    def test_returns_multiple_layers(self, multicolor_badge):
-        """Multi-color image should produce multiple layers."""
-        layers, dim, bg_hex = preprocess_raster_multicolor(
-            multicolor_badge, max_colors=6
-        )
-        assert len(layers) >= 2
-        assert dim > 0
-        for mask, hex_color in layers:
-            assert mask.shape == (dim, dim)
-            assert hex_color.startswith("#")
-            assert len(hex_color) == 7
-
-    def test_transparent_quantizes_opaque_pixels(self, transparent_logo):
-        """Transparent image should quantize opaque pixels into layers."""
-        layers, dim, bg_hex = preprocess_raster_multicolor(
-            transparent_logo, max_colors=6
-        )
-        assert len(layers) >= 1
-        assert bg_hex.startswith("#")
-
-
-class TestMulticolorBimi:
-    def test_multicolor_badge_has_multiple_fills(self, multicolor_badge):
-        """Multi-color badge SVG should have multiple distinct fill colors."""
-        svg = raster_to_bimi_svg(multicolor_badge, "Badge Co")
-        fills = re.findall(r'fill="(#[0-9a-f]{6})"', svg)
-        # Should have background rect fill + at least 2 path fills
-        unique_fills = set(fills)
-        assert len(unique_fills) >= 3, f"Expected 3+ unique fills, got {unique_fills}"
-
-    def test_simple_logo_still_works(self, black_square_on_white):
-        """Simple two-color logo should still produce valid BIMI SVG."""
-        svg = raster_to_bimi_svg(black_square_on_white, "Simple")
-        assert 'version="1.2"' in svg
-        assert 'baseProfile="tiny-ps"' in svg
-        assert "<path" in svg
-
-    def test_multicolor_under_32kb(self, multicolor_badge):
-        """Multi-color output should stay under BIMI 32KB limit."""
-        svg = raster_to_bimi_svg(multicolor_badge, "Badge Co")
-        assert len(svg.encode("utf-8")) <= 32 * 1024

@@ -176,299 +176,6 @@ def preprocess_raster(path: str) -> tuple[np.ndarray, np.ndarray, int]:
 
 
 # ---------------------------------------------------------------------------
-# Multi-color quantization helpers
-# ---------------------------------------------------------------------------
-
-
-def _quantize_colors(
-    img: Image.Image, max_colors: int = 6
-) -> tuple[np.ndarray, list[tuple[int, int, int]]]:
-    """Quantize image to a small palette.
-
-    Returns:
-        label_map: 2D ndarray of color indices (H x W)
-        palette:   list of RGB tuples for each index
-    """
-    rgb = img.convert("RGBA")
-    # Composite onto white to remove transparency before quantizing
-    bg = Image.new("RGBA", rgb.size, (255, 255, 255, 255))
-    bg.paste(rgb, mask=rgb.split()[3])
-    rgb = bg.convert("RGB")
-
-    quantized = rgb.quantize(colors=max_colors, method=Image.Quantize.MEDIANCUT)
-    palette_flat = quantized.getpalette()
-    label_map = np.array(quantized)
-
-    # Extract only the palette entries actually used
-    used_indices = np.unique(label_map)
-    palette = []
-    index_remap = {}
-    for new_idx, old_idx in enumerate(used_indices):
-        r = palette_flat[old_idx * 3]
-        g = palette_flat[old_idx * 3 + 1]
-        b = palette_flat[old_idx * 3 + 2]
-        palette.append((r, g, b))
-        index_remap[old_idx] = new_idx
-
-    # Remap label_map to contiguous indices
-    remapped = np.zeros_like(label_map)
-    for old_idx, new_idx in index_remap.items():
-        remapped[label_map == old_idx] = new_idx
-    label_map = remapped
-
-    return label_map, palette
-
-
-def _identify_background_index(
-    label_map: np.ndarray, palette: list[tuple[int, int, int]]
-) -> int:
-    """Return the palette index of the background color."""
-    h, w = label_map.shape
-    border = max(4, min(h, w) // 20)
-    edges = np.concatenate(
-        [
-            label_map[:border].ravel(),
-            label_map[-border:].ravel(),
-            label_map[border:-border, :border].ravel(),
-            label_map[border:-border, -border:].ravel(),
-        ]
-    )
-    counts = np.bincount(edges, minlength=len(palette))
-    return int(np.argmax(counts))
-
-
-def _merge_similar_colors(
-    layers: list[tuple[np.ndarray, tuple[int, int, int]]], threshold: float = 30.0
-) -> list[tuple[np.ndarray, str]]:
-    """Merge layers whose colors are within Euclidean RGB distance.
-
-    Returns list of (mask, hex_color) with similar colors merged.
-    """
-    merged: list[tuple[np.ndarray, np.ndarray]] = [
-        (mask, np.array(color, dtype=float)) for mask, color in layers
-    ]
-
-    changed = True
-    while changed:
-        changed = False
-        for i in range(len(merged)):
-            for j in range(i + 1, len(merged)):
-                dist = np.linalg.norm(merged[i][1] - merged[j][1])
-                if dist < threshold:
-                    # Weighted average color by pixel count
-                    c_i = merged[i][0].sum()
-                    c_j = merged[j][0].sum()
-                    total = c_i + c_j
-                    if total > 0:
-                        avg = (merged[i][1] * c_i + merged[j][1] * c_j) / total
-                    else:
-                        avg = merged[i][1]
-                    combined_mask = merged[i][0] | merged[j][0]
-                    merged[i] = (combined_mask, avg)
-                    merged.pop(j)
-                    changed = True
-                    break
-            if changed:
-                break
-
-    result = []
-    for mask, color in merged:
-        rgb = color.astype(int)
-        hex_color = "#{:02x}{:02x}{:02x}".format(*rgb)
-        result.append((mask, hex_color))
-    return result
-
-
-def preprocess_raster_multicolor(
-    path: str, max_colors: int = 6
-) -> tuple[list[tuple[np.ndarray, str]], int, str]:
-    """Preprocess a raster image for multi-color tracing.
-
-    Returns:
-        layers: list of (binary_mask, hex_color) for each foreground color
-        upsampled_dim: side length of the upsampled canvas
-        bg_hex: hex color of the identified background
-    """
-    img = Image.open(path)
-
-    # Multi-frame: select largest frame
-    if hasattr(img, "n_frames") and img.n_frames > 1:
-        best, best_size = img.copy(), img.size[0] * img.size[1]
-        for i in range(img.n_frames):
-            img.seek(i)
-            px = img.size[0] * img.size[1]
-            if px > best_size:
-                best, best_size = img.copy(), px
-        img = best
-
-    if img.mode == "P" and "transparency" in img.info:
-        img = img.convert("RGBA")
-
-    transparent = _has_transparency(img)
-    # Multi-color quantization separates regions by color, not edge
-    # detection, so heavy upsampling just bloats path data.  Target
-    # ~800px which gives good detail for BIMI avatars.
-    max_dim = max(img.width, img.height)
-    target_dim = 1000
-    if max_dim <= target_dim:
-        if max_dim < 200:
-            upsample = 3
-        elif max_dim < 400:
-            upsample = 2
-        else:
-            upsample = 1
-        upsampled_dim = max_dim * upsample
-    else:
-        # Downsample large images to target
-        upsample = 1
-        upsampled_dim = target_dim
-
-    if transparent:
-        img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
-        alpha = np.array(img_up.split()[-1])
-        opaque_mask = alpha > 127
-
-        if not opaque_mask.any():
-            return [(opaque_mask, "#000000")], upsampled_dim, "#ffffff"
-
-        # Composite onto white, then quantize opaque pixels into
-        # multiple colors instead of averaging them into one.
-        bg_rgba = Image.new("RGBA", img_up.size, (255, 255, 255, 255))
-        bg_rgba.paste(img_up, mask=img_up.split()[3])
-        img_rgb = bg_rgba.convert("RGB")
-
-        label_map, palette = _quantize_colors(img_rgb, max_colors)
-
-        # The composited background (white) is the true background
-        bg_idx = _identify_background_index(label_map, palette)
-        bg_color = palette[bg_idx]
-        bg_hex = "#{:02x}{:02x}{:02x}".format(*bg_color)
-
-        total_pixels = label_map.size
-        bg_arr = np.array(bg_color, dtype=float)
-        raw_layers: list[tuple[np.ndarray, tuple[int, int, int]]] = []
-        for idx, color in enumerate(palette):
-            if idx == bg_idx:
-                continue
-            if np.linalg.norm(np.array(color, dtype=float) - bg_arr) < 30:
-                continue
-            # AND with the alpha mask so transparent pixels are excluded
-            color_mask = (label_map == idx) & opaque_mask
-            if color_mask.sum() < total_pixels * 0.005:
-                continue
-            raw_layers.append((color_mask, color))
-
-        if not raw_layers:
-            fg = np.array(img_rgb)[opaque_mask].mean(axis=0).astype(int)
-            hex_color = "#{:02x}{:02x}{:02x}".format(*fg)
-            return [(opaque_mask, hex_color)], upsampled_dim, bg_hex
-
-        layers = _merge_similar_colors(raw_layers)
-
-        fmt = _detect_format(path)
-        blur_radius = max(1, upsample // 4)
-        smoothed_layers = []
-        for layer_mask, hex_color in layers:
-            gray = Image.fromarray(layer_mask.astype(np.uint8) * 255, mode="L")
-            if fmt == "jpeg":
-                gray = gray.filter(ImageFilter.MedianFilter(size=5))
-                gray = gray.filter(ImageFilter.MedianFilter(size=3))
-            gray = gray.filter(ImageFilter.GaussianBlur(radius=blur_radius))
-            smoothed = np.array(gray) > 127
-            if smoothed.any():
-                smoothed_layers.append((smoothed, hex_color))
-
-        if not smoothed_layers:
-            smoothed_layers = layers
-
-        return smoothed_layers, upsampled_dim, bg_hex
-
-    img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
-
-    label_map, palette = _quantize_colors(img_up, max_colors)
-    bg_idx = _identify_background_index(label_map, palette)
-    bg_color = palette[bg_idx]
-
-    # Distinguish edge-connected background from interior regions of the
-    # same color.  Only pixels connected to the image border are true
-    # background; interior "holes" (e.g. a white circle center inside a
-    # colored ring) are kept as foreground so they trace correctly.
-    bg_mask = label_map == bg_idx
-    bg_labels = measure.label(bg_mask, connectivity=1)
-    # Find labels that touch any border row/column
-    border_labels: set[int] = set()
-    h, w = bg_labels.shape
-    border_labels.update(bg_labels[0, :].tolist())
-    border_labels.update(bg_labels[-1, :].tolist())
-    border_labels.update(bg_labels[:, 0].tolist())
-    border_labels.update(bg_labels[:, -1].tolist())
-    border_labels.discard(0)  # 0 = non-background pixels
-
-    # True background: only the border-touching components
-    true_bg_mask = np.zeros_like(bg_mask)
-    for bl in border_labels:
-        true_bg_mask |= bg_labels == bl
-
-    # Interior regions of the background color become a foreground layer
-    interior_bg_mask = bg_mask & ~true_bg_mask
-
-    total_pixels = label_map.size
-    raw_layers: list[tuple[np.ndarray, tuple[int, int, int]]] = []
-
-    if interior_bg_mask.sum() >= total_pixels * 0.005:
-        raw_layers.append((interior_bg_mask, bg_color))
-
-    bg_arr = np.array(bg_color, dtype=float)
-    for idx, color in enumerate(palette):
-        if idx == bg_idx:
-            continue
-        # Skip colors too similar to background (e.g. JPEG compression
-        # artifacts that split one color into multiple buckets)
-        if np.linalg.norm(np.array(color, dtype=float) - bg_arr) < 30:
-            continue
-        mask = label_map == idx
-        # Skip tiny regions (< 0.5% of image)
-        if mask.sum() < total_pixels * 0.005:
-            continue
-        raw_layers.append((mask, color))
-
-    bg_hex = "#{:02x}{:02x}{:02x}".format(*bg_color)
-
-    if not raw_layers:
-        # Fallback: treat everything non-background as foreground
-        mask = label_map != bg_idx
-        fg_rgb = np.array(img_up.convert("RGB"))
-        if mask.any():
-            fg = fg_rgb[mask].mean(axis=0).astype(int)
-            hex_color = "#{:02x}{:02x}{:02x}".format(*fg)
-        else:
-            hex_color = "#000000"
-        return [(mask, hex_color)], upsampled_dim, bg_hex
-
-    layers = _merge_similar_colors(raw_layers)
-
-    # Apply blur to each mask for smoother tracing
-    fmt = _detect_format(path)
-    blur_radius = max(1, upsample // 4)
-    smoothed_layers = []
-    for mask, hex_color in layers:
-        gray = Image.fromarray(mask.astype(np.uint8) * 255, mode="L")
-        if fmt == "jpeg":
-            gray = gray.filter(ImageFilter.MedianFilter(size=5))
-            gray = gray.filter(ImageFilter.MedianFilter(size=3))
-        gray = gray.filter(ImageFilter.GaussianBlur(radius=blur_radius))
-        smoothed = np.array(gray) > 127
-        if smoothed.any():
-            smoothed_layers.append((smoothed, hex_color))
-
-    if not smoothed_layers:
-        # If smoothing eliminated everything, return unsmoothed
-        smoothed_layers = layers
-
-    return smoothed_layers, upsampled_dim, bg_hex
-
-
-# ---------------------------------------------------------------------------
 # Contour simplification (Douglas-Peucker)
 # ---------------------------------------------------------------------------
 
@@ -741,109 +448,18 @@ def trace_to_svg_paths(
             continue
 
         # contour coords are (row, col) = (y, x); swap for SVG
-        # Use L for straight segments, C for curves (saves ~70% per
-        # straight segment which is common in text and geometric shapes).
         cp0 = beziers[0]
         parts = [f"M{cp0[0][1]:.1f},{cp0[0][0]:.1f}"]
         for cp in beziers:
-            start = cp[0]
-            end = cp[3]
-            seg_len = np.linalg.norm(end - start)
-            if seg_len < 1e-6:
-                continue
-            # Check if control points lie on the start→end line
-            seg_dir = (end - start) / seg_len
-            diff1 = cp[1] - start
-            diff2 = cp[2] - start
-            d1 = abs(seg_dir[0] * diff1[1] - seg_dir[1] * diff1[0])
-            d2 = abs(seg_dir[0] * diff2[1] - seg_dir[1] * diff2[0])
-            if d1 < tolerance and d2 < tolerance:
-                parts.append(f"L{cp[3][1]:.1f},{cp[3][0]:.1f}")
-            else:
-                parts.append(
-                    f"C{cp[1][1]:.1f},{cp[1][0]:.1f} "
-                    f"{cp[2][1]:.1f},{cp[2][0]:.1f} "
-                    f"{cp[3][1]:.1f},{cp[3][0]:.1f}"
-                )
+            parts.append(
+                f"C{cp[1][1]:.1f},{cp[1][0]:.1f} "
+                f"{cp[2][1]:.1f},{cp[2][0]:.1f} "
+                f"{cp[3][1]:.1f},{cp[3][0]:.1f}"
+            )
         parts.append("Z")
         paths.append("".join(parts))
 
     return paths
-
-
-def _path_bbox_area(path_d: str) -> float:
-    """Approximate bounding box area of an SVG path string."""
-    coords = re.findall(r"(-?[\d.]+),(-?[\d.]+)", path_d)
-    if not coords:
-        return 0.0
-    xs = [float(c[0]) for c in coords]
-    ys = [float(c[1]) for c in coords]
-    return (max(xs) - min(xs)) * (max(ys) - min(ys))
-
-
-def _filter_small_paths(
-    path_strs: list[str], min_area_frac: float, total_area: float
-) -> list[str]:
-    """Remove paths whose bounding box area is below a fraction of total."""
-    threshold = total_area * min_area_frac
-    return [p for p in path_strs if _path_bbox_area(p) >= threshold]
-
-
-def _round_path_coords(path_d: str) -> str:
-    """Round all coordinates in an SVG path string to integers."""
-    return re.sub(r"-?\d+\.\d+", lambda m: str(round(float(m.group(0)))), path_d)
-
-
-def _trace_multicolor_layers(
-    layers: list[tuple[np.ndarray, str]],
-    upsampled_dim: int,
-    tolerance: float = 2.0,
-    min_area_frac: float = 0.001,
-    max_paths_per_layer: int = 80,
-) -> list[tuple[list[str], str, str]]:
-    """Trace each color layer independently.
-
-    Small contours (bounding box < ``min_area_frac`` of canvas) are
-    discarded, and each layer is capped at ``max_paths_per_layer`` paths
-    (keeping the largest).  Coordinates are rounded to integers to
-    reduce path data size.
-
-    Returns list of (path_d_strings, hex_color, potrace_xform) sorted by
-    mask area descending (largest layers render first / underneath).
-    """
-    results: list[tuple[list[str], str, str, int]] = []
-    canvas_area = float(upsampled_dim) ** 2
-
-    for mask, hex_color in layers:
-        area = int(mask.sum())
-        potrace_result = _trace_with_potrace(mask)
-        if potrace_result is not None:
-            path_strs, xform = potrace_result
-        else:
-            path_strs = trace_to_svg_paths(mask, upsampled_dim, tolerance)
-            xform = ""
-
-        if not path_strs:
-            continue
-
-        # Filter out tiny contour fragments (anti-aliasing artifacts)
-        path_strs = _filter_small_paths(path_strs, min_area_frac, canvas_area)
-        if not path_strs:
-            continue
-
-        # Cap number of paths per layer, keeping largest by bbox area
-        if len(path_strs) > max_paths_per_layer:
-            path_strs.sort(key=_path_bbox_area, reverse=True)
-            path_strs = path_strs[:max_paths_per_layer]
-
-        # Round coordinates to integers to reduce path data size
-        path_strs = [_round_path_coords(p) for p in path_strs]
-
-        results.append((path_strs, hex_color, xform, area))
-
-    # Sort by area descending so largest regions render underneath
-    results.sort(key=lambda r: r[3], reverse=True)
-    return [(paths, color, xform) for paths, color, xform, _ in results]
 
 
 # ---------------------------------------------------------------------------
@@ -878,85 +494,58 @@ def _compute_path_bounds(path_strs: list[str]) -> tuple[float, float, float, flo
 
 def raster_to_bimi_svg(path: str, company_name: str) -> str:
     """Convert a raster image to a BIMI-compliant SVG string."""
+    binary, gt_mask, upsampled_dim = preprocess_raster(path)
+
+    img = Image.open(path)
+    bg_color = _dominant_color(img)
+
+    # Determine mark color from foreground pixels
+    arr_rgb = np.array(img.convert("RGB"))
+    mask_resized = (
+        np.array(
+            Image.fromarray(binary.astype(np.uint8) * 255).resize(
+                (img.width, img.height), Image.Resampling.NEAREST
+            )
+        )
+        > 127
+    )
+    if mask_resized.any():
+        fg_pixels = arr_rgb[mask_resized]
+        mark_color = "#{:02x}{:02x}{:02x}".format(*fg_pixels.mean(axis=0).astype(int))
+    else:
+        bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
+        bg_lum = 0.299 * bg_rgb[0] + 0.587 * bg_rgb[1] + 0.114 * bg_rgb[2]
+        mark_color = "#000000" if bg_lum > 127 else "#ffffff"
+
+    # Prefer potrace for higher quality tracing
+    potrace_xform = ""
+    potrace_result = _trace_with_potrace(binary)
+    if potrace_result is not None:
+        path_strs, potrace_xform = potrace_result
+        h, w = binary.shape
+        min_x, min_y, max_x, max_y = 0.0, 0.0, float(w), float(h)
+    else:
+        # Fallback: scikit-image contour tracing + Bezier fitting
+        tolerance = max(2.0, upsampled_dim / 400)
+        path_strs = trace_to_svg_paths(binary, upsampled_dim, tolerance)
+
+        # If too much path data, retry with coarser tolerance
+        while sum(len(p) for p in path_strs) > BIMI_MAX_SIZE and tolerance < 20:
+            tolerance *= 1.5
+            path_strs = trace_to_svg_paths(binary, upsampled_dim, tolerance)
+
+        if not path_strs:
+            raise ValueError("Could not trace any paths from the image.")
+
+        min_x, min_y, max_x, max_y = _compute_path_bounds(path_strs)
+
+    # Compute bounds and center with 85% scale for circle-crop clearance
+    content_w = max_x - min_x
+    content_h = max_y - min_y
+
     canvas_size = 800
     av_scale = 0.85
     usable = canvas_size * av_scale
-
-    max_colors = 10
-    tolerance = None  # computed per-attempt
-
-    layers, upsampled_dim, bg_color = preprocess_raster_multicolor(path, max_colors)
-    if tolerance is None:
-        tolerance = max(2.0, upsampled_dim / 400)
-
-    traced = _trace_multicolor_layers(layers, upsampled_dim, tolerance)
-
-    if not traced:
-        raise ValueError("Could not trace any paths from the image.")
-
-    # Progressive simplification to stay under 32KB.
-    # Priority: increase tolerance first (keeps all features with less
-    # detail), then filter small contours, then reduce colors.
-    min_area_frac = 0.0005
-    max_paths = 200
-    total_path_bytes = sum(len(" ".join(ps)) for ps, _, _ in traced)
-    while total_path_bytes > 31000:
-        if tolerance < 8:
-            # First: increase trace tolerance
-            tolerance *= 1.5
-            traced = _trace_multicolor_layers(
-                layers, upsampled_dim, tolerance, min_area_frac, max_paths
-            )
-        elif min_area_frac < 0.01:
-            # Second: filter small contours
-            min_area_frac *= 2
-            max_paths = max(20, max_paths - 20)
-            traced = _trace_multicolor_layers(
-                layers, upsampled_dim, tolerance, min_area_frac, max_paths
-            )
-        elif tolerance < 40:
-            # Third: increase tolerance further
-            tolerance *= 1.5
-            traced = _trace_multicolor_layers(
-                layers, upsampled_dim, tolerance, min_area_frac, max_paths
-            )
-        elif max_colors > 3:
-            # Last resort: reduce colors but keep at least 3 (2 foreground)
-            max_colors -= 1
-            layers, upsampled_dim, bg_color = preprocess_raster_multicolor(
-                path, max_colors
-            )
-            tolerance = max(2.0, upsampled_dim / 400)
-            min_area_frac = 0.0001
-            max_paths = 200
-            traced = _trace_multicolor_layers(
-                layers, upsampled_dim, tolerance, min_area_frac, max_paths
-            )
-        else:
-            break
-        if not traced:
-            raise ValueError("Could not trace any paths from the image.")
-        total_path_bytes = sum(len(" ".join(ps)) for ps, _, _ in traced)
-
-    # Compute unified bounding box across all layers
-    all_path_strs = []
-    has_potrace = False
-    potrace_h, potrace_w = 0, 0
-    for path_strs, _, xform in traced:
-        all_path_strs.extend(path_strs)
-        if xform:
-            has_potrace = True
-            # All layers share the same image dimensions
-            potrace_h, potrace_w = layers[0][0].shape
-
-    if has_potrace:
-        min_x, min_y = 0.0, 0.0
-        max_x, max_y = float(potrace_w), float(potrace_h)
-    else:
-        min_x, min_y, max_x, max_y = _compute_path_bounds(all_path_strs)
-
-    content_w = max_x - min_x
-    content_h = max_y - min_y
     scale_factor = usable / max(content_w, content_h)
 
     mark_cx = (min_x + max_x) / 2
@@ -964,15 +553,14 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     tx = canvas_size / 2 - mark_cx * scale_factor
     ty = canvas_size / 2 - mark_cy * scale_factor
 
-    # Build path elements for each color layer
-    path_elems = []
-    for path_strs, hex_color, xform in traced:
-        combined_d = " ".join(path_strs)
-        elem = f'<path d="{combined_d}" fill="{hex_color}" fill-rule="evenodd"/>'
-        if xform:
-            elem = f'<g transform="{xform}">{elem}</g>'
-        path_elems.append(elem)
-    paths_svg = "\n    ".join(path_elems)
+    combined_d = " ".join(path_strs)
+    path_elem = f'<path d="{combined_d}" fill="{mark_color}" fill-rule="evenodd"/>'
+
+    # Potrace paths use PostScript coords — wrap in its transform
+    if potrace_xform:
+        paths_svg = f'<g transform="{potrace_xform}">{path_elem}</g>'
+    else:
+        paths_svg = path_elem
 
     return BIMI_TEMPLATE.format(
         size=canvas_size,
