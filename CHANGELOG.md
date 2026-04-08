@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] - 2026-04-08
+
+### Added
+
+- Translated remaining UI strings: Select, Updated Just Now, 1 Message, 1 unread, All, Offers, Other, Today, Edit, Contacts, Move, Back, Visit site, Best regards, The COMPANY Team, minutes/hours ago, 1 of 52, Trash
+- Prompt injection defense: user inputs wrapped in XML tags with explicit data-only instruction
+- Control character stripping on company and industry inputs
+
+### Changed
+
+- Reduced company and industry field limits from 200 to 100 characters
+- Switched LLM placeholders from `{n}`/`{company}` braces to `NUM`/`COMPANY` to prevent LLMs from misinterpreting them as template syntax
+
 ## [0.7.0] - 2026-04-08
 
 ### Added

@@ -124,14 +124,18 @@ def preview():
         flash("Invalid domain name. Enter a domain like example.com", "error")
         return redirect(url_for("index"))
 
-    company = request.form.get("company", "").strip()
-    if not company or len(company) > 200:
-        flash("Company name is required (max 200 characters).", "error")
+    company = re.sub(
+        r"[\x00-\x1f\x7f-\x9f]", "", request.form.get("company", "")
+    ).strip()
+    if not company or len(company) > 100:
+        flash("Company name is required (max 100 characters).", "error")
         return redirect(url_for("index"))
 
-    industry = request.form.get("industry", "").strip()
-    if not industry or len(industry) > 200:
-        flash("Industry is required (max 200 characters).", "error")
+    industry = re.sub(
+        r"[\x00-\x1f\x7f-\x9f]", "", request.form.get("industry", "")
+    ).strip()
+    if not industry or len(industry) > 100:
+        flash("Industry is required (max 100 characters).", "error")
         return redirect(url_for("index"))
 
     language = request.form.get("language", "English").strip()

@@ -22,6 +22,7 @@ BIMI Preview Generator -- a Flask web app that converts logos into BIMI-complian
 - The BIMI SVG is served via URL (`/bimi-svg/<job_id>`) and displayed in the preview using `<img>` tags. A download button links to `/download/<job_id>`.
 - A background daemon thread scans `uploads/` every 60 seconds and deletes files older than 10 minutes. Original uploads are deleted immediately after conversion.
 - The `email_body` field from LLM output is sanitized server-side -- only `<p>`, `<br>`, `<strong>`, and `<em>` tags are allowed.
+- User inputs (company, industry) are stripped of control characters, capped at 100 chars, and wrapped in XML tags in the LLM prompt with an explicit data-only instruction to defend against prompt injection.
 
 ## Tech Stack
 
