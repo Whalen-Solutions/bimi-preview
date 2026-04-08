@@ -1,5 +1,6 @@
 .env
 uploads/
+samples/
 __pycache__/
 *.pyc
 .venv/
@@ -14,9 +15,6 @@ docker-compose.override.yml
 
 # Docker
 .docker/
-
-# Sample images
-samples/
 
 # bash
 .bashrc
