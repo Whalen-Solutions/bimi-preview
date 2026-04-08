@@ -110,11 +110,9 @@ def _quantize_colors(
     """Quantize an RGB image and return per-color binary masks.
 
     Returns a list of ``(hex_color, mask)`` pairs for each foreground
-    color (i.e. the background color is excluded).  Each *mask* is a
-    boolean ndarray where ``True`` marks pixels of that color.
-
-    Similar colors (including anti-aliasing intermediates) are merged
-    so each layer traces as one clean shape.
+    color.  Similar colors are merged into a single group whose mask
+    covers *all* pixels of every constituent color — including
+    anti-aliasing edges — so potrace traces a complete, smooth outline.
     """
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
@@ -125,39 +123,46 @@ def _quantize_colors(
     arr = np.array(quantized)
     n_palette = len(palette) // 3
 
-    # Collect raw foreground entries: (rgb_tuple, pixel_count, palette_index)
-    entries: list[tuple[tuple[int, ...], int, int]] = []
-    total_pixels = arr.size
+    # Collect all non-background palette entries
+    entries: list[tuple[tuple[int, ...], int, int]] = []  # (rgb, count, idx)
     for idx in range(n_palette):
         rgb = tuple(palette[idx * 3 : idx * 3 + 3])
-        # Skip colors close to the background
         if _color_dist(rgb, bg_rgb) < 50:
             continue
         count = int((arr == idx).sum())
-        # Skip noise — layers covering < 0.1% of the image
-        if count < max(10, total_pixels // 1000):
+        if count == 0:
             continue
         entries.append((rgb, count, idx))
 
     if not entries:
         return []
 
-    # Discard anti-aliasing intermediates: keep only the dominant color
-    # in each similar-color group.  Anti-aliased edge pixels form
-    # jagged masks that degrade potrace's smooth curve output.
+    # Group similar colors so that anti-aliasing intermediates merge
+    # into the dominant color's mask.  Sorted by count so the largest
+    # color anchors each group.
     merge_threshold = 100.0
-    # Sort by pixel count descending so the dominant color comes first
     entries.sort(key=lambda e: -e[1])
-    kept: list[tuple[tuple[int, ...], int]] = []  # (rgb, palette_index)
-    for rgb, _count, idx in entries:
-        # If this color is similar to an already-kept color, discard it
-        if any(_color_dist(rgb, k_rgb) < merge_threshold for k_rgb, _ in kept):
-            continue
-        kept.append((rgb, idx))
+    # Each group: (anchor_rgb, total_count, [palette_indices])
+    groups: list[tuple[tuple[int, ...], int, list[int]]] = []
+    for rgb, count, idx in entries:
+        merged = False
+        for gi, (g_rgb, g_count, g_indices) in enumerate(groups):
+            if _color_dist(rgb, g_rgb) < merge_threshold:
+                g_indices.append(idx)
+                groups[gi] = (g_rgb, g_count + count, g_indices)
+                merged = True
+                break
+        if not merged:
+            groups.append((rgb, count, [idx]))
 
+    # Build masks — each group's mask includes all constituent colors
+    total_pixels = arr.size
     layers: list[tuple[str, np.ndarray]] = []
-    for rgb, idx in kept:
-        mask = arr == idx
+    for rgb, count, indices in groups:
+        # Skip noise groups covering < 0.1% of the image
+        if count < max(10, total_pixels // 1000):
+            continue
+        mask = np.isin(arr, indices)
         hex_color = "#{:02x}{:02x}{:02x}".format(*rgb)
         layers.append((hex_color, mask))
 
