@@ -48,7 +48,140 @@ Rules:
 - Today is {today}. Time references must be current — no past quarters, months, \
 or years unless today is near their end. Use the company's fiscal calendar for \
 financial content if known, calendar dates for events
-- Return ONLY valid JSON, no markdown fences, no explanation"""
+- Return ONLY valid JSON, no markdown fences, no explanation
+- Write ALL text content in {language}"""
+
+# ---------------------------------------------------------------------------
+# Language support per provider
+# ---------------------------------------------------------------------------
+
+# Languages each provider's default model can fluently generate text in.
+# Anthropic: benchmarked languages from docs.anthropic.com
+# OpenAI / Gemini: broader multilingual support
+_PROVIDER_LANGUAGES: dict[str, list[str]] = {
+    "anthropic": [
+        "Arabic",
+        "Bengali",
+        "Chinese (Simplified)",
+        "English",
+        "French",
+        "German",
+        "Hindi",
+        "Indonesian",
+        "Italian",
+        "Japanese",
+        "Korean",
+        "Portuguese (Brazil)",
+        "Spanish",
+        "Swahili",
+        "Yoruba",
+    ],
+    "openai": [
+        "Arabic",
+        "Bengali",
+        "Bulgarian",
+        "Chinese (Simplified)",
+        "Chinese (Traditional)",
+        "Croatian",
+        "Czech",
+        "Danish",
+        "Dutch",
+        "English",
+        "Estonian",
+        "Finnish",
+        "French",
+        "German",
+        "Greek",
+        "Gujarati",
+        "Hebrew",
+        "Hindi",
+        "Hungarian",
+        "Indonesian",
+        "Italian",
+        "Japanese",
+        "Kannada",
+        "Korean",
+        "Latvian",
+        "Lithuanian",
+        "Malay",
+        "Malayalam",
+        "Marathi",
+        "Norwegian",
+        "Persian",
+        "Polish",
+        "Portuguese (Brazil)",
+        "Portuguese (Portugal)",
+        "Punjabi",
+        "Romanian",
+        "Russian",
+        "Serbian",
+        "Slovak",
+        "Slovenian",
+        "Spanish",
+        "Swahili",
+        "Swedish",
+        "Tamil",
+        "Telugu",
+        "Thai",
+        "Turkish",
+        "Ukrainian",
+        "Urdu",
+        "Vietnamese",
+    ],
+    "gemini": [
+        "Arabic",
+        "Bengali",
+        "Bulgarian",
+        "Chinese (Simplified)",
+        "Chinese (Traditional)",
+        "Croatian",
+        "Czech",
+        "Danish",
+        "Dutch",
+        "English",
+        "Estonian",
+        "Filipino",
+        "Finnish",
+        "French",
+        "German",
+        "Greek",
+        "Gujarati",
+        "Hebrew",
+        "Hindi",
+        "Hungarian",
+        "Indonesian",
+        "Italian",
+        "Japanese",
+        "Kannada",
+        "Korean",
+        "Latvian",
+        "Lithuanian",
+        "Malay",
+        "Malayalam",
+        "Marathi",
+        "Norwegian",
+        "Persian",
+        "Polish",
+        "Portuguese (Brazil)",
+        "Portuguese (Portugal)",
+        "Punjabi",
+        "Romanian",
+        "Russian",
+        "Serbian",
+        "Slovak",
+        "Slovenian",
+        "Spanish",
+        "Swahili",
+        "Swedish",
+        "Tamil",
+        "Telugu",
+        "Thai",
+        "Turkish",
+        "Ukrainian",
+        "Urdu",
+        "Vietnamese",
+    ],
+}
 
 EXPECTED_KEYS = {
     "inbox_subject",
@@ -180,7 +313,17 @@ def _detect_provider() -> str | None:
     return None
 
 
-def generate_email_content(company: str, domain: str, industry: str) -> dict:
+def get_supported_languages() -> list[str]:
+    """Return the sorted list of languages supported by the configured provider."""
+    provider = _detect_provider()
+    if provider is None:
+        return ["English"]
+    return _PROVIDER_LANGUAGES.get(provider, ["English"])
+
+
+def generate_email_content(
+    company: str, domain: str, industry: str, language: str = "English"
+) -> dict:
     """Generate realistic email preview content via LLM.
 
     Returns a dict of template variables on success, or an empty dict on
@@ -196,6 +339,7 @@ def generate_email_content(company: str, domain: str, industry: str) -> dict:
         domain=domain,
         industry=industry,
         today=date.today().strftime("%B %-d, %Y"),
+        language=language,
     )
 
     try:

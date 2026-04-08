@@ -64,7 +64,7 @@
     color: #5f6368;
     margin-bottom: 6px;
   }
-  input[type="text"], input[type="file"] {
+  input[type="text"], input[type="file"], select {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #dadce0;
@@ -73,7 +73,7 @@
     color: #202124;
     transition: border-color .15s;
   }
-  input[type="text"]:focus {
+  input[type="text"]:focus, select:focus {
     outline: none;
     border-color: #1a73e8;
     box-shadow: 0 0 0 2px rgba(26,115,232,.15);
@@ -240,6 +240,16 @@
     <div class="field">
       <label for="industry">Industry</label>
       <input type="text" id="industry" name="industry" placeholder="e.g. Cybersecurity, Healthcare, Retail" required maxlength="200">
+    </div>
+
+    <div class="field">
+      <label for="language">Email Language</label>
+      <select id="language" name="language">
+        {% for lang in languages %}
+        <option value="{{ lang }}"{{ ' selected' if lang == 'English' else '' }}>{{ lang }}</option>
+        {% endfor %}
+      </select>
+      <p class="hint">Language for the generated email preview content</p>
     </div>
 
     <div class="field">

@@ -27,7 +27,7 @@ from flask import (  # noqa: E402
     session,
 )
 from bimi import convert_to_bimi  # noqa: E402
-from llm import generate_email_content  # noqa: E402
+from llm import generate_email_content, get_supported_languages  # noqa: E402
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", os.urandom(32))
@@ -107,7 +107,7 @@ def allowed_file(filename: str) -> bool:
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.jinja2.html")
+    return render_template("index.jinja2.html", languages=get_supported_languages())
 
 
 @app.route("/preview", methods=["GET"])
@@ -133,6 +133,11 @@ def preview():
     if not industry or len(industry) > 200:
         flash("Industry is required (max 200 characters).", "error")
         return redirect(url_for("index"))
+
+    language = request.form.get("language", "English").strip()
+    supported = get_supported_languages()
+    if language not in supported:
+        language = "English"
 
     file = request.files.get("logo")
     if not file or not file.filename:
@@ -161,6 +166,7 @@ def preview():
             company,
             clean_domain,
             industry,
+            language,
         )
 
         try:
