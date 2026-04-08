@@ -143,7 +143,7 @@ def _is_multicolor(img: Image.Image) -> bool:
     Returns True when the foreground pixels span a wide enough color
     range that a single fill color would lose important detail.
     """
-    truly_transparent = False
+    rgb = None
     if _has_transparency(img):
         rgba = img.convert("RGBA")
         arr = np.array(rgba)
@@ -152,8 +152,7 @@ def _is_multicolor(img: Image.Image) -> bool:
         transparent_frac = 1.0 - opaque.sum() / alpha.size
         if transparent_frac >= 0.05 and opaque.sum() >= 16:
             rgb = arr[:, :, :3][opaque]
-            truly_transparent = True
-    if not truly_transparent:
+    if rgb is None:
         # Opaque image: identify foreground by color distance from edges
         arr = np.array(img.convert("RGB"))
         h, w = arr.shape[:2]
@@ -285,9 +284,10 @@ def preprocess_raster(path: str) -> tuple[np.ndarray, np.ndarray, int]:
 
     # Multi-frame formats: ICO has multiple sizes, GIF/WebP/TIFF can be
     # animated or multi-page.  Select the largest frame by pixel area.
-    if hasattr(img, "n_frames") and img.n_frames > 1:
+    n_frames = getattr(img, "n_frames", 1)
+    if n_frames > 1:
         best, best_size = img.copy(), img.size[0] * img.size[1]
-        for i in range(img.n_frames):
+        for i in range(n_frames):
             img.seek(i)
             px = img.size[0] * img.size[1]
             if px > best_size:
@@ -693,7 +693,7 @@ def _clean_color_mask(mask: np.ndarray, min_component_pixels: int) -> np.ndarray
     """
     from scipy.ndimage import label
 
-    labeled, n_features = label(mask)
+    labeled, n_features = label(mask)  # type: ignore[reportGeneralTypeIssues]
     cleaned = mask.copy()
     for i in range(1, n_features + 1):
         component = labeled == i
@@ -945,7 +945,7 @@ def _multicolor_raster_to_bimi_svg(path: str, company_name: str) -> str | None:
         # Pre-scan detail layers: detect circular regions so we can
         # subtract them from the silhouette (avoids a colored halo
         # peeking out from behind the perfect <circle>).
-        detail_results: list[tuple[str, str, tuple]] = []
+        detail_results: list[tuple[str, str | np.ndarray, tuple | None]] = []
         circle_masks: list[np.ndarray] = []
         total_opaque = opaque.sum()
         for hex_color, mask in regions[1:]:
@@ -993,7 +993,9 @@ def _multicolor_raster_to_bimi_svg(path: str, company_name: str) -> str | None:
 
         sil_mask = cleaned_opaque.copy()
         for cmask in circle_masks:
-            dilated = binary_dilation(cmask, iterations=1)
+            dilated: np.ndarray = np.asarray(
+                binary_dilation(cmask, iterations=1), dtype=bool
+            )
             sil_mask = sil_mask & ~dilated
 
         silhouette_elem, sil_bounds = _silhouette_element(
@@ -1022,6 +1024,7 @@ def _multicolor_raster_to_bimi_svg(path: str, company_name: str) -> str | None:
             if isinstance(data, str):
                 # Already an SVG element (circle)
                 all_path_elems.append(data)
+                assert bounds is not None
                 rmin_x, rmin_y, rmax_x, rmax_y = bounds
                 all_min_x = min(all_min_x, rmin_x)
                 all_min_y = min(all_min_y, rmin_y)
@@ -1441,7 +1444,7 @@ def _inline_styles(root: ET.Element) -> None:
 
 def _build_id_map(root: ET.Element) -> dict[str, ET.Element]:
     """Build a map of ``id`` -> element for the tree."""
-    return {elem.get("id"): elem for elem in root.iter() if elem.get("id")}
+    return {str(elem.get("id")): elem for elem in root.iter() if elem.get("id")}
 
 
 def _resolve_use_refs(root: ET.Element) -> None:
