@@ -3,17 +3,19 @@
 Converts raster images (JPEG, PNG, WebP, GIF, BMP, TIFF) and existing SVGs
 to BIMI-compliant SVG Tiny-PS format.
 
-Uses pyautotrace for multi-color raster-to-SVG tracing.
+Uses PIL for color quantization and potrace for high-quality Bézier tracing
+of each color layer.
 """
 
 import re
+import shutil
+import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
-from autotrace import Bitmap, Color, VectorFormat
 from PIL import Image
 
 
@@ -74,9 +76,10 @@ def _prepare_raster(path: str) -> Image.Image:
 
     # Multi-frame formats: ICO has multiple sizes, GIF/WebP/TIFF can be
     # animated or multi-page.  Select the largest frame by pixel area.
-    if hasattr(img, "n_frames") and img.n_frames > 1:
+    n_frames: int = getattr(img, "n_frames", 1)
+    if n_frames > 1:
         best, best_size = img.copy(), img.size[0] * img.size[1]
-        for i in range(img.n_frames):
+        for i in range(n_frames):
             img.seek(i)
             px = img.size[0] * img.size[1]
             if px > best_size:
@@ -96,38 +99,119 @@ def _prepare_raster(path: str) -> Image.Image:
 # ---------------------------------------------------------------------------
 
 
-def _trace_raster(img: Image.Image, bg_color: str) -> str:
-    """Trace an RGB image with pyautotrace and return SVG path elements.
+def _quantize_colors(
+    img: Image.Image, bg_color: str, max_colors: int
+) -> list[tuple[str, np.ndarray]]:
+    """Quantize an RGB image and return per-color binary masks.
 
-    Returns the inner SVG markup (``<path>`` elements) without a wrapping
-    ``<svg>`` root.  The coordinate space matches the image pixel
-    dimensions.
+    Returns a list of ``(hex_color, mask)`` pairs for each foreground
+    color (i.e. the background color is excluded).  Each *mask* is a
+    boolean ndarray where ``True`` marks pixels of that color.
     """
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
-    arr = np.array(img.convert("RGB"))
-    bitmap = Bitmap(arr)
-    vector = bitmap.trace(
-        color_count=0,
-        background_color=Color(*bg_rgb),
-    )
+    # +1 to account for the background color occupying a slot
+    quantized = img.convert("RGB").quantize(colors=max_colors + 1, dither=0)
+    palette = quantized.getpalette()
+    assert palette is not None
+    arr = np.array(quantized)
+    n_palette = len(palette) // 3
 
-    svg_bytes = vector.encode(VectorFormat.SVG)
-    svg_text = svg_bytes.decode("utf-8")
+    total_pixels = arr.size
+    layers: list[tuple[str, np.ndarray]] = []
+    for idx in range(n_palette):
+        r, g, b = palette[idx * 3 : idx * 3 + 3]
+        # Skip colors that match the background (within tolerance)
+        if abs(r - bg_rgb[0]) + abs(g - bg_rgb[1]) + abs(b - bg_rgb[2]) < 60:
+            continue
+        mask = arr == idx
+        count = int(mask.sum())
+        # Skip noise — layers covering < 0.1% of the image
+        if count < max(10, total_pixels // 1000):
+            continue
+        hex_color = f"#{r:02x}{g:02x}{b:02x}"
+        layers.append((hex_color, mask))
 
-    # Extract <path> elements from autotrace's SVG output.
-    # Format: <path style="fill:#rrggbb; stroke:none;" d="..."/>
-    path_matches = re.findall(
-        r'<path\s+style="fill:(#[0-9a-fA-F]{6});[^"]*"\s+d="([^"]+)"',
-        svg_text,
-    )
+    return layers
 
-    if not path_matches:
-        raise ValueError("Could not trace any paths from the image.")
+
+def _trace_mask_potrace(mask: np.ndarray) -> tuple[list[str], str] | None:
+    """Trace a binary mask using potrace.
+
+    Returns ``(path_d_strings, g_transform)`` or ``None`` if potrace
+    is unavailable or fails.
+    """
+    if not shutil.which("potrace"):
+        return None
+
+    # potrace traces black-on-white: foreground → black
+    fg_as_black = (~mask).astype(np.uint8) * 255
+    pil_img = Image.fromarray(fg_as_black, mode="L")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bmp_path = str(Path(tmpdir) / "mask.bmp")
+        svg_path = str(Path(tmpdir) / "traced.svg")
+        pil_img.save(bmp_path, format="BMP")
+
+        try:
+            subprocess.run(
+                ["potrace", bmp_path, "-s", "--flat", "-o", svg_path],
+                check=True,
+                capture_output=True,
+                timeout=30,
+            )
+        except (
+            subprocess.CalledProcessError,
+            FileNotFoundError,
+            subprocess.TimeoutExpired,
+        ):
+            return None
+
+        svg_text = Path(svg_path).read_text()
+
+    paths = re.findall(r'\bd="([^"]+)"', svg_text)
+    if not paths:
+        return None
+
+    xform_match = re.search(r'<g[^>]+transform="([^"]+)"', svg_text)
+    xform = xform_match.group(1) if xform_match else ""
+
+    return paths, xform
+
+
+def _trace_raster(img: Image.Image, bg_color: str, max_colors: int = 8) -> str:
+    """Quantize an image and trace each color layer with potrace.
+
+    Returns the inner SVG markup (``<path>`` elements) for all
+    foreground colors.  The coordinate space uses potrace's native
+    PostScript coordinates wrapped in its own transform.
+    """
+    layers = _quantize_colors(img, bg_color, max_colors)
+    if not layers:
+        raise ValueError("Could not extract any foreground colors from the image.")
+
+    if not shutil.which("potrace"):
+        raise ValueError(
+            "potrace is required for raster-to-BIMI conversion but was "
+            "not found. Install it with: apt install potrace"
+        )
 
     parts: list[str] = []
-    for fill, d in path_matches:
-        parts.append(f'<path d="{d}" fill="{fill}"/>')
+    for hex_color, mask in layers:
+        result = _trace_mask_potrace(mask)
+        if result is None:
+            continue
+        path_strs, xform = result
+        combined_d = " ".join(path_strs)
+        path_elem = f'<path d="{combined_d}" fill="{hex_color}" fill-rule="evenodd"/>'
+        if xform:
+            parts.append(f'<g transform="{xform}">{path_elem}</g>')
+        else:
+            parts.append(path_elem)
+
+    if not parts:
+        raise ValueError("Could not trace any paths from the image.")
+
     return "\n    ".join(parts)
 
 
@@ -143,12 +227,11 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
         bg_img.paste(img, mask=img.split()[-1])
         img = bg_img
 
-    # Ensure RGB mode for autotrace
     img = img.convert("RGB")
 
-    paths_svg = _trace_raster(img, bg_color)
-
-    # Autotrace coords match the image pixel dimensions
+    # Potrace output is in its own PostScript coordinate space; the
+    # outer <g> centers the traced content with circle-crop clearance.
+    # Bounds come from the image pixel dimensions (potrace maps 1:1).
     img_w, img_h = img.size
     canvas_size = 800
     av_scale = 0.85
@@ -160,18 +243,30 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     tx = canvas_size / 2 - cx * scale_factor
     ty = canvas_size / 2 - cy * scale_factor
 
-    return (
-        f'<svg version="1.2" baseProfile="tiny-ps"\n'
-        f'     xmlns="http://www.w3.org/2000/svg"\n'
-        f'     viewBox="0 0 {canvas_size} {canvas_size}">\n'
-        f"  <title>{company_name}</title>\n"
-        f"  <desc>{company_name} logo mark</desc>\n"
-        f'  <rect width="{canvas_size}" height="{canvas_size}" fill="{bg_color}"/>\n'
-        f'  <g transform="translate({tx:.2f},{ty:.2f}) scale({scale_factor:.6f})">\n'
-        f"    {paths_svg}\n"
-        f"  </g>\n"
-        f"</svg>"
-    )
+    # Trace with progressively fewer colors until the SVG fits under 32 KB
+    svg = ""
+    for max_colors in (32, 16, 8, 4, 2):
+        paths_svg = _trace_raster(img, bg_color, max_colors=max_colors)
+
+        svg = (
+            f'<svg version="1.2" baseProfile="tiny-ps"\n'
+            f'     xmlns="http://www.w3.org/2000/svg"\n'
+            f'     viewBox="0 0 {canvas_size} {canvas_size}">\n'
+            f"  <title>{company_name}</title>\n"
+            f"  <desc>{company_name} logo mark</desc>\n"
+            f'  <rect width="{canvas_size}" height="{canvas_size}"'
+            f' fill="{bg_color}"/>\n'
+            f'  <g transform="translate({tx:.2f},{ty:.2f})'
+            f' scale({scale_factor:.6f})">\n'
+            f"    {paths_svg}\n"
+            f"  </g>\n"
+            f"</svg>"
+        )
+
+        if len(svg.encode("utf-8")) <= BIMI_MAX_SIZE:
+            return svg
+
+    return svg
 
 
 # ---------------------------------------------------------------------------
@@ -430,7 +525,9 @@ def _inline_styles(root: ET.Element) -> None:
 
 def _build_id_map(root: ET.Element) -> dict[str, ET.Element]:
     """Build a map of ``id`` -> element for the tree."""
-    return {elem.get("id"): elem for elem in root.iter() if elem.get("id")}
+    return {
+        id_val: elem for elem in root.iter() if (id_val := elem.get("id")) is not None
+    }
 
 
 def _resolve_use_refs(root: ET.Element) -> None:
