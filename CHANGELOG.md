@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-04-07
+
+### Added
+
+- Multi-color raster-to-BIMI SVG conversion using PIL color quantization and potrace per-color-layer tracing
+- Automatic color grouping merges anti-aliasing intermediates into parent colors for clean traces
+- Progressive color reduction (32 → 16 → 8 → 4 → 2) to fit within the 32 KB BIMI size limit
+- JPEG artifact noise filtering discards color layers covering less than 0.1% of pixels
+
+### Changed
+
+- Replaced custom Otsu thresholding, Douglas-Peucker simplification, and Bézier curve fitting with PIL `quantize()` + potrace — simplified `bimi.py` by ~700 lines
+- Removed `scipy` and `scikit-image` Python dependencies; `potrace` is now a required system package
+
 ## [0.5.3] - 2026-04-05
 
 ### Added
