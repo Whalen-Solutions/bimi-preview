@@ -91,6 +91,18 @@ def _prepare_raster(path: str) -> Image.Image:
     if img.mode == "P" and "transparency" in img.info:
         img = img.convert("RGBA")
 
+    # Rescue washed-out images where the entire dynamic range is
+    # compressed into a narrow band (e.g. near-white LinkedIn exports).
+    # Stretch the histogram so the faint content becomes traceable.
+    rgb = img.convert("RGB")
+    extrema = rgb.getextrema()  # ((r_min,r_max), (g_min,g_max), (b_min,b_max))
+    dyn_range = max(hi - lo for lo, hi in extrema)
+    if dyn_range < 50:
+        from PIL import ImageFilter, ImageOps
+
+        img = ImageOps.autocontrast(rgb)
+        img = img.filter(ImageFilter.MedianFilter(size=3))
+
     return img
 
 
@@ -139,31 +151,82 @@ def _quantize_colors(
 
     # Group similar colors so that anti-aliasing intermediates merge
     # into the dominant color's mask.  Sorted by count so the largest
-    # color anchors each group.
-    merge_threshold = 100.0
+    # color anchors each group.  A threshold of 60 preserves visually
+    # distinct colors (e.g. NBC peacock feathers) while still merging
+    # near-identical shades from JPEG compression.
+    merge_threshold = 60.0
     entries.sort(key=lambda e: -e[1])
-    # Each group: (anchor_rgb, total_count, [palette_indices])
-    groups: list[tuple[tuple[int, ...], int, list[int]]] = []
+    # Each group: (anchor_rgb, total_count, core_indices, all_indices)
+    # core_indices drive the representative color; all_indices (which
+    # includes absorbed artifact indices) drive the trace mask.
+    groups: list[tuple[tuple[int, ...], int, list[int], list[int]]] = []
     for rgb, count, idx in entries:
         merged = False
-        for gi, (g_rgb, g_count, g_indices) in enumerate(groups):
+        for gi, (g_rgb, g_count, g_core, g_all) in enumerate(groups):
             if _color_dist(rgb, g_rgb) < merge_threshold:
-                g_indices.append(idx)
-                groups[gi] = (g_rgb, g_count + count, g_indices)
+                g_core.append(idx)
+                g_all.append(idx)
+                groups[gi] = (g_rgb, g_count + count, g_core, g_all)
                 merged = True
                 break
         if not merged:
-            groups.append((rgb, count, [idx]))
+            groups.append((rgb, count, [idx], [idx]))
 
-    # Build masks — each group's mask includes all constituent colors
+    # Absorb artifact groups into their nearest larger neighbor.
+    # JPEG compression creates scattered fringe pixels at color
+    # boundaries that quantize into separate palette entries.  These
+    # produce noisy trace layers that smudge letterforms.  A group is
+    # considered an artifact when its pixels are spatially scattered
+    # (low density within its bounding box) AND it is small relative
+    # to the dominant group.  Absorbed indices extend the trace mask
+    # but do NOT affect the representative color.
+    max_count = max(g[1] for g in groups)
+
+    def _is_artifact(indices: list[int]) -> bool:
+        mask = np.isin(arr, indices)
+        count = int(mask.sum())
+        if count < 10:
+            return True
+        ys, xs = np.where(mask)
+        bbox_area = (xs.max() - xs.min() + 1) * (ys.max() - ys.min() + 1)
+        density = count / bbox_area
+        return density < 0.10 and count < max_count * 0.25
+
+    changed = True
+    while changed:
+        changed = False
+        for si in range(len(groups) - 1, -1, -1):
+            s_rgb, s_count, s_core, s_all = groups[si]
+            if not _is_artifact(s_all):
+                continue
+            best_gi, best_dist = -1, float("inf")
+            for gi, (g_rgb, g_count, g_core, g_all) in enumerate(groups):
+                if gi == si or _is_artifact(g_all):
+                    continue
+                d = _color_dist(s_rgb, g_rgb)
+                if d < best_dist:
+                    best_dist, best_gi = d, gi
+            if best_gi >= 0:
+                g_rgb, g_count, g_core, g_all = groups[best_gi]
+                g_all.extend(s_all)
+                groups[best_gi] = (g_rgb, g_count + s_count, g_core, g_all)
+                groups.pop(si)
+                changed = True
+
+    # Build masks — all_indices (core + absorbed artifacts) form the
+    # trace mask for smooth edges; core_indices alone determine the
+    # representative color so absorbed fringe pixels don't dilute it.
+    rgb_arr = np.array(img.convert("RGB"))
     total_pixels = arr.size
     layers: list[tuple[str, np.ndarray]] = []
-    for rgb, count, indices in groups:
+    for _rgb, count, core_indices, all_indices in groups:
         # Skip noise groups covering < 0.1% of the image
         if count < max(10, total_pixels // 1000):
             continue
-        mask = np.isin(arr, indices)
-        hex_color = "#{:02x}{:02x}{:02x}".format(*rgb)
+        mask = np.isin(arr, all_indices)
+        core_mask = np.isin(arr, core_indices)
+        mean_rgb = rgb_arr[core_mask].mean(axis=0).astype(int)
+        hex_color = "#{:02x}{:02x}{:02x}".format(*mean_rgb)
         layers.append((hex_color, mask))
 
     return layers
