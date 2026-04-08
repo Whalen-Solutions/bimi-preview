@@ -87,7 +87,37 @@ def _has_transparency(img: Image.Image) -> bool:
 
 
 def _dominant_color(img: Image.Image) -> str:
-    """Infer the dominant background color from the image edges."""
+    """Infer the dominant background color from the image edges.
+
+    For transparent images, only fully-opaque edge pixels are sampled.
+    If fewer than 16 opaque edge pixels exist the background is assumed
+    to be white (the standard BIMI background).
+    """
+    if _has_transparency(img):
+        rgba = np.array(img.convert("RGBA"))
+        alpha = rgba[:, :, 3]
+        transparent_frac = (alpha <= 127).sum() / alpha.size
+        # If a significant portion of the image is transparent, the
+        # transparent area IS the background — use white (standard BIMI).
+        if transparent_frac > 0.10:
+            return "#ffffff"
+        # Mostly-opaque image with minor transparency: sample opaque edges.
+        h, w = rgba.shape[:2]
+        border = max(4, min(h, w) // 20)
+        edge_rgba = np.concatenate(
+            [
+                rgba[:border].reshape(-1, 4),
+                rgba[-border:].reshape(-1, 4),
+                rgba[border:-border, :border].reshape(-1, 4),
+                rgba[border:-border, -border:].reshape(-1, 4),
+            ]
+        )
+        opaque = edge_rgba[:, 3] > 127
+        if opaque.sum() < 16:
+            return "#ffffff"
+        mean = edge_rgba[opaque][:, :3].mean(axis=0).astype(int)
+        return "#{:02x}{:02x}{:02x}".format(*mean)
+
     arr = np.array(img.convert("RGB"))
     h, w = arr.shape[:2]
     border = max(4, min(h, w) // 20)
@@ -101,6 +131,145 @@ def _dominant_color(img: Image.Image) -> str:
     )
     mean = edges.mean(axis=0).astype(int)
     return "#{:02x}{:02x}{:02x}".format(*mean)
+
+
+def _is_multicolor(img: Image.Image) -> bool:
+    """Detect if an image has multiple visually distinct foreground colors.
+
+    For transparent images, foreground is the opaque region.
+    For opaque images, foreground is pixels that differ significantly
+    from the dominant edge (background) color.
+
+    Returns True when the foreground pixels span a wide enough color
+    range that a single fill color would lose important detail.
+    """
+    truly_transparent = False
+    if _has_transparency(img):
+        rgba = img.convert("RGBA")
+        arr = np.array(rgba)
+        alpha = arr[:, :, 3]
+        opaque = alpha > 127
+        transparent_frac = 1.0 - opaque.sum() / alpha.size
+        if transparent_frac >= 0.05 and opaque.sum() >= 16:
+            rgb = arr[:, :, :3][opaque]
+            truly_transparent = True
+    if not truly_transparent:
+        # Opaque image: identify foreground by color distance from edges
+        arr = np.array(img.convert("RGB"))
+        h, w = arr.shape[:2]
+        border = max(4, min(h, w) // 20)
+        edges = np.concatenate(
+            [
+                arr[:border].reshape(-1, 3),
+                arr[-border:].reshape(-1, 3),
+                arr[border:-border, :border].reshape(-1, 3),
+                arr[border:-border, -border:].reshape(-1, 3),
+            ]
+        )
+        bg = edges.mean(axis=0)
+        dist = np.sqrt(((arr.astype(float) - bg) ** 2).sum(axis=2))
+        fg_mask = dist > 30
+        if fg_mask.sum() < 16:
+            return False
+        rgb = arr[fg_mask]
+
+    # Check color spread: std dev across each channel.
+    # Anti-aliasing on single-color logos produces std < 10;
+    # multi-color logos with distinct regions typically exceed 20.
+    std = rgb.astype(float).std(axis=0)
+    return bool(std.max() > 20)
+
+
+def _make_bg_transparent(img: Image.Image) -> Image.Image:
+    """Convert an opaque image to RGBA by making background pixels transparent.
+
+    Background is identified as pixels close to the dominant edge color.
+    """
+    arr = np.array(img.convert("RGB"))
+    h, w = arr.shape[:2]
+    border = max(4, min(h, w) // 20)
+    edges = np.concatenate(
+        [
+            arr[:border].reshape(-1, 3),
+            arr[-border:].reshape(-1, 3),
+            arr[border:-border, :border].reshape(-1, 3),
+            arr[border:-border, -border:].reshape(-1, 3),
+        ]
+    )
+    bg = edges.mean(axis=0)
+    dist = np.sqrt(((arr.astype(float) - bg) ** 2).sum(axis=2))
+    alpha = np.where(dist > 30, 255, 0).astype(np.uint8)
+    rgba = np.dstack([arr, alpha])
+    return Image.fromarray(rgba, "RGBA")
+
+
+def _quantize_colors(
+    img: Image.Image, n_colors: int = 8
+) -> list[tuple[str, np.ndarray]]:
+    """Quantize a transparent image into color regions.
+
+    Returns a list of ``(hex_color, binary_mask)`` tuples sorted by area
+    (largest first).  Each mask is a boolean ndarray at the upsampled
+    resolution, True where that color region exists.
+    """
+    rgba = img.convert("RGBA")
+    arr = np.array(rgba)
+    alpha = arr[:, :, 3]
+    opaque = alpha > 127
+
+    if opaque.sum() < 4:
+        return []
+
+    # Set transparent pixels to a uniform color so they consume only
+    # one quantization bin, leaving more bins for real foreground colors.
+    rgb_arr = arr[:, :, :3].copy()
+    rgb_arr[~opaque] = 0
+    rgb_img = Image.fromarray(rgb_arr, "RGB")
+    quantized = rgb_img.quantize(colors=n_colors, method=Image.Quantize.MEDIANCUT)
+    palette = quantized.getpalette()
+    assert palette is not None
+    q_arr = np.array(quantized)
+
+    regions: list[tuple[str, np.ndarray]] = []
+    for idx in range(n_colors):
+        mask = (q_arr == idx) & opaque
+        if mask.sum() < 4:
+            continue
+        # Use actual mean color of pixels in this bin rather than the
+        # palette entry, which can diverge from the true centroid.
+        actual = arr[:, :, :3][mask]
+        r, g, b = actual.mean(axis=0).astype(int)
+        hex_color = f"#{r:02x}{g:02x}{b:02x}"
+        regions.append((hex_color, mask))
+
+    # Merge regions whose palette colors are perceptually close.
+    # Anti-aliasing and JPEG artifacts often split a single logo color
+    # into several similar quantized bins — merging them produces
+    # cleaner paths and fewer noisy slivers.
+    merge_threshold = 50
+    merged: list[tuple[tuple[int, int, int], np.ndarray]] = []
+    for hex_color, mask in regions:
+        rgb = (
+            int(hex_color[1:3], 16),
+            int(hex_color[3:5], 16),
+            int(hex_color[5:7], 16),
+        )
+        found = False
+        for i, (mrgb, mmask) in enumerate(merged):
+            dist = sum((a - b) ** 2 for a, b in zip(rgb, mrgb)) ** 0.5
+            if dist < merge_threshold:
+                # Keep the color of the larger region, union the masks
+                merged[i] = (mrgb, mmask | mask)
+                found = True
+                break
+        if not found:
+            merged.append((rgb, mask))
+
+    regions = [(f"#{r:02x}{g:02x}{b:02x}", m) for (r, g, b), m in merged]
+
+    # Sort largest region first
+    regions.sort(key=lambda x: x[1].sum(), reverse=True)
+    return regions
 
 
 def preprocess_raster(path: str) -> tuple[np.ndarray, np.ndarray, int]:
@@ -138,11 +307,18 @@ def preprocess_raster(path: str) -> tuple[np.ndarray, np.ndarray, int]:
     upsampled_dim = max_dim * upsample
 
     if transparent:
-        # Resize preserving alpha
-        img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
-        alpha = np.array(img_up.split()[-1])
-        gt_mask = alpha > 127
-        return gt_mask, gt_mask, upsampled_dim
+        rgba = np.array(img.convert("RGBA"))
+        transparent_frac = (rgba[:, :, 3] <= 127).sum() / rgba[:, :, 3].size
+        if transparent_frac >= 0.05:
+            # Genuinely transparent — use alpha as the mask
+            img_up = img.resize(
+                (upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS
+            )
+            alpha = np.array(img_up.split()[-1])
+            gt_mask = alpha > 127
+            return gt_mask, gt_mask, upsampled_dim
+        # Nearly opaque (< 5% transparent, e.g. just rounded corners) —
+        # fall through to Otsu thresholding which preserves internal detail.
 
     img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
     img_gray = img_up.convert("L")
@@ -416,10 +592,39 @@ def _trace_with_potrace(
     return paths, xform
 
 
+def _smooth_contour(contour: np.ndarray, sigma: float = 2.5) -> np.ndarray:
+    """Gaussian-smooth contour coordinates to remove pixel staircase jitter.
+
+    Applies 1-D Gaussian smoothing independently to the row and column
+    coordinates.  The contour is temporarily "unrolled" (duplicated at
+    the ends) so the smoothing wraps correctly for closed contours.
+    """
+    from scipy.ndimage import gaussian_filter1d
+
+    n = len(contour)
+    if n < 5:
+        return contour
+
+    # Wrap: prepend/append copies so the filter sees continuity
+    wrap = min(n // 4, 20)
+    extended = np.concatenate([contour[-wrap:], contour, contour[:wrap]])
+    smoothed = np.column_stack(
+        [
+            gaussian_filter1d(extended[:, 0], sigma),
+            gaussian_filter1d(extended[:, 1], sigma),
+        ]
+    )
+    return smoothed[wrap : wrap + n]
+
+
 def trace_to_svg_paths(
     binary: np.ndarray, upsampled_dim: int, tolerance: float = 2.0
 ) -> list[str]:
-    """Trace binary mask to SVG path strings with cubic Bezier curves."""
+    """Trace binary mask to SVG path strings with adaptive line/curve selection.
+
+    Sharp corners get straight ``L`` segments to preserve geometric
+    edges; smooth stretches get cubic Bezier ``C`` curves.
+    """
     # Pad with background so contours close properly at image edges
     # instead of merging along the boundary.
     padded = np.pad(binary, pad_width=1, mode="constant", constant_values=False)
@@ -433,31 +638,18 @@ def trace_to_svg_paths(
         # Adjust coordinates back from padded space
         contour = contour - 1.0
 
-        # Phase 1: Douglas-Peucker to reduce thousands of points to key vertices.
-        # Use a coarser tolerance so we keep enough shape detail for Bezier fitting.
+        # Smooth the raw pixel-staircase contour before simplification.
+        # This removes jagged single-pixel jitter while preserving the
+        # overall shape and true corners.
+        contour = _smooth_contour(contour)
+
+        # Douglas-Peucker to reduce thousands of points to key vertices.
         dp_tolerance = tolerance * 0.5
         simplified = _simplify_contour(contour, dp_tolerance)
         if len(simplified) < 3:
             continue
 
-        # Phase 2: fit smooth cubic Beziers through the simplified points
-        tan_left = _estimate_left_tangent(simplified)
-        tan_right = _estimate_right_tangent(simplified)
-        beziers = _fit_cubic_beziers(simplified, tolerance, tan_left, tan_right)
-        if not beziers:
-            continue
-
-        # contour coords are (row, col) = (y, x); swap for SVG
-        cp0 = beziers[0]
-        parts = [f"M{cp0[0][1]:.1f},{cp0[0][0]:.1f}"]
-        for cp in beziers:
-            parts.append(
-                f"C{cp[1][1]:.1f},{cp[1][0]:.1f} "
-                f"{cp[2][1]:.1f},{cp[2][0]:.1f} "
-                f"{cp[3][1]:.1f},{cp[3][0]:.1f}"
-            )
-        parts.append("Z")
-        paths.append("".join(parts))
+        paths.append(_build_adaptive_path(simplified, tolerance))
 
     return paths
 
@@ -492,11 +684,428 @@ def _compute_path_bounds(path_strs: list[str]) -> tuple[float, float, float, flo
     return min_x, min_y, max_x, max_y
 
 
+def _clean_color_mask(mask: np.ndarray, min_component_pixels: int) -> np.ndarray:
+    """Remove noise from a quantized color mask.
+
+    Drops connected components smaller than *min_component_pixels*.
+    Does NOT apply morphological opening — that erodes thin geometric
+    features like the triangular facets in low-poly artwork.
+    """
+    from scipy.ndimage import label
+
+    labeled, n_features = label(mask)
+    cleaned = mask.copy()
+    for i in range(1, n_features + 1):
+        component = labeled == i
+        if component.sum() < min_component_pixels:
+            cleaned[component] = False
+    return cleaned
+
+
+def _corner_angle(p0: np.ndarray, p1: np.ndarray, p2: np.ndarray) -> float:
+    """Turning angle (radians) at *p1* between segments p0→p1 and p1→p2."""
+    v1 = p1 - p0
+    v2 = p2 - p1
+    n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
+    if n1 < 1e-10 or n2 < 1e-10:
+        return 0.0
+    cos_a = np.clip(np.dot(v1, v2) / (n1 * n2), -1.0, 1.0)
+    return float(np.arccos(cos_a))
+
+
+def _build_adaptive_path(
+    simplified: np.ndarray, tolerance: float, corner_threshold: float = 0.25
+) -> str:
+    """Build an SVG sub-path choosing lines vs curves per vertex.
+
+    At each vertex, the turning angle is measured.  Sharp corners
+    (angle > *corner_threshold* radians, ~14°) get straight ``L``
+    segments.  Smooth stretches between corners are fitted with
+    cubic Bezier curves.
+
+    This produces crisp geometric edges where they exist AND smooth
+    curves where the contour is rounded — within the same path.
+    """
+    n = len(simplified)
+    # Classify each interior vertex as sharp or smooth
+    is_corner = [False] * n
+    for i in range(1, n - 1):
+        angle = _corner_angle(simplified[i - 1], simplified[i], simplified[i + 1])
+        is_corner[i] = angle > corner_threshold
+    # First/last are always corners (path start/end)
+    is_corner[0] = True
+    is_corner[-1] = True
+
+    # contour coords are (row, col) = (y, x); swap for SVG
+    def fmt(pt: np.ndarray) -> tuple[float, float]:
+        return (pt[1], pt[0])
+
+    parts = ["M{:.1f},{:.1f}".format(*fmt(simplified[0]))]
+
+    i = 1
+    while i < n:
+        if is_corner[i]:
+            # Sharp corner — emit a straight line
+            parts.append("L{:.1f},{:.1f}".format(*fmt(simplified[i])))
+            i += 1
+        else:
+            # Collect the smooth run up to the next corner
+            run_start = i - 1
+            while i < n and not is_corner[i]:
+                i += 1
+            run_end = min(i, n - 1)
+            run_pts = simplified[run_start : run_end + 1]
+            if len(run_pts) < 2:
+                parts.append("L{:.1f},{:.1f}".format(*fmt(simplified[run_end])))
+                i = run_end + 1
+                continue
+            # Fit Bezier curves to this smooth segment
+            tan_l = _estimate_left_tangent(run_pts)
+            tan_r = _estimate_right_tangent(run_pts)
+            beziers = _fit_cubic_beziers(run_pts, tolerance, tan_l, tan_r)
+            for cp in beziers:
+                parts.append(
+                    "C{:.1f},{:.1f} {:.1f},{:.1f} {:.1f},{:.1f}".format(
+                        cp[1][1],
+                        cp[1][0],
+                        cp[2][1],
+                        cp[2][0],
+                        cp[3][1],
+                        cp[3][0],
+                    )
+                )
+            # Advance past the corner that ended the run
+            if i < n:
+                parts.append("L{:.1f},{:.1f}".format(*fmt(simplified[i])))
+                i += 1
+
+    parts.append("Z")
+    return "".join(parts)
+
+
+def _trace_color_region(
+    mask: np.ndarray,
+    upsampled_dim: int,
+    tolerance: float,
+    min_contour_area: float,
+) -> list[str]:
+    """Trace a cleaned color mask to SVG paths, filtering small contours.
+
+    Uses adaptive per-vertex rendering: sharp corners get straight
+    line segments, smooth stretches get Bezier curves.  This handles
+    logos that mix geometric edges and curves in a single shape.
+    """
+    padded = np.pad(mask, pad_width=1, mode="constant", constant_values=False)
+    contours = measure.find_contours(padded.astype(float), 0.5)
+
+    paths = []
+    for contour in contours:
+        if len(contour) < 4:
+            continue
+
+        contour = contour - 1.0
+
+        # Skip tiny contours (noise from quantization boundaries)
+        bbox_w = contour[:, 1].max() - contour[:, 1].min()
+        bbox_h = contour[:, 0].max() - contour[:, 0].min()
+        if bbox_w * bbox_h < min_contour_area:
+            continue
+
+        # Light smoothing to reduce pixel-staircase jitter.  Use a
+        # lower sigma than the single-color path so geometric / low-poly
+        # details (angular feathers, faceted shapes) stay sharp.
+        contour = _smooth_contour(contour, sigma=1.0)
+
+        simplified = _simplify_contour(contour, tolerance)
+        if len(simplified) < 3:
+            continue
+
+        paths.append(_build_adaptive_path(simplified, tolerance))
+
+    return paths
+
+
+def _silhouette_element(
+    mask: np.ndarray,
+    upsampled_dim: int,
+    fill: str,
+    tolerance: float,
+) -> tuple[str | None, tuple[float, float, float, float]]:
+    """Build the base-layer SVG element for the opaque silhouette.
+
+    If the silhouette is approximately circular, returns a ``<circle>``
+    element for a perfectly smooth edge.  Otherwise falls back to
+    Bezier-traced ``<path>``.
+
+    Returns ``(svg_element_string, (min_x, min_y, max_x, max_y))``
+    or ``(None, ...)`` on failure.
+    """
+    # Find bounding box of opaque pixels
+    rows = np.any(mask, axis=1)
+    cols = np.any(mask, axis=0)
+    if not rows.any():
+        return None, (0, 0, 0, 0)
+
+    rmin, rmax = int(np.argmax(rows)), int(mask.shape[0] - 1 - np.argmax(rows[::-1]))
+    cmin, cmax = int(np.argmax(cols)), int(mask.shape[1] - 1 - np.argmax(cols[::-1]))
+
+    bbox_h = rmax - rmin + 1
+    bbox_w = cmax - cmin + 1
+    cx = (cmin + cmax) / 2.0
+    cy = (rmin + rmax) / 2.0
+    r = (bbox_w + bbox_h) / 4.0  # average radius
+
+    # Check circularity: bbox is roughly square AND the filled area
+    # is close to π·r² (within 10%)
+    aspect = min(bbox_w, bbox_h) / max(bbox_w, bbox_h) if max(bbox_w, bbox_h) > 0 else 0
+    expected_area = np.pi * r * r
+    actual_area = float(mask.sum())
+
+    if aspect > 0.9 and 0.80 < actual_area / expected_area < 1.10:
+        # Close enough to a circle — emit a perfect <circle>
+        # SVG coords: x=col, y=row
+        elem = f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="{fill}"/>'
+        bounds = (cx - r, cy - r, cx + r, cy + r)
+        return elem, bounds
+
+    # Not circular — fall back to Bezier-traced path
+    path_strs = trace_to_svg_paths(mask, upsampled_dim, tolerance)
+    if not path_strs:
+        return None, (0, 0, 0, 0)
+    combined_d = " ".join(path_strs)
+    elem = f'<path d="{combined_d}" fill="{fill}" fill-rule="evenodd"/>'
+    bounds = _compute_path_bounds(path_strs)
+    return elem, bounds
+
+
+def _multicolor_raster_to_bimi_svg(path: str, company_name: str) -> str | None:
+    """Convert a multi-color raster to BIMI SVG.
+
+    Quantizes the image into distinct color regions, then traces each
+    as a *cumulative* mask — the largest region (background) includes
+    the full opaque area, the next-largest adds its area on top, and so
+    on.  This layered approach eliminates white-gap artifacts between
+    adjacent color regions.
+
+    Handles both transparent and opaque images.  Opaque images have
+    their background made transparent before quantization.
+    """
+    img = Image.open(path)
+
+    # Detect the actual background color from the original image BEFORE
+    # any transparency manipulation, so it can be used in the output SVG.
+    detected_bg = _dominant_color(img)
+
+    # Opaque multicolor images need synthetic transparency so the
+    # quantization and silhouette logic can identify the foreground.
+    # Track whether the image lacks meaningful transparency — such
+    # images produce hard alpha edges with anti-aliasing artifacts
+    # that need erosion.  Genuinely transparent images have clean
+    # alpha separation and should NOT be eroded (it destroys thin
+    # geometric details like angular feathers or talons).
+    if _has_transparency(img):
+        rgba_arr = np.array(img.convert("RGBA"))
+        tfrac = (rgba_arr[:, :, 3] <= 127).sum() / rgba_arr[:, :, 3].size
+        needs_erosion = tfrac < 0.05  # nearly opaque, noisy boundaries
+    else:
+        needs_erosion = True
+    if not _has_transparency(img):
+        img = _make_bg_transparent(img)
+
+    # Try progressively simpler settings until output fits 32 KB.
+    for dim, n_colors in [(600, 10), (512, 8), (400, 6), (300, 4)]:
+        upsample = _upsample_factor(img)
+        upsampled_dim = max(min(max(img.width, img.height) * upsample, dim), 200)
+        img_up = img.resize((upsampled_dim, upsampled_dim), Image.Resampling.LANCZOS)
+        regions = _quantize_colors(img_up, n_colors=n_colors)
+        if not regions:
+            continue
+
+        # Filter thresholds — tuned to remove anti-aliasing noise and
+        # stray quantization fragments while keeping real facets.
+        min_comp = max(8, int(upsampled_dim * upsampled_dim * 0.0005))
+        min_contour = upsampled_dim * upsampled_dim * 0.001
+        tolerance = max(2.0, upsampled_dim / 400)
+
+        opaque = np.array(img_up.convert("RGBA"))[:, :, 3] > 127
+
+        first_color, _ = regions[0]
+
+        # If the largest region's color is close to the detected
+        # background, treat it as background — use the detected bg
+        # color and skip tracing an invisible silhouette.
+        fc_rgb = tuple(int(first_color[i : i + 2], 16) for i in (1, 3, 5))
+        bg_rgb = tuple(int(detected_bg[i : i + 2], 16) for i in (1, 3, 5))
+        bg_dist = sum((a - b) ** 2 for a, b in zip(fc_rgb, bg_rgb)) ** 0.5
+        if bg_dist < 30:
+            first_color = detected_bg
+
+        cleaned_opaque = _clean_color_mask(opaque, min_comp)
+
+        # Pre-scan detail layers: detect circular regions so we can
+        # subtract them from the silhouette (avoids a colored halo
+        # peeking out from behind the perfect <circle>).
+        detail_results: list[tuple[str, str, tuple]] = []
+        circle_masks: list[np.ndarray] = []
+        total_opaque = opaque.sum()
+        for hex_color, mask in regions[1:]:
+            cleaned = _clean_color_mask(mask & opaque, min_comp)
+            region_area = cleaned.sum()
+            if region_area < min_comp:
+                continue
+            # Skip tiny regions (< 3% of foreground) — they are almost
+            # always anti-aliasing slivers, not meaningful color facets.
+            if region_area < total_opaque * 0.03:
+                continue
+
+            # Erode to strip anti-aliasing slivers — but only for
+            # images that were originally opaque.  The opaque→transparent
+            # conversion creates hard alpha edges that bleed intermediate
+            # colors.  Genuinely transparent images have clean alpha
+            # separation and erosion would destroy real thin details
+            # (geometric feathers, angular talons, faceted shapes).
+            if needs_erosion:
+                from scipy.ndimage import binary_erosion
+
+                eroded = binary_erosion(cleaned, iterations=2)
+                eroded = _clean_color_mask(eroded, min_comp)
+                if eroded.sum() >= region_area * 0.5:
+                    cleaned = eroded
+                elif eroded.sum() < min_comp:
+                    continue
+
+            # Check if this region is circular — emit <circle> for
+            # perfect smoothness (dots, bullets, round icons).
+            elem, bounds = _silhouette_element(
+                cleaned, upsampled_dim, hex_color, tolerance
+            )
+            if elem is not None and elem.startswith("<circle"):
+                detail_results.append((hex_color, elem, bounds))
+                circle_masks.append(cleaned)
+                continue
+
+            detail_results.append((hex_color, cleaned, None))
+
+        # Subtract circular detail regions from the silhouette so the
+        # base layer doesn't extend behind perfect <circle> elements.
+        # Dilate by 2px to also remove anti-aliasing fringe pixels.
+        from scipy.ndimage import binary_dilation
+
+        sil_mask = cleaned_opaque.copy()
+        for cmask in circle_masks:
+            dilated = binary_dilation(cmask, iterations=1)
+            sil_mask = sil_mask & ~dilated
+
+        silhouette_elem, sil_bounds = _silhouette_element(
+            sil_mask, upsampled_dim, first_color, tolerance
+        )
+        if silhouette_elem is None:
+            continue
+
+        all_path_elems: list[str] = []
+        all_min_x = all_min_y = float("inf")
+        all_max_x = all_max_y = float("-inf")
+
+        # Skip the silhouette when its color matches the background —
+        # it's invisible and wastes bytes (e.g. white rounded rect on
+        # white bg).  Still use its bounds for centering.
+        if bg_dist >= 30:
+            all_path_elems.append(silhouette_elem)
+        rmin_x, rmin_y, rmax_x, rmax_y = sil_bounds
+        all_min_x = min(all_min_x, rmin_x)
+        all_min_y = min(all_min_y, rmin_y)
+        all_max_x = max(all_max_x, rmax_x)
+        all_max_y = max(all_max_y, rmax_y)
+
+        # Emit detail layers
+        for hex_color, data, bounds in detail_results:
+            if isinstance(data, str):
+                # Already an SVG element (circle)
+                all_path_elems.append(data)
+                rmin_x, rmin_y, rmax_x, rmax_y = bounds
+                all_min_x = min(all_min_x, rmin_x)
+                all_min_y = min(all_min_y, rmin_y)
+                all_max_x = max(all_max_x, rmax_x)
+                all_max_y = max(all_max_y, rmax_y)
+                continue
+
+            # data is a cleaned mask — trace it
+            path_strs = _trace_color_region(data, upsampled_dim, tolerance, min_contour)
+            t = tolerance
+            while (
+                sum(len(p) for p in path_strs) > BIMI_MAX_SIZE // len(regions)
+                and t < 30
+            ):
+                t *= 1.5
+                path_strs = _trace_color_region(data, upsampled_dim, t, min_contour)
+
+            if not path_strs:
+                continue
+
+            combined_d = " ".join(path_strs)
+            all_path_elems.append(
+                f'<path d="{combined_d}" fill="{hex_color}" fill-rule="evenodd"/>'
+            )
+
+            rmin_x, rmin_y, rmax_x, rmax_y = _compute_path_bounds(path_strs)
+            all_min_x = min(all_min_x, rmin_x)
+            all_min_y = min(all_min_y, rmin_y)
+            all_max_x = max(all_max_x, rmax_x)
+            all_max_y = max(all_max_y, rmax_y)
+
+        # Need at least one visible element.  When the silhouette color
+        # differs from the background it counts as a visible element on
+        # its own (e.g. a colored circle on a white background).
+        if len(all_path_elems) < 1:
+            continue
+
+        content_w = all_max_x - all_min_x
+        content_h = all_max_y - all_min_y
+
+        canvas_size = 800
+        usable = canvas_size * 0.85
+        scale_factor = usable / max(content_w, content_h)
+
+        mark_cx = (all_min_x + all_max_x) / 2
+        mark_cy = (all_min_y + all_max_y) / 2
+        tx = canvas_size / 2 - mark_cx * scale_factor
+        ty = canvas_size / 2 - mark_cy * scale_factor
+
+        paths_svg = "\n    ".join(all_path_elems)
+        svg = BIMI_TEMPLATE.format(
+            size=canvas_size,
+            title=company_name,
+            desc=f"{company_name} logo mark",
+            bg_color=detected_bg,
+            tx=f"{tx:.2f}",
+            ty=f"{ty:.2f}",
+            scale=f"{scale_factor:.6f}",
+            paths=paths_svg,
+        )
+
+        if len(svg.encode("utf-8")) <= BIMI_MAX_SIZE:
+            return svg
+
+    # All iterations exhausted — return None so caller can fall back
+    # to single-color tracing (e.g. when "multicolor" was just
+    # anti-aliasing noise, not truly distinct color regions).
+    return None
+
+
 def raster_to_bimi_svg(path: str, company_name: str) -> str:
     """Convert a raster image to a BIMI-compliant SVG string."""
+    img = Image.open(path)
+
+    # Multi-color images get per-region color tracing.
+    # Falls back to single-color below if multicolor produces no output
+    # (e.g. when the "spread" was just anti-aliasing noise).
+    if _is_multicolor(img):
+        result = _multicolor_raster_to_bimi_svg(path, company_name)
+        if result is not None:
+            return result
+
     binary, gt_mask, upsampled_dim = preprocess_raster(path)
 
-    img = Image.open(path)
     bg_color = _dominant_color(img)
 
     # Determine mark color from foreground pixels
@@ -525,8 +1134,10 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
         h, w = binary.shape
         min_x, min_y, max_x, max_y = 0.0, 0.0, float(w), float(h)
     else:
-        # Fallback: scikit-image contour tracing + Bezier fitting
-        tolerance = max(2.0, upsampled_dim / 400)
+        # Fallback: scikit-image contour tracing + adaptive paths.
+        # Tight tolerance produces cleaner edges — affordable because
+        # adaptive L segments are ~4x smaller than C Bezier commands.
+        tolerance = max(1.0, upsampled_dim / 800)
         path_strs = trace_to_svg_paths(binary, upsampled_dim, tolerance)
 
         # If too much path data, retry with coarser tolerance

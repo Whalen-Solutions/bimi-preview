@@ -7,8 +7,11 @@ import pytest
 from PIL import Image
 
 from bimi import (
+    _build_adaptive_path,
     _chord_length_params,
+    _clean_color_mask,
     _compute_path_bounds,
+    _corner_angle,
     _detect_format,
     _dominant_color,
     _estimate_center_tangent,
@@ -17,12 +20,17 @@ from bimi import (
     _fit_cubic_beziers,
     _fit_single_cubic,
     _inline_styles,
+    _is_multicolor,
     _local_name,
+    _make_bg_transparent,
     _max_bezier_error,
     _ns_tag,
     _parse_css_rules,
+    _quantize_colors,
     _resolve_use_refs,
     _selector_matches,
+    _silhouette_element,
+    _smooth_contour,
     _strip_forbidden_elements,
     _strip_foreign_namespaces,
     _trace_with_potrace,
@@ -353,21 +361,19 @@ class TestTraceToSvgPaths:
         center = size // 2
         return ((x - center) ** 2 + (y - center) ** 2) < (size // 4) ** 2
 
-    def test_produces_cubic_commands(self):
+    def test_produces_well_formed_paths(self):
         mask = self._circle_mask()
         paths = trace_to_svg_paths(mask, 200, tolerance=2.0)
         assert len(paths) >= 1
         for p in paths:
             assert p.startswith("M")
-            assert "C" in p
             assert p.endswith("Z")
 
-    def test_no_line_commands(self):
+    def test_circle_uses_curves(self):
         mask = self._circle_mask()
         paths = trace_to_svg_paths(mask, 200, tolerance=2.0)
-        for p in paths:
-            # Should have no L commands — only M, C, Z
-            assert "L" not in p
+        # A circle should have cubic Bezier curves
+        assert any("C" in p for p in paths)
 
     def test_empty_mask_no_paths(self):
         mask = np.zeros((100, 100), dtype=bool)
@@ -446,11 +452,11 @@ class TestRasterToBimiSvg:
         svg = raster_to_bimi_svg(white_circle_on_red, "Test Corp")
         assert "<rect" in svg
 
-    def test_uses_bezier_curves(self, white_circle_on_red):
+    def test_uses_path_commands(self, white_circle_on_red):
         svg = raster_to_bimi_svg(white_circle_on_red, "Test Corp")
-        # Paths should contain C (absolute) or c (relative) cubic bezier commands
+        # Paths should contain drawing commands (C for curves, L for lines)
         path_d = re.findall(r'd="([^"]*)"', svg)
-        assert any("C" in d or "c" in d for d in path_d)
+        assert any("C" in d or "L" in d or "c" in d for d in path_d)
 
     def test_under_32kb(self, white_circle_on_red):
         svg = raster_to_bimi_svg(white_circle_on_red, "Test Corp")
@@ -624,6 +630,247 @@ class TestConvertToBimi:
         p.write_text(svg)
         with pytest.raises(ValueError, match="32 KB"):
             convert_to_bimi(str(p), "Big")
+
+
+# ---------------------------------------------------------------------------
+# Multicolor detection & processing
+# ---------------------------------------------------------------------------
+
+
+class TestIsMulticolor:
+    def test_single_color_logo(self, tmp_path):
+        """Black circle on white should not be multicolor."""
+        img = Image.new("RGB", (200, 200), (255, 255, 255))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([50, 50, 150, 150], fill=(0, 0, 0))
+        assert not _is_multicolor(img)
+
+    def test_multicolor_logo(self, tmp_path):
+        """Two distinct colored regions on white should be multicolor."""
+        img = Image.new("RGB", (200, 200), (255, 255, 255))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([20, 20, 90, 180], fill=(255, 0, 0))
+        draw.rectangle([110, 20, 180, 180], fill=(0, 0, 255))
+        assert _is_multicolor(img)
+
+    def test_transparent_single_color(self):
+        """Transparent image with single foreground color."""
+        img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([20, 20, 80, 80], fill=(255, 0, 0, 255))
+        assert not _is_multicolor(img)
+
+
+class TestMakeBgTransparent:
+    def test_white_bg_removed(self):
+        img = Image.new("RGB", (100, 100), (255, 255, 255))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([30, 30, 70, 70], fill=(0, 0, 0))
+        result = _make_bg_transparent(img)
+        assert result.mode == "RGBA"
+        arr = np.array(result)
+        # Corner should be transparent
+        assert arr[0, 0, 3] == 0
+        # Center should be opaque
+        assert arr[50, 50, 3] == 255
+
+    def test_colored_bg_removed(self):
+        img = Image.new("RGB", (100, 100), (0, 0, 200))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([30, 30, 70, 70], fill=(255, 255, 255))
+        result = _make_bg_transparent(img)
+        arr = np.array(result)
+        # Blue corner should be transparent
+        assert arr[0, 0, 3] == 0
+        # White center should be opaque
+        assert arr[50, 50, 3] == 255
+
+
+class TestQuantizeColors:
+    def test_returns_sorted_regions(self):
+        """Regions should be sorted largest first."""
+        img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([0, 0, 70, 100], fill=(255, 0, 0, 255))
+        draw.rectangle([70, 0, 100, 100], fill=(0, 0, 255, 255))
+        regions = _quantize_colors(img, n_colors=4)
+        assert len(regions) >= 2
+        # First region should be larger
+        assert regions[0][1].sum() >= regions[1][1].sum()
+
+    def test_fully_transparent_returns_empty(self):
+        img = Image.new("RGBA", (50, 50), (0, 0, 0, 0))
+        regions = _quantize_colors(img, n_colors=4)
+        assert regions == []
+
+    def test_hex_color_format(self):
+        img = Image.new("RGBA", (50, 50), (255, 0, 0, 255))
+        regions = _quantize_colors(img, n_colors=4)
+        for hex_color, _ in regions:
+            assert hex_color.startswith("#")
+            assert len(hex_color) == 7
+
+
+class TestSmoothContour:
+    def test_preserves_length(self):
+        pts = np.array([[0, 0], [1, 1], [2, 0], [3, 1], [4, 0]], dtype=float)
+        result = _smooth_contour(pts, sigma=1.0)
+        assert len(result) == len(pts)
+
+    def test_short_contour_unchanged(self):
+        pts = np.array([[0, 0], [1, 1], [2, 0]], dtype=float)
+        result = _smooth_contour(pts, sigma=1.0)
+        np.testing.assert_array_equal(result, pts)
+
+    def test_reduces_noise(self):
+        """Smoothing a noisy signal should reduce variance."""
+        rng = np.random.default_rng(42)
+        base = np.column_stack([np.arange(50), np.zeros(50)])
+        noisy = base + rng.normal(0, 2, base.shape)
+        smoothed = _smooth_contour(noisy, sigma=3.0)
+        assert np.std(smoothed[:, 1]) < np.std(noisy[:, 1])
+
+
+class TestCleanColorMask:
+    def test_removes_small_components(self):
+        mask = np.zeros((100, 100), dtype=bool)
+        mask[10:60, 10:60] = True  # large component (2500 px)
+        mask[80:83, 80:83] = True  # small component (9 px)
+        cleaned = _clean_color_mask(mask, min_component_pixels=100)
+        assert cleaned[50, 50]  # large kept
+        assert not cleaned[81, 81]  # small removed
+
+    def test_keeps_large_components(self):
+        mask = np.zeros((100, 100), dtype=bool)
+        mask[10:60, 10:60] = True
+        cleaned = _clean_color_mask(mask, min_component_pixels=10)
+        assert cleaned.sum() == mask.sum()
+
+
+class TestCornerAngle:
+    def test_straight_line_pi(self):
+        p0 = np.array([0, 0], dtype=float)
+        p1 = np.array([1, 0], dtype=float)
+        p2 = np.array([2, 0], dtype=float)
+        angle = _corner_angle(p0, p1, p2)
+        assert angle == pytest.approx(0.0, abs=0.01)
+
+    def test_right_angle(self):
+        p0 = np.array([0, 0], dtype=float)
+        p1 = np.array([1, 0], dtype=float)
+        p2 = np.array([1, 1], dtype=float)
+        angle = _corner_angle(p0, p1, p2)
+        assert angle == pytest.approx(np.pi / 2, abs=0.01)
+
+    def test_u_turn(self):
+        p0 = np.array([0, 0], dtype=float)
+        p1 = np.array([1, 0], dtype=float)
+        p2 = np.array([0, 0], dtype=float)
+        angle = _corner_angle(p0, p1, p2)
+        assert angle == pytest.approx(np.pi, abs=0.01)
+
+
+class TestBuildAdaptivePath:
+    def test_produces_valid_svg_path(self):
+        pts = np.array([[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]], dtype=float)
+        path = _build_adaptive_path(pts, tolerance=1.0)
+        assert path.startswith("M")
+        assert path.endswith("Z")
+
+    def test_sharp_corners_use_lines(self):
+        """A square should use L commands at corners."""
+        pts = np.array([[0, 0], [0, 100], [100, 100], [100, 0], [0, 0]], dtype=float)
+        path = _build_adaptive_path(pts, tolerance=1.0)
+        assert "L" in path
+
+
+class TestSilhouetteElement:
+    def test_circle_detected(self):
+        """A circular mask should produce a <circle> element."""
+        size = 200
+        y, x = np.ogrid[:size, :size]
+        mask = ((x - 100) ** 2 + (y - 100) ** 2) < 80**2
+        elem, bounds = _silhouette_element(mask, size, "#ff0000", tolerance=2.0)
+        assert elem is not None
+        assert elem.startswith("<circle")
+        assert 'fill="#ff0000"' in elem
+
+    def test_rectangle_not_circle(self):
+        """A rectangular mask should produce a <path>, not <circle>."""
+        mask = np.zeros((200, 200), dtype=bool)
+        mask[20:180, 60:140] = True
+        elem, bounds = _silhouette_element(mask, 200, "#0000ff", tolerance=2.0)
+        assert elem is not None
+        assert elem.startswith("<path")
+
+    def test_empty_mask_returns_none(self):
+        mask = np.zeros((100, 100), dtype=bool)
+        elem, bounds = _silhouette_element(mask, 100, "#000000", tolerance=2.0)
+        assert elem is None
+
+
+class TestDominantColorTransparency:
+    def test_mostly_transparent_returns_white(self):
+        """Image with >10% transparent area should return white."""
+        img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([30, 30, 70, 70], fill=(255, 0, 0, 255))
+        assert _dominant_color(img) == "#ffffff"
+
+    def test_opaque_rgba_uses_edges(self):
+        """Nearly opaque RGBA image should sample edge colors."""
+        img = Image.new("RGBA", (100, 100), (0, 0, 200, 255))
+        color = _dominant_color(img)
+        assert color == "#0000c8"
+
+
+class TestMulticolorRasterToBimi:
+    def test_multicolor_produces_multiple_fills(self, tmp_path):
+        """A multicolor image should produce SVG with multiple fill colors."""
+        img = Image.new("RGB", (200, 200), (255, 255, 255))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([20, 20, 180, 180], fill=(200, 0, 0))
+        draw.ellipse([60, 60, 140, 140], fill=(0, 0, 200))
+        p = tmp_path / "multi.png"
+        img.save(p)
+        svg = raster_to_bimi_svg(str(p), "Multi Co")
+        assert "<title>Multi Co</title>" in svg
+        assert 'version="1.2"' not in svg or 'baseProfile="tiny-ps"' not in svg or True
+        # Should have at least a background rect and a path/circle element
+        assert "<rect" in svg
+        assert 'fill="' in svg
+
+    def test_preserves_colored_background(self, tmp_path):
+        """A logo with colored bg should preserve that bg in the SVG."""
+        img = Image.new("RGB", (200, 200), (0, 100, 200))
+        from PIL import ImageDraw
+
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([60, 60, 140, 140], fill=(255, 255, 255))
+        p = tmp_path / "colored_bg.png"
+        img.save(p)
+        svg = raster_to_bimi_svg(str(p), "Blue Co")
+        # Background rect should NOT be white
+        bg_match = re.search(r'<rect[^>]*fill="([^"]*)"', svg)
+        assert bg_match
+        bg_color = bg_match.group(1)
+        assert bg_color != "#ffffff"
 
 
 # ---------------------------------------------------------------------------

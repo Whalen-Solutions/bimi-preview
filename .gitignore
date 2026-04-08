@@ -15,6 +15,9 @@ docker-compose.override.yml
 # Docker
 .docker/
 
+# Sample images
+samples/
+
 # bash
 .bashrc
 .bash_history
