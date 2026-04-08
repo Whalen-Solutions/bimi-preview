@@ -3074,8 +3074,8 @@
 
         {# -- Signature -- #}
         <div class="mobile-email-signature">
-          Best regards,<br>
-          The {{ company }} Team<br>
+          {{ ui_best_regards | default("Best regards,") }}<br>
+          {{ (ui_the_team | default("The COMPANY Team")).replace("COMPANY", company) }}<br>
           <span id="mobile-sig-email"></span>
         </div>
 
@@ -3138,7 +3138,7 @@
         </div>
         <div class="apple-inbox-actions">
           <div class="apple-pill-btn">
-            <span class="apple-inbox-action-text">Select</span>
+            <span class="apple-inbox-action-text">{{ ui_select | default("Select") }}</span>
           </div>
           <div class="apple-pill-btn apple-pill-icon">
             <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12" cy="8" r="1.5"/></svg>
@@ -3148,7 +3148,7 @@
 
       {# -- Title -- #}
       <div class="apple-inbox-title"><h2>{{ ui_inbox | default("Inbox") }}</h2></div>
-      <div class="apple-inbox-subtitle">iCloud &middot; Updated Just Now</div>
+      <div class="apple-inbox-subtitle">iCloud &middot; {{ ui_updated_just_now | default("Updated Just Now") }}</div>
 
       {# -- Category pills: "Primary" (blue+icon+text), then icon-only pills -- #}
       <div class="apple-categories">
@@ -3324,7 +3324,7 @@
 
       {# -- "1 Message" / "✦ Summarize" -- #}
       <div class="apple-email-msg-bar">
-        <span class="apple-email-msg-label">1 Message</span>
+        <span class="apple-email-msg-label">{{ ui_n_messages | default("1 Message") }}</span>
         <div class="apple-email-summarize">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
           {{ ui_summarize | default("Summarize") }}
@@ -3396,8 +3396,8 @@
 
         {# -- Signature -- #}
         <div class="apple-email-signature">
-          Best regards,<br>
-          The {{ company }} Team<br>
+          {{ ui_best_regards | default("Best regards,") }}<br>
+          {{ (ui_the_team | default("The COMPANY Team")).replace("COMPANY", company) }}<br>
           <span class="apple-sig-email"></span>
         </div>
 
@@ -3474,7 +3474,7 @@
         <div class="yahoo-user-avatar">SW</div>
         <div class="yahoo-top-title">
           <span class="yahoo-top-title-text">{{ ui_inbox | default("Inbox") }}</span>
-          <span class="yahoo-top-title-sub">1 unread</span>
+          <span class="yahoo-top-title-sub">{{ ui_n_unread | default("1 unread") }}</span>
         </div>
         <div class="yahoo-top-actions">
           {# Filter #}
@@ -3495,17 +3495,17 @@
 
       {# -- Category pills -- #}
       <div class="yahoo-categories">
-        <div class="yahoo-cat-pill">All</div>
+        <div class="yahoo-cat-pill">{{ ui_all | default("All") }}</div>
         <div class="yahoo-cat-pill yahoo-cat-active">{{ ui_primary | default("Primary") }}</div>
-        <div class="yahoo-cat-pill">Offers</div>
-        <div class="yahoo-cat-pill">Other</div>
+        <div class="yahoo-cat-pill">{{ ui_offers | default("Offers") }}</div>
+        <div class="yahoo-cat-pill">{{ ui_other | default("Other") }}</div>
       </div>
 
       {# -- Section header -- #}
       <div class="yahoo-section-header">
         <div class="yahoo-section-circle"></div>
-        <span class="yahoo-section-label">Today</span>
-        <span class="yahoo-section-edit">Edit</span>
+        <span class="yahoo-section-label">{{ ui_today | default("Today") }}</span>
+        <span class="yahoo-section-edit">{{ ui_edit | default("Edit") }}</span>
       </div>
 
       {# -- Inbox rows -- #}
@@ -3593,7 +3593,7 @@
           <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
           </svg>
-          <span>Contacts</span>
+          <span>{{ ui_contacts | default("Contacts") }}</span>
         </div>
         <div class="yahoo-nav-item">
           <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -3697,8 +3697,8 @@
 
         {# -- Signature -- #}
         <div class="yahoo-email-signature">
-          Best regards,<br>
-          The {{ company }} Team<br>
+          {{ ui_best_regards | default("Best regards,") }}<br>
+          {{ (ui_the_team | default("The COMPANY Team")).replace("COMPANY", company) }}<br>
           <span class="yahoo-sig-email"></span>
         </div>
 
@@ -3728,7 +3728,7 @@
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 6h18v13H3V6zM3 6l3-3h4l3 3M13 11l4 4m0-4l-4 4"/>
           </svg>
-          <span>Move</span>
+          <span>{{ ui_move | default("Move") }}</span>
         </div>
         <div class="yahoo-toolbar-item">
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -3841,7 +3841,7 @@
     <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
     <div class="gmail-toolbar-spacer"></div>
     <div class="gmail-toolbar-pagination">
-      <span>1 of 52</span>
+      <span>{{ ui_n_of_n | default("1 of 52") }}</span>
       {# Previous #}
       <svg class="gmail-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
       {# Next #}
@@ -3917,8 +3917,8 @@
     </div>
 
     <div class="email-signature">
-      Best regards,<br>
-      The {{ company }} Team<br>
+      {{ ui_best_regards | default("Best regards,") }}<br>
+      {{ (ui_the_team | default("The COMPANY Team")).replace("COMPANY", company) }}<br>
       <span id="sig-email"></span>
     </div>
   </div>
@@ -3953,7 +3953,7 @@
       </div>
       <div class="amd-sidebar-item">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
-        Trash
+        {{ ui_trash | default("Trash") }}
       </div>
     </div>
 
@@ -4110,8 +4110,8 @@
       </div>
 
       <div class="amd-sig">
-        Best regards,<br>
-        The {{ company }} Team<br>
+        {{ ui_best_regards | default("Best regards,") }}<br>
+        {{ (ui_the_team | default("The COMPANY Team")).replace("COMPANY", company) }}<br>
         <span class="amd-sig-email"></span>
       </div>
 
@@ -4186,7 +4186,7 @@
     {# -- Toolbar -- #}
     <div class="yahoo-desktop-toolbar">
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      <span class="yahoo-desktop-toolbar-label">Back</span>
+      <span class="yahoo-desktop-toolbar-label">{{ ui_back | default("Back") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
@@ -4194,7 +4194,7 @@
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
       <span class="yahoo-desktop-toolbar-label">{{ ui_archive | default("Archive") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H5v2h4v-2zm10 0h-4v2h4v-2zM5 14v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6H5zm4 6H7v-4h2v4zm4 0h-2v-4h2v4zm4 0h-2v-4h2v4z"/></svg>
-      <span class="yahoo-desktop-toolbar-label">Move</span>
+      <span class="yahoo-desktop-toolbar-label">{{ ui_move | default("Move") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
       <span class="yahoo-desktop-toolbar-label">{{ ui_delete | default("Delete") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1.41-1.41L13.17 12 9.59 8.41 11 7l5 5-5 5z"/></svg>
@@ -4219,7 +4219,7 @@
         <div class="yahoo-brand-name">{{ company }}</div>
         <div class="yahoo-brand-url">{{ domain }}</div>
       </div>
-      <a class="yahoo-brand-visit" href="#">Visit site &rarr;</a>
+      <a class="yahoo-brand-visit" href="#">{{ ui_visit_site | default("Visit site") }} &rarr;</a>
     </div>
     {% endif %}
 
@@ -4280,8 +4280,8 @@
     </div>
 
     <div class="yahoo-desktop-sig">
-      Best regards,<br>
-      The {{ company }} Team<br>
+      {{ ui_best_regards | default("Best regards,") }}<br>
+      {{ (ui_the_team | default("The COMPANY Team")).replace("COMPANY", company) }}<br>
       <span class="yahoo-desktop-sig-email"></span>
     </div>
 

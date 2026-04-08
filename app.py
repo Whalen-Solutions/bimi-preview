@@ -209,10 +209,12 @@ def preview():
 
     delta_min = int((now - email_arrived).total_seconds() // 60)
     if delta_min < 60:
-        relative = f"{delta_min} minutes ago"
+        tmpl = llm_content.get("ui_minutes_ago", "NUM minutes ago")
+        relative = tmpl.replace("NUM", str(delta_min))
     else:
         hours = delta_min // 60
-        relative = f"{hours} hour{'s' if hours != 1 else ''} ago"
+        tmpl = llm_content.get("ui_hours_ago", "NUM hours ago")
+        relative = tmpl.replace("NUM", str(hours))
     email_time = f"{inbox_time} ({relative})"
 
     return render_template(
