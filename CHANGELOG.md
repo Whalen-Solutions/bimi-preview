@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.2] - 2026-04-08
+
+### Added
+
+- Translated "To:" and "to me" labels across all email client mockups
+
+### Fixed
+
+- Consolidated `to`, `me`, and `to_me` into two consistent labels (`to_me` and `to_colon`) to prevent the LLM from translating them inconsistently across mockups
+
 ## [0.7.1] - 2026-04-08
 
 ### Added

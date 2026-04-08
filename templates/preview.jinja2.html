@@ -3366,7 +3366,7 @@
               <span class="apple-email-sender-name">{{ company }}</span>
               <span class="apple-email-time">{{ inbox_time | default("10:42 AM") }}</span>
             </div>
-            <div class="apple-email-detail">To: <span class="apple-to-email"></span> &#x25B8;</div>
+            <div class="apple-email-detail">{{ ui_to_colon | default("To:") }} <span class="apple-to-email"></span> &#x25B8;</div>
           </div>
         </div>
 
@@ -3668,7 +3668,7 @@
           </div>
           <div class="yahoo-email-meta">
             <span class="yahoo-email-sender-name">{{ company }}</span>
-            <div class="yahoo-email-detail">To: Me &#x25BE;</div>
+            <div class="yahoo-email-detail">{{ ui_to_me | default("to me") }} &#x25BE;</div>
           </div>
           <div class="yahoo-email-time-star">
             <span class="yahoo-email-time">{{ inbox_time | default("10:42 AM") }}</span>
@@ -4079,7 +4079,7 @@
           <div class="amd-sender-domain"><svg class="amd-verified-check" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#c7c7cc"/><polyline points="4.5 8 7 10.5 11.5 5.5" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ domain }}</div>
           {% endif %}
           <div class="amd-sender-subject">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</div>
-          <div class="amd-sender-detail">To: <span class="amd-to-email"></span></div>
+          <div class="amd-sender-detail">{{ ui_to_colon | default("To:") }} <span class="amd-to-email"></span></div>
         </div>
         <div class="amd-sender-right">
           <div class="amd-sender-folder">
@@ -4254,7 +4254,7 @@
             <span class="yahoo-desktop-sender-url">{{ domain }} &#x203A;</span>
           </div>
           <div class="yahoo-desktop-sender-from">From: <span class="yahoo-desktop-from-email"></span></div>
-          <div class="yahoo-desktop-sender-to">To: <span class="yahoo-desktop-to-email"></span></div>
+          <div class="yahoo-desktop-sender-to">{{ ui_to_colon | default("To:") }} <span class="yahoo-desktop-to-email"></span></div>
         </div>
         <div class="yahoo-desktop-sender-date">{{ email_time | default("10:42 AM (1 hour ago)") }}</div>
       </div>
