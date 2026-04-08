@@ -16,7 +16,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 # ---------------------------------------------------------------------------
@@ -232,6 +232,13 @@ def _trace_raster(img: Image.Image, bg_color: str, max_colors: int = 8) -> str:
 
     parts: list[str] = []
     for hex_color, mask in layers:
+        # Morphological closing (dilate → erode) fills 1-pixel gaps at
+        # thin tips/endpoints without significantly changing the shape.
+        mask_img = Image.fromarray(mask.astype(np.uint8) * 255, mode="L")
+        mask_img = mask_img.filter(ImageFilter.MaxFilter(3))
+        mask_img = mask_img.filter(ImageFilter.MinFilter(3))
+        mask = np.array(mask_img) > 127
+
         result = _trace_mask_potrace(mask)
         if result is None:
             continue
