@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.6.0] - 2026-04-07
+## [0.6.0] - 2026-04-08
 
 ### Added
 
@@ -26,7 +26,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Added Yahoo Mail and Apple Mail the ihe index's intro text.
+- Added Yahoo Mail and Apple Mail to the index's intro text
 
 ## [0.5.1] - 2026-04-04
 
@@ -42,11 +42,21 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Apple Mail for iOS inbox and open email previews with iOS 26.4 UI: category filter pills, white floating pill buttons with shadow, mailing list unsubscribe banner, Summarize bar, and floating bottom toolbar overlaying email content
+- Apple Mail for iOS inbox and open email previews with iOS 18 UI: category filter pills, white floating pill buttons with shadow, mailing list unsubscribe banner, Summarize bar, and floating bottom toolbar overlaying email content
 - Apple Mail for macOS desktop preview with three-pane layout: sidebar (Favorites/iCloud mailboxes), message list with category pills, and reading pane with toolbar, mailing list banner, sender header with verified checkmark, and email body
 - VMC/CMC certificate handling for Apple Mail: VMC shows BIMI logo, CMC shows initial (Apple Mail does not display CMC logos)
 - Dark mode support for all Apple Mail previews (true black iOS backgrounds, dark gray macOS surfaces)
 - SEO meta tags on the index page: description, Open Graph, and Twitter Card tags for social sharing
+
+#### VMC/CMC support by client
+
+| Client | VMC Logo | VMC Checkmark | CMC Logo |
+| --- | --- | --- | --- |
+| Gmail (mobile & desktop) | Yes | Yes | Yes (no checkmark) |
+| Apple Mail (iOS) | Yes | — | — |
+| Apple Mail (macOS) | Yes | Yes | — |
+| Yahoo Mail (mobile) | Yes | — | — |
+| Yahoo Mail (desktop) | Yes | Yes | — |
 
 ### Changed
 
@@ -54,19 +64,19 @@ All notable changes to this project will be documented in this file.
 - Removed `www.` prefix from domain display in Apple Mail and Yahoo Mail desktop previews
 - Preview page footer now mentions Apple Mail alongside Gmail and Yahoo Mail
 
-## [0.4.5] - 2026-04-02
+## [0.4.5] - 2026-04-03
 
 ### Fixed
 
 - Yahoo mobile text-size (AA) icon now turns white in dark mode instead of staying gray
 
-## [0.4.4] - 2026-04-02
+## [0.4.4] - 2026-04-03
 
 ### Changed
 
 - Clarified BIMI certificate type hint: VMC shows checkmarks in Gmail and Yahoo, CMC shows logo only in Gmail, Yahoo does not support CMC
 
-## [0.4.3] - 2026-04-02
+## [0.4.3] - 2026-04-03
 
 ### Added
 
@@ -92,13 +102,13 @@ All notable changes to this project will be documented in this file.
 
 - Dark mode no longer fills the entire phone battery icon by excluding `fill="none"` outline rects from the dark mode fill override
 
-## [0.4.2] - 2026-04-01
+## [0.4.2] - 2026-04-02
 
 ### Added
 
 - Dark mode toggle on the preview page that switches mobile and desktop Gmail mockups to Gmail's dark theme colors
 
-## [0.4.1] - 2026-04-01
+## [0.4.1] - 2026-04-02
 
 ### Fixed
 
@@ -106,7 +116,7 @@ All notable changes to this project will be documented in this file.
 - Multi-frame formats (GIF, WebP, TIFF) now select the largest frame by pixel area instead of silently using the first frame
 - ICO multi-frame selection no longer returns the wrong frame when no frame is larger than the first
 
-## [0.4.0] - 2026-04-01
+## [0.4.0] - 2026-04-02
 
 ### Added
 
