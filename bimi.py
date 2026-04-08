@@ -99,6 +99,11 @@ def _prepare_raster(path: str) -> Image.Image:
 # ---------------------------------------------------------------------------
 
 
+def _color_dist(a: tuple[int, ...], b: tuple[int, ...]) -> float:
+    """Euclidean distance between two RGB triples."""
+    return float(np.sqrt(sum((x - y) ** 2 for x, y in zip(a, b))))
+
+
 def _quantize_colors(
     img: Image.Image, bg_color: str, max_colors: int
 ) -> list[tuple[str, np.ndarray]]:
@@ -107,6 +112,9 @@ def _quantize_colors(
     Returns a list of ``(hex_color, mask)`` pairs for each foreground
     color (i.e. the background color is excluded).  Each *mask* is a
     boolean ndarray where ``True`` marks pixels of that color.
+
+    Similar colors (including anti-aliasing intermediates) are merged
+    so each layer traces as one clean shape.
     """
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
@@ -117,19 +125,45 @@ def _quantize_colors(
     arr = np.array(quantized)
     n_palette = len(palette) // 3
 
+    # Collect raw foreground entries: (rgb_tuple, pixel_count, palette_index)
+    entries: list[tuple[tuple[int, ...], int, int]] = []
     total_pixels = arr.size
-    layers: list[tuple[str, np.ndarray]] = []
     for idx in range(n_palette):
-        r, g, b = palette[idx * 3 : idx * 3 + 3]
-        # Skip colors that match the background (within tolerance)
-        if abs(r - bg_rgb[0]) + abs(g - bg_rgb[1]) + abs(b - bg_rgb[2]) < 60:
+        rgb = tuple(palette[idx * 3 : idx * 3 + 3])
+        # Skip colors close to the background
+        if _color_dist(rgb, bg_rgb) < 50:
             continue
-        mask = arr == idx
-        count = int(mask.sum())
+        count = int((arr == idx).sum())
         # Skip noise — layers covering < 0.1% of the image
         if count < max(10, total_pixels // 1000):
             continue
-        hex_color = f"#{r:02x}{g:02x}{b:02x}"
+        entries.append((rgb, count, idx))
+
+    if not entries:
+        return []
+
+    # Merge similar colors: greedily assign each color to the nearest
+    # existing group within a Euclidean distance threshold.  This
+    # collapses anti-aliasing intermediates into their parent color.
+    merge_threshold = 100.0
+    # Sort by pixel count descending so the dominant color anchors each group
+    entries.sort(key=lambda e: -e[1])
+    groups: list[tuple[tuple[int, ...], int, list[int]]] = []  # (rgb, count, [indices])
+    for rgb, count, idx in entries:
+        merged = False
+        for gi, (g_rgb, g_count, g_indices) in enumerate(groups):
+            if _color_dist(rgb, g_rgb) < merge_threshold:
+                g_indices.append(idx)
+                groups[gi] = (g_rgb, g_count + count, g_indices)
+                merged = True
+                break
+        if not merged:
+            groups.append((rgb, count, [idx]))
+
+    layers: list[tuple[str, np.ndarray]] = []
+    for rgb, _count, indices in groups:
+        mask = np.isin(arr, indices)
+        hex_color = "#{:02x}{:02x}{:02x}".format(*rgb)
         layers.append((hex_color, mask))
 
     return layers
