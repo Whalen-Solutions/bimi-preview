@@ -142,27 +142,22 @@ def _quantize_colors(
     if not entries:
         return []
 
-    # Merge similar colors: greedily assign each color to the nearest
-    # existing group within a Euclidean distance threshold.  This
-    # collapses anti-aliasing intermediates into their parent color.
+    # Discard anti-aliasing intermediates: keep only the dominant color
+    # in each similar-color group.  Anti-aliased edge pixels form
+    # jagged masks that degrade potrace's smooth curve output.
     merge_threshold = 100.0
-    # Sort by pixel count descending so the dominant color anchors each group
+    # Sort by pixel count descending so the dominant color comes first
     entries.sort(key=lambda e: -e[1])
-    groups: list[tuple[tuple[int, ...], int, list[int]]] = []  # (rgb, count, [indices])
-    for rgb, count, idx in entries:
-        merged = False
-        for gi, (g_rgb, g_count, g_indices) in enumerate(groups):
-            if _color_dist(rgb, g_rgb) < merge_threshold:
-                g_indices.append(idx)
-                groups[gi] = (g_rgb, g_count + count, g_indices)
-                merged = True
-                break
-        if not merged:
-            groups.append((rgb, count, [idx]))
+    kept: list[tuple[tuple[int, ...], int]] = []  # (rgb, palette_index)
+    for rgb, _count, idx in entries:
+        # If this color is similar to an already-kept color, discard it
+        if any(_color_dist(rgb, k_rgb) < merge_threshold for k_rgb, _ in kept):
+            continue
+        kept.append((rgb, idx))
 
     layers: list[tuple[str, np.ndarray]] = []
-    for rgb, _count, indices in groups:
-        mask = np.isin(arr, indices)
+    for rgb, idx in kept:
+        mask = arr == idx
         hex_color = "#{:02x}{:02x}{:02x}".format(*rgb)
         layers.append((hex_color, mask))
 
