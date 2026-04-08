@@ -8,15 +8,16 @@ BIMI Preview Generator -- a Flask web app that converts logos into BIMI-complian
 
 - **app.py** -- Flask routes and request handling. The `/preview` POST endpoint validates input, runs BIMI conversion and LLM content generation in parallel via `ThreadPoolExecutor`, computes timezone-aware email times (`status_bar_time`, `inbox_time`, `email_time`) from a hidden `tz` form field, then renders the preview template. GET `/preview` redirects to `/`.
 - **bimi.py** -- Image-to-BIMI SVG conversion. Handles raster images (PNG, JPG, etc.) and SVG input. Outputs SVG Tiny-PS with square viewBox, solid background, circle-crop clearance, and forbidden elements stripped. Uses PIL color quantization and potrace for multi-color raster-to-SVG tracing with smooth Bézier curves, plus CairoSVG for SVG rasterization.
-- **llm.py** -- LLM provider abstraction supporting Anthropic, OpenAI, and Google Gemini. Generates realistic email content (subject line, body, and an `other_senders` array of inbox neighbors) as structured JSON. `_parse_response` flattens the array into numbered template keys (`other_sender_1_name`, etc.) and derives `_initial` from each sender's name. Email times and `email_subject` are not in the prompt -- times are computed server-side in `app.py` and `email_subject` falls back to `inbox_subject` in the template. Returns `{}` on any failure so Jinja `| default()` filters activate gracefully.
+- **llm.py** -- LLM provider abstraction supporting Anthropic, OpenAI, and Google Gemini. Generates realistic email content (subject line, body, and an `other_senders` array of inbox neighbors) plus translated `ui_labels` for mail client chrome, all as structured JSON. `_parse_response` flattens arrays into numbered template keys (`other_sender_1_name`, etc.) and `ui_labels` into prefixed keys (`ui_inbox`, `ui_reply`, etc.). `get_supported_languages()` returns the language list for the configured provider. `_PROVIDER_LANGUAGES` defines per-provider language support (Anthropic: 15, OpenAI/Gemini: 50). Returns `{}` on any failure so Jinja `| default()` filters activate gracefully.
 - **templates/** -- Jinja2 templates:
-  - `index.jinja2.html` -- Upload form (company, domain, industry, logo file)
+  - `index.jinja2.html` -- Upload form (company, domain, industry, language, logo file)
   - `preview.jinja2.html` -- Gmail, Apple Mail, and Yahoo Mail inbox + open email mockups with BIMI avatar
   - `prompt.jinja2.html` -- LLM prompt documentation page
 
 ## Key Design Decisions
 
-- LLM content generation is optional. If no API key is configured or the LLM call fails (including credit exhaustion), the preview renders with hardcoded default text via Jinja `| default()` filters -- no crash, no broken page.
+- LLM content generation is optional. If no API key is configured or the LLM call fails (including credit exhaustion), the preview renders with hardcoded English default text via Jinja `| default()` filters -- no crash, no broken page.
+- The language dropdown shows only languages supported by the configured LLM provider. The selected language applies to both email content and mail client UI labels (Inbox, Reply, Delete, etc.). When English is selected, `ui_labels` is omitted from the prompt to save tokens -- the template's `| default()` fallbacks provide the English UI strings.
 - Email addresses are constructed in client-side JS (not rendered in HTML) to prevent Cloudflare email obfuscation from mangling them.
 - The BIMI SVG is served via URL (`/bimi-svg/<job_id>`) and displayed in the preview using `<img>` tags. A download button links to `/download/<job_id>`.
 - A background daemon thread scans `uploads/` every 60 seconds and deletes files older than 10 minutes. Original uploads are deleted immediately after conversion.

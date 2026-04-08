@@ -19,17 +19,17 @@ A Flask web app that converts a logo into a BIMI-compliant SVG Tiny-PS file and 
 
 ## How It Works
 
-1. **Upload** a logo image (PNG, JPG, SVG, WebP, GIF, BMP, or TIFF) along with your company name, email domain, and industry.
-2. **Convert** -- the app converts the image to a BIMI-compliant SVG Tiny-PS file with a square viewBox, solid background, circle-crop clearance, and all forbidden elements removed.
-3. **Generate** -- a small LLM (Claude Haiku or GPT-4o-mini) generates industry-appropriate email content: subject lines, preview text, email body, and realistic inbox neighbors.
-4. **Preview** -- see pixel-accurate Gmail, Apple Mail, and Yahoo Mail mockups (mobile and desktop) with your BIMI avatar in the inbox list and the open email view.
+1. **Upload** a logo image (PNG, JPG, SVG, WebP, GIF, BMP, or TIFF) along with your company name, email domain, industry, and preferred email language.
+2. **Convert** -- the app converts the image to a BIMI-compliant SVG Tiny-PS file using PIL color quantization and potrace for multi-color tracing with smooth Bezier curves.
+3. **Generate** -- a small LLM generates industry-appropriate email content and translated UI labels in the selected language.
+4. **Preview** -- see pixel-accurate Gmail, Apple Mail, and Yahoo Mail mockups (mobile and desktop) with your BIMI avatar, all rendered in the chosen language.
 5. **Download** -- click the download button to grab the BIMI-compliant SVG to publish on your domain and configure in DNS. Files are automatically cleaned up after 10 minutes.
 
 ## Prerequisites
 
 - Python 3.11+
 - An API key for **Anthropic**, **OpenAI**, or **Google Gemini** (for LLM-generated email content; optional -- defaults are used if no key is set)
-- `potrace` (optional, for higher-quality raster-to-SVG tracing)
+- `potrace` (required for raster-to-SVG tracing)
   
   ```bash
   # Debian/Ubuntu
@@ -242,8 +242,8 @@ The generated SVG conforms to the SVG Tiny-PS profile required by BIMI:
 ```text
 bimi-preview/
   app.py              Flask routes and request handling
-  bimi.py             Image-to-BIMI SVG conversion (raster + SVG input)
-  llm.py              LLM provider abstraction (Anthropic / OpenAI / Gemini)
+  bimi.py             Image-to-BIMI SVG conversion (PIL quantization + potrace)
+  llm.py              LLM provider abstraction (Anthropic / OpenAI / Gemini) with multilingual support
   templates/
     index.jinja2.html        Upload form
     preview.jinja2.html      Gmail/Apple Mail/Yahoo Mail mockups (Jinja2)

@@ -37,7 +37,7 @@ for the email that fits what this company actually does.",
     {{"name": "A lesser-known service or noreply sender without its own Gmail logo \
 (e.g. Teamwork, Gusto, DocuSign)", "subject": "Notification-style subject", \
 "preview": "Preview", "time": "e.g. Mar 28"}}
-  ]
+  ]{ui_labels_json}
 }}
 
 Rules:
@@ -50,6 +50,29 @@ or years unless today is near their end. Use the company's fiscal calendar for \
 financial content if known, calendar dates for events
 - Return ONLY valid JSON, no markdown fences, no explanation
 - Write ALL text content in {language}"""
+
+_UI_LABELS_JSON = """,
+  "ui_labels": {{
+    "inbox": "Inbox",
+    "primary": "Primary",
+    "search_in_mail": "Search in mail",
+    "search": "Search",
+    "reply": "Reply",
+    "reply_all": "Reply all",
+    "forward": "Forward",
+    "archive": "Archive",
+    "delete": "Delete",
+    "spam": "Spam",
+    "unsubscribe": "Unsubscribe",
+    "to_me": "to me",
+    "summarize": "Summarize",
+    "compose": "Compose",
+    "favorites": "Favorites",
+    "sent": "Sent",
+    "more": "More",
+    "messages_count": "4 messages",
+    "mailing_list": "This message is from a mailing list."
+  }}"""
 
 # ---------------------------------------------------------------------------
 # Language support per provider
@@ -290,6 +313,13 @@ def _parse_response(raw: str) -> dict:
         data[f"{prefix}_preview"] = sender.get("preview", "")
         data[f"{prefix}_time"] = sender.get("time", "")
 
+    # Flatten ui_labels into prefixed template keys.
+    # Popped unconditionally so it never leaks into the template as a dict.
+    labels = data.pop("ui_labels", {})
+    if isinstance(labels, dict):
+        for key, val in labels.items():
+            data[f"ui_{key}"] = val
+
     return data
 
 
@@ -340,6 +370,7 @@ def generate_email_content(
         industry=industry,
         today=date.today().strftime("%B %-d, %Y"),
         language=language,
+        ui_labels_json="" if language == "English" else _UI_LABELS_JSON,
     )
 
     try:

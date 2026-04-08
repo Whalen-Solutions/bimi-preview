@@ -2856,7 +2856,7 @@
           <svg class="mobile-hamburger" viewBox="0 0 24 24" fill="currentColor">
             <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
           </svg>
-          <span>Search in mail</span>
+          <span>{{ ui_search_in_mail | default("Search in mail") }}</span>
           <div class="mobile-user-circle"></div>
         </div>
       </div>
@@ -3049,7 +3049,7 @@
               <span class="mobile-email-time">{{ email_time | default("10:42 AM (1 hour ago)") }}</span>
             </div>
             <div class="mobile-email-detail">&lt;<span id="mobile-sender-email"></span>&gt;</div>
-            <div class="mobile-email-detail">to me</div>
+            <div class="mobile-email-detail">{{ ui_to_me | default("to me") }}</div>
           </div>
         </div>
 
@@ -3083,7 +3083,7 @@
 
       {# -- Reply bar -- #}
       <div class="mobile-reply-bar">
-        <div class="mobile-reply-pill">Reply</div>
+        <div class="mobile-reply-pill">{{ ui_reply | default("Reply") }}</div>
         <svg class="mobile-reply-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
         </svg>
@@ -3147,14 +3147,14 @@
       </div>
 
       {# -- Title -- #}
-      <div class="apple-inbox-title"><h2>Inbox</h2></div>
+      <div class="apple-inbox-title"><h2>{{ ui_inbox | default("Inbox") }}</h2></div>
       <div class="apple-inbox-subtitle">iCloud &middot; Updated Just Now</div>
 
       {# -- Category pills: "Primary" (blue+icon+text), then icon-only pills -- #}
       <div class="apple-categories">
         <div class="apple-cat-pill apple-cat-active">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          Primary
+          {{ ui_primary | default("Primary") }}
         </div>
         <div class="apple-cat-pill">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 4l-1-2H2v2h2l3.6 7.59-1.35 2.44C5.52 15.37 6.48 17 8 17h12v-2H8l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0021.02 4H7.17z"/></svg>
@@ -3265,7 +3265,7 @@
         {# Search pill — magnifying glass + "Search" text #}
         <div class="apple-search-pill">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-          <span>Search</span>
+          <span>{{ ui_search | default("Search") }}</span>
         </div>
         {# Microphone #}
         <div class="apple-nav-pill apple-nav-pill-icon">
@@ -3327,7 +3327,7 @@
         <span class="apple-email-msg-label">1 Message</span>
         <div class="apple-email-summarize">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
-          Summarize
+          {{ ui_summarize | default("Summarize") }}
         </div>
       </div>
 
@@ -3342,12 +3342,12 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 4 12 13 2 4"/></svg>
               <span class="apple-mailing-badge"></span>
             </div>
-            <span class="apple-mailing-text">This message is from a mailing list.</span>
+            <span class="apple-mailing-text">{{ ui_mailing_list | default("This message is from a mailing list.") }}</span>
             <div class="apple-mailing-dismiss">
               <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
             </div>
           </div>
-          <div class="apple-mailing-unsub">Unsubscribe</div>
+          <div class="apple-mailing-unsub">{{ ui_unsubscribe | default("Unsubscribe") }}</div>
         </div>
 
         {# -- Sender: avatar, name (bold) + time, "To:" line -- #}
@@ -3473,7 +3473,7 @@
       <div class="yahoo-top-bar">
         <div class="yahoo-user-avatar">SW</div>
         <div class="yahoo-top-title">
-          <span class="yahoo-top-title-text">Inbox</span>
+          <span class="yahoo-top-title-text">{{ ui_inbox | default("Inbox") }}</span>
           <span class="yahoo-top-title-sub">1 unread</span>
         </div>
         <div class="yahoo-top-actions">
@@ -3496,7 +3496,7 @@
       {# -- Category pills -- #}
       <div class="yahoo-categories">
         <div class="yahoo-cat-pill">All</div>
-        <div class="yahoo-cat-pill yahoo-cat-active">Primary</div>
+        <div class="yahoo-cat-pill yahoo-cat-active">{{ ui_primary | default("Primary") }}</div>
         <div class="yahoo-cat-pill">Offers</div>
         <div class="yahoo-cat-pill">Other</div>
       </div>
@@ -3587,7 +3587,7 @@
           <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
           </svg>
-          <span>Inbox</span>
+          <span>{{ ui_inbox | default("Inbox") }}</span>
         </div>
         <div class="yahoo-nav-item">
           <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -3599,7 +3599,7 @@
           <svg class="yahoo-nav-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zm-8-2l4-4-1.41-1.41L13 12.17V8h-2v4.17l-1.59-1.58L8 12l4 4z"/>
           </svg>
-          <span>Unsubscribe</span>
+          <span>{{ ui_unsubscribe | default("Unsubscribe") }}</span>
         </div>
       </div>
 
@@ -3710,19 +3710,19 @@
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 6h18M8 6V4h8v2M5 6l1 14h12l1-14"/>
           </svg>
-          <span>Delete</span>
+          <span>{{ ui_delete | default("Delete") }}</span>
         </div>
         <div class="yahoo-toolbar-item">
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/>
           </svg>
-          <span>Reply</span>
+          <span>{{ ui_reply | default("Reply") }}</span>
         </div>
         <div class="yahoo-toolbar-item">
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 9V5l7 7-7 7v-4c-5 0-8.5 1.6-11 5 1-5 4-10 11-11z"/>
           </svg>
-          <span>Forward</span>
+          <span>{{ ui_forward | default("Forward") }}</span>
         </div>
         <div class="yahoo-toolbar-item">
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -3734,7 +3734,7 @@
           <svg class="yahoo-toolbar-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
           </svg>
-          <span>More</span>
+          <span>{{ ui_more | default("More") }}</span>
         </div>
       </div>
 
@@ -3854,7 +3854,7 @@
   <div class="email-view">
     <div class="email-subject-line">
       <span class="email-subject-text">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</span>
-      <span class="email-subject-badge">Inbox <span class="email-subject-badge-x">&times;</span></span>
+      <span class="email-subject-badge">{{ ui_inbox | default("Inbox") }} <span class="email-subject-badge-x">&times;</span></span>
       <div class="email-subject-actions">
         {# Print #}
         <svg class="email-subject-action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
@@ -3879,9 +3879,9 @@
           {% endif %}
           {# Email address constructed via JS to avoid Cloudflare obfuscation #}
           <span class="email-sender-addr">&lt;<span id="sender-email"></span>&gt;</span>
-          <span class="email-unsubscribe">Unsubscribe</span>
+          <span class="email-unsubscribe">{{ ui_unsubscribe | default("Unsubscribe") }}</span>
         </div>
-        <div class="email-to">to me <span class="email-to-arrow"></span></div>
+        <div class="email-to">{{ ui_to_me | default("to me") }} <span class="email-to-arrow"></span></div>
       </div>
       <div class="email-header-actions">
         <div class="email-time-header">
@@ -3936,20 +3936,20 @@
         <div class="amd-traffic-dot" style="background:#ffbd2e;"></div>
         <div class="amd-traffic-dot" style="background:#28c840;"></div>
       </div>
-      <div class="amd-sidebar-section">Favorites</div>
+      <div class="amd-sidebar-section">{{ ui_favorites | default("Favorites") }}</div>
       <div class="amd-sidebar-item amd-active">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-        Inbox
+        {{ ui_inbox | default("Inbox") }}
       </div>
       <div class="amd-sidebar-item">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        Sent
+        {{ ui_sent | default("Sent") }}
       </div>
       <div class="amd-sidebar-section">Smart Mailboxes</div>
       <div class="amd-sidebar-section">iCloud</div>
       <div class="amd-sidebar-item">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-        Inbox
+        {{ ui_inbox | default("Inbox") }}
       </div>
       <div class="amd-sidebar-item">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
@@ -3961,8 +3961,8 @@
     <div class="amd-msglist">
       <div class="amd-msglist-header">
         <div>
-          <div class="amd-msglist-title">Inbox</div>
-          <div class="amd-msglist-subtitle">Primary &middot; 4 messages</div>
+          <div class="amd-msglist-title">{{ ui_inbox | default("Inbox") }}</div>
+          <div class="amd-msglist-subtitle">{{ ui_primary | default("Primary") }} &middot; {{ ui_messages_count | default("4 messages") }}</div>
         </div>
         <div class="amd-msglist-actions">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
@@ -3972,7 +3972,7 @@
       <div class="amd-categories">
         <div class="amd-cat-pill amd-cat-active">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          Primary
+          {{ ui_primary | default("Primary") }}
         </div>
         <div class="amd-cat-pill">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 4l-1-2H2v2h2l3.6 7.59-1.35 2.44C5.52 15.37 6.48 17 8 17h12v-2H8l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0021.02 4H7.17z"/></svg>
@@ -4045,7 +4045,7 @@
         <div class="amd-toolbar-spacer"></div>
         <div class="amd-toolbar-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-          Search
+          {{ ui_search | default("Search") }}
         </div>
       </div>
 
@@ -4055,8 +4055,8 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 4 12 13 2 4"/></svg>
           <span class="amd-mailing-badge"></span>
         </div>
-        <span class="amd-mailing-text">This message is from a mailing list.</span>
-        <span class="amd-mailing-unsub">Unsubscribe</span>
+        <span class="amd-mailing-text">{{ ui_mailing_list | default("This message is from a mailing list.") }}</span>
+        <span class="amd-mailing-unsub">{{ ui_unsubscribe | default("Unsubscribe") }}</span>
         <div class="amd-mailing-x">
           <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
         </div>
@@ -4084,7 +4084,7 @@
         <div class="amd-sender-right">
           <div class="amd-sender-folder">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6H12l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-            Inbox &ndash; iCloud
+            {{ ui_inbox | default("Inbox") }} &ndash; iCloud
           </div>
           <div>{{ inbox_time | default("10:42 AM") }}</div>
         </div>
@@ -4192,13 +4192,13 @@
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
       <div class="yahoo-desktop-toolbar-sep"></div>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
-      <span class="yahoo-desktop-toolbar-label">Archive</span>
+      <span class="yahoo-desktop-toolbar-label">{{ ui_archive | default("Archive") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H5v2h4v-2zm10 0h-4v2h4v-2zM5 14v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6H5zm4 6H7v-4h2v4zm4 0h-2v-4h2v4zm4 0h-2v-4h2v4z"/></svg>
       <span class="yahoo-desktop-toolbar-label">Move</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>
-      <span class="yahoo-desktop-toolbar-label">Delete</span>
+      <span class="yahoo-desktop-toolbar-label">{{ ui_delete | default("Delete") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1.41-1.41L13.17 12 9.59 8.41 11 7l5 5-5 5z"/></svg>
-      <span class="yahoo-desktop-toolbar-label">Spam</span>
+      <span class="yahoo-desktop-toolbar-label">{{ ui_spam | default("Spam") }}</span>
       <svg class="yahoo-desktop-toolbar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
       <div class="yahoo-desktop-toolbar-spacer"></div>
       {# Up arrow (previous) #}
@@ -4226,7 +4226,7 @@
     {# -- Subject line -- #}
     <div class="yahoo-desktop-subject-line">
       <span class="yahoo-desktop-subject-text">{{ email_subject | default(inbox_subject | default("Your account security update for " + domain)) }}</span>
-      <span class="yahoo-desktop-subject-folder">Yahoo/Inbox</span>
+      <span class="yahoo-desktop-subject-folder">Yahoo/{{ ui_inbox | default("Inbox") }}</span>
       <svg class="yahoo-desktop-subject-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
     </div>
 

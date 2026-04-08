@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-04-08
+
+### Added
+
+- Email language dropdown on the form with per-provider language lists (Anthropic: 15 languages, OpenAI/Gemini: 50 each)
+- LLM-generated translations for mail client UI labels (Inbox, Primary, Search, Reply, Forward, Delete, Spam, Archive, Unsubscribe, Summarize, Compose, Favorites, Sent, More, "to me")
+- All email preview content and UI chrome now renders in the selected language
+
 ## [0.6.0] - 2026-04-08
 
 ### Added
