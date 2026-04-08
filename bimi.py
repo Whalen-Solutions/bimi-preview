@@ -127,7 +127,7 @@ def _quantize_colors(
     entries: list[tuple[tuple[int, ...], int, int]] = []  # (rgb, count, idx)
     for idx in range(n_palette):
         rgb = tuple(palette[idx * 3 : idx * 3 + 3])
-        if _color_dist(rgb, bg_rgb) < 50:
+        if _color_dist(rgb, bg_rgb) < 80:
             continue
         count = int((arr == idx).sum())
         if count == 0:
