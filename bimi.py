@@ -200,7 +200,7 @@ def _quantize_colors(
         changed = False
         for si in range(len(groups) - 1, -1, -1):
             s_rgb, s_count, s_core, s_all = groups[si]
-            if not _is_artifact(s_all):
+            if not _is_artifact(s_core):
                 continue
             best_gi, best_dist = -1, float("inf")
             for gi, (g_rgb, g_count, g_core, g_all) in enumerate(groups):
