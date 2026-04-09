@@ -232,7 +232,11 @@ def _quantize_colors(
         ys, xs = np.where(mask)
         bbox_area = (xs.max() - xs.min() + 1) * (ys.max() - ys.min() + 1)
         density = count / bbox_area
-        return density < 0.10 and count < max_count * 0.25
+        # Only absorb truly scattered noise — low density AND tiny
+        # relative to the image.  Previous thresholds (0.10 / 0.25)
+        # wrongly absorbed non-contiguous but legitimate content like
+        # geometric facets spread across a shape.
+        return density < 0.03 and count < max_count * 0.10
 
     changed = True
     while changed:
@@ -262,8 +266,10 @@ def _quantize_colors(
     total_pixels = arr.size
     layers: list[tuple[str, np.ndarray]] = []
     for _rgb, count, core_indices, all_indices in groups:
-        # Skip noise groups covering < 0.1% of the image
-        if count < max(10, total_pixels // 1000):
+        # Skip noise groups covering < 0.02% of the image.
+        # Previous threshold (0.1%) filtered tiny but legitimate
+        # features like umlaut dots and period marks.
+        if count < max(10, total_pixels // 5000):
             continue
         mask = np.isin(arr, all_indices)
         # Sample the purest interior pixels for accurate brand colors.
