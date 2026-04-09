@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-04-09
+
+### Improved
+
+- BIMI color accuracy: sample purest interior pixels (eroded mask + median filtering) for faithful brand colors instead of averaging noisy edges
+- Extended quantization range to 128 colors for complex logos before falling back to fewer
+- Transparent PNG handling: composite onto white before background detection instead of sampling transparent-turned-black edge pixels that produced dark muddy backgrounds
+- Artifact detection now checks core palette indices only, preventing real color groups from being absorbed
+
+### Fixed
+
+- Pylance type errors in `_prepare_raster` extrema unpacking
+- Replaced bare `dither=0` with `Image.Dither.NONE` for type safety
+
+### Docs
+
+- Added BIMI conversion philosophy section to AGENTS.md
+
 ## [0.7.2] - 2026-04-08
 
 ### Added

@@ -333,14 +333,16 @@ def _trace_raster(img: Image.Image, bg_color: str, max_colors: int = 8) -> str:
 def raster_to_bimi_svg(path: str, company_name: str) -> str:
     """Convert a raster image to a BIMI-compliant multi-color SVG string."""
     img = _prepare_raster(path)
-    bg_color = _dominant_color(img)
 
-    # Composite transparent images onto the detected background color
+    # Composite transparent images onto white before color detection —
+    # _dominant_color converts to RGB which turns transparent pixels black,
+    # producing a dark muddy background instead of the expected white.
     if _has_transparency(img):
-        bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
-        bg_img = Image.new("RGB", img.size, bg_rgb)
+        bg_img = Image.new("RGB", img.size, (255, 255, 255))
         bg_img.paste(img, mask=img.split()[-1])
         img = bg_img
+
+    bg_color = _dominant_color(img)
 
     img = img.convert("RGB")
 
