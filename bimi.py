@@ -160,6 +160,11 @@ def _quantize_colors(
             fg_count = int(pixel_mask[fg_mask].sum())
             if fg_count / count < 0.1:
                 continue
+            # Near-white entries that are only partially opaque are
+            # anti-aliasing fringe — filter them to free color slots
+            # for real content.  Fully opaque white (e.g. text) passes.
+            if _color_dist(rgb, bg_rgb) < 80 and fg_count / count < 0.5:
+                continue
         else:
             if _color_dist(rgb, bg_rgb) < 80:
                 continue
