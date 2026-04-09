@@ -334,15 +334,15 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     """Convert a raster image to a BIMI-compliant multi-color SVG string."""
     img = _prepare_raster(path)
 
-    # Composite transparent images onto white before color detection —
-    # _dominant_color converts to RGB which turns transparent pixels black,
-    # producing a dark muddy background instead of the expected white.
+    # Transparent images always get a white background — don't try to
+    # detect a dominant color from edges that may contain logo content.
     if _has_transparency(img):
+        bg_color = "#ffffff"
         bg_img = Image.new("RGB", img.size, (255, 255, 255))
         bg_img.paste(img, mask=img.split()[-1])
         img = bg_img
-
-    bg_color = _dominant_color(img)
+    else:
+        bg_color = _dominant_color(img)
 
     img = img.convert("RGB")
 
