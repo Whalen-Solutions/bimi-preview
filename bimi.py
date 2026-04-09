@@ -227,9 +227,24 @@ def _quantize_colors(
         if count < max(10, total_pixels // 1000):
             continue
         mask = np.isin(arr, all_indices)
-        core_mask = np.isin(arr, core_indices)
-        mean_rgb = rgb_arr[core_mask].mean(axis=0).astype(int)
-        hex_color = "#{:02x}{:02x}{:02x}".format(*mean_rgb)
+        # Sample the purest interior pixels for accurate brand colors.
+        # 1. Erode the full trace mask to exclude anti-aliased edges.
+        # 2. Filter to pixels near the median (exclude outliers from
+        #    absorbed artifacts or JPEG noise).
+        # 3. Take the mean of these pure interior pixels.
+        from PIL import ImageFilter
+
+        mask_img = Image.fromarray(mask.astype(np.uint8) * 255, mode="L")
+        interior = np.array(mask_img.filter(ImageFilter.MinFilter(3))) > 127
+        color_pixels = rgb_arr[interior] if interior.any() else rgb_arr[mask]
+        anchor = np.median(color_pixels.astype(float), axis=0)
+        dists = np.sqrt(((color_pixels.astype(float) - anchor) ** 2).sum(axis=1))
+        close = color_pixels[dists < 30]
+        if len(close) >= 10:
+            rep_rgb = close.mean(axis=0).astype(int)
+        else:
+            rep_rgb = np.median(color_pixels, axis=0).astype(int)
+        hex_color = "#{:02x}{:02x}{:02x}".format(*rep_rgb)
         layers.append((hex_color, mask))
 
     return layers
@@ -345,7 +360,7 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
 
     # Trace with progressively fewer colors until the SVG fits under 32 KB
     svg = ""
-    for max_colors in (32, 16, 8, 4, 2):
+    for max_colors in (128, 64, 32, 16, 8, 4, 2):
         paths_svg = _trace_raster(img, bg_color, max_colors=max_colors)
 
         svg = (
