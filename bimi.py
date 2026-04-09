@@ -331,10 +331,28 @@ def _trace_mask_potrace(mask: np.ndarray) -> tuple[list[str], str] | None:
     return paths, xform
 
 
-def _trace_layers_independent(
-    layers: list[tuple[str, np.ndarray]],
-) -> list[str]:
-    """Trace each color layer independently with potrace."""
+def _trace_raster(
+    img: Image.Image,
+    bg_color: str,
+    max_colors: int = 8,
+    fg_mask: np.ndarray | None = None,
+) -> str:
+    """Quantize an image and trace each color layer with potrace.
+
+    Returns the inner SVG markup (``<path>`` elements) for all
+    foreground colors.  The coordinate space uses potrace's native
+    PostScript coordinates wrapped in its own transform.
+    """
+    layers = _quantize_colors(img, bg_color, max_colors, fg_mask=fg_mask)
+    if not layers:
+        raise ValueError("Could not extract any foreground colors from the image.")
+
+    if not shutil.which("potrace"):
+        raise ValueError(
+            "potrace is required for raster-to-BIMI conversion but was "
+            "not found. Install it with: apt install potrace"
+        )
+
     parts: list[str] = []
     for hex_color, mask in layers:
         result = _trace_mask_potrace(mask)
@@ -347,90 +365,7 @@ def _trace_layers_independent(
             parts.append(f'<g transform="{xform}">{path_elem}</g>')
         else:
             parts.append(path_elem)
-    return parts
 
-
-def _trace_layers_union_base(
-    layers: list[tuple[str, np.ndarray]],
-) -> list[str]:
-    """Trace the primary layer from the union of all foreground masks.
-
-    The largest layer gets the full foreground silhouette so that accent
-    colors (e.g. a beak breaking an outline) don't create gaps in the
-    primary shape.  Smaller layers overlay on top with their own masks.
-    """
-    if len(layers) < 2:
-        return _trace_layers_independent(layers)
-
-    # Build the union of all foreground masks
-    union_mask = np.zeros_like(layers[0][1])
-    for _, mask in layers:
-        union_mask |= mask
-
-    # Largest layer (first, sorted by count) uses the union silhouette
-    primary_color = layers[0][0]
-    result = _trace_mask_potrace(union_mask)
-    if result is None:
-        return _trace_layers_independent(layers)
-
-    path_strs, xform = result
-    combined_d = " ".join(path_strs)
-    path_elem = f'<path d="{combined_d}" fill="{primary_color}" fill-rule="evenodd"/>'
-    parts: list[str] = []
-    if xform:
-        parts.append(f'<g transform="{xform}">{path_elem}</g>')
-    else:
-        parts.append(path_elem)
-
-    # Overlay smaller layers on top
-    for hex_color, mask in layers[1:]:
-        result = _trace_mask_potrace(mask)
-        if result is None:
-            continue
-        path_strs, xform = result
-        combined_d = " ".join(path_strs)
-        path_elem = f'<path d="{combined_d}" fill="{hex_color}" fill-rule="evenodd"/>'
-        if xform:
-            parts.append(f'<g transform="{xform}">{path_elem}</g>')
-        else:
-            parts.append(path_elem)
-
-    return parts
-
-
-def _trace_raster(
-    img: Image.Image,
-    bg_color: str,
-    max_colors: int = 8,
-    fg_mask: np.ndarray | None = None,
-) -> str:
-    """Quantize an image and trace each color layer with potrace.
-
-    Returns the inner SVG markup (``<path>`` elements) for all
-    foreground colors.  Tries union-base tracing first (primary layer
-    from the union of all foreground masks) for better silhouette
-    coverage, then falls back to independent per-color tracing if the
-    union result is too large.
-    """
-    layers = _quantize_colors(img, bg_color, max_colors, fg_mask=fg_mask)
-    if not layers:
-        raise ValueError("Could not extract any foreground colors from the image.")
-
-    if not shutil.which("potrace"):
-        raise ValueError(
-            "potrace is required for raster-to-BIMI conversion but was "
-            "not found. Install it with: apt install potrace"
-        )
-
-    # Try union-base first (better silhouette for logos with accent
-    # colors that interrupt the primary outline), fall back to
-    # independent tracing if the result is too large.
-    parts = _trace_layers_union_base(layers)
-    union_svg = "\n    ".join(parts) if parts else ""
-    if union_svg and len(union_svg.encode("utf-8")) <= BIMI_MAX_SIZE:
-        return union_svg
-
-    parts = _trace_layers_independent(layers)
     if not parts:
         raise ValueError("Could not trace any paths from the image.")
 
