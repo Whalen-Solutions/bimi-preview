@@ -96,7 +96,8 @@ def _prepare_raster(path: str) -> Image.Image:
     # Stretch the histogram so the faint content becomes traceable.
     rgb = img.convert("RGB")
     extrema = rgb.getextrema()  # ((r_min,r_max), (g_min,g_max), (b_min,b_max))
-    dyn_range = max(hi - lo for lo, hi in extrema)
+    extrema_pairs: tuple[tuple[int, int], ...] = extrema  # type: ignore[assignment]
+    dyn_range = max(hi - lo for lo, hi in extrema_pairs)
     if dyn_range < 50:
         from PIL import ImageFilter, ImageOps
 
@@ -129,7 +130,9 @@ def _quantize_colors(
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
     # +1 to account for the background color occupying a slot
-    quantized = img.convert("RGB").quantize(colors=max_colors + 1, dither=0)
+    quantized = img.convert("RGB").quantize(
+        colors=max_colors + 1, dither=Image.Dither.NONE
+    )
     palette = quantized.getpalette()
     assert palette is not None
     arr = np.array(quantized)
@@ -276,6 +279,17 @@ def _trace_mask_potrace(mask: np.ndarray) -> tuple[list[str], str] | None:
     return paths, xform
 
 
+def _count_natural_colors(img: Image.Image, bg_color: str) -> int:
+    """Estimate how many visually distinct foreground colors the image has.
+
+    Uses generous quantization with full merge and artifact-absorption
+    logic to count the meaningful color groups, filtering out JPEG
+    compression artifacts and anti-aliasing intermediates.
+    """
+    layers = _quantize_colors(img, bg_color, max_colors=48)
+    return max(1, len(layers))
+
+
 def _trace_raster(img: Image.Image, bg_color: str, max_colors: int = 8) -> str:
     """Quantize an image and trace each color layer with potrace.
 
@@ -340,9 +354,25 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     tx = canvas_size / 2 - cx * scale_factor
     ty = canvas_size / 2 - cy * scale_factor
 
-    # Trace with progressively fewer colors until the SVG fits under 32 KB
+    # Detect the logo's natural foreground color count so we don't create
+    # more layers than the image actually needs.  Most logos are 1-5 colors;
+    # using too many layers adds noise without improving fidelity.
+    natural_colors = _count_natural_colors(img, bg_color)
+
+    # Build candidate list: start at the natural count (faithful reproduction)
+    # and include progressively fewer colors as fallbacks for the 32 KB limit.
+    candidates_set = {natural_colors, 2}
+    c = natural_colors
+    while c > 2:
+        c = max(2, c // 2)
+        candidates_set.add(c)
+    for std in (32, 16, 8, 4):
+        if std <= natural_colors:
+            candidates_set.add(std)
+    candidates = sorted(candidates_set, reverse=True)
+
     svg = ""
-    for max_colors in (32, 16, 8, 4, 2):
+    for max_colors in candidates:
         paths_svg = _trace_raster(img, bg_color, max_colors=max_colors)
 
         svg = (

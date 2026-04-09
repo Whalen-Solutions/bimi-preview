@@ -14,6 +14,14 @@ BIMI Preview Generator -- a Flask web app that converts logos into BIMI-complian
   - `preview.jinja2.html` -- Gmail, Apple Mail, and Yahoo Mail inbox + open email mockups with BIMI avatar
   - `prompt.jinja2.html` -- LLM prompt documentation page
 
+## BIMI Conversion Philosophy
+
+The ultimate goal of raster-to-BIMI conversion is **faithful reproduction of the original logo** while meeting BIMI requirements (32 KB, SVG Tiny-PS). Key principles:
+
+- **Minimize layers.** Most logos are 1-2 colors. Detect the logo's natural color count first and never create more layers than it actually needs. Over-quantizing a simple flat logo into many layers adds noise and artifacts without improving quality.
+- **Maximize color fidelity.** Use as many colors as needed to faithfully reproduce the logo, up to the natural count, within the 32 KB size budget. Don't artificially reduce colors when there's room.
+- **Never add artificial layers.** Trying more colors than the logo actually has creates artifact layers from JPEG compression noise, anti-aliasing, etc. Cap quantization at the detected natural color count.
+
 ## Key Design Decisions
 
 - LLM content generation is optional. If no API key is configured or the LLM call fails (including credit exhaustion), the preview renders with hardcoded English default text via Jinja `| default()` filters -- no crash, no broken page.
