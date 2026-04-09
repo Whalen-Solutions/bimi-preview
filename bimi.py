@@ -191,12 +191,10 @@ def _quantize_colors(
 
     # Group similar colors so that anti-aliasing intermediates merge
     # into the dominant color's mask.  Sorted by count so the largest
-    # color anchors each group.  A threshold of 45 preserves visually
-    # distinct colors (e.g. geometric facets, NBC peacock feathers)
-    # while still merging near-identical shades from JPEG compression
-    # noise (typically 10-30 apart).  Artifact absorption handles any
-    # small AA groups that survive at this tighter threshold.
-    merge_threshold = 45.0
+    # color anchors each group.  A threshold of 60 preserves visually
+    # distinct colors (e.g. NBC peacock feathers) while still merging
+    # near-identical shades from JPEG compression.
+    merge_threshold = 60.0
     entries.sort(key=lambda e: -e[1])
     # Each group: (anchor_rgb, total_count, core_indices, all_indices)
     # core_indices drive the representative color; all_indices (which
