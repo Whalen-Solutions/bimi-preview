@@ -138,10 +138,26 @@ def _quantize_colors(
     """
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
-    # +1 to account for the background color occupying a slot
-    quantized = img.convert("RGB").quantize(
-        colors=max_colors + 1, dither=Image.Dither.NONE
-    )
+    rgb_img = img.convert("RGB")
+
+    if fg_mask is not None:
+        # Build the palette from foreground pixels only so the quantizer
+        # allocates all color slots to actual content instead of wasting
+        # them on white background variations.
+        fg_pixels = np.array(rgb_img)[fg_mask]
+        n_fg = len(fg_pixels)
+        side = int(np.ceil(np.sqrt(n_fg)))
+        padded = np.zeros((side * side, 3), dtype=np.uint8)
+        padded[:n_fg] = fg_pixels
+        palette_img = Image.fromarray(padded.reshape(side, side, 3), "RGB")
+        palette_img = palette_img.quantize(
+            colors=max_colors + 1, dither=Image.Dither.NONE
+        )
+        quantized = rgb_img.quantize(palette=palette_img, dither=Image.Dither.NONE)
+    else:
+        # +1 to account for the background color occupying a slot
+        quantized = rgb_img.quantize(colors=max_colors + 1, dither=Image.Dither.NONE)
+
     palette = quantized.getpalette()
     assert palette is not None
     arr = np.array(quantized)
