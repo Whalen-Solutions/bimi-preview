@@ -63,8 +63,8 @@ def _dominant_color(img: Image.Image) -> str:
             arr[border:-border, -border:].reshape(-1, 3),
         ]
     )
-    mean = edges.mean(axis=0).astype(int)
-    return "#{:02x}{:02x}{:02x}".format(*mean)
+    median = np.median(edges, axis=0).astype(int)
+    return "#{:02x}{:02x}{:02x}".format(*median)
 
 
 def _prepare_raster(path: str) -> Image.Image:
@@ -246,7 +246,7 @@ def _quantize_colors(
                 d = _color_dist(s_rgb, g_rgb)
                 if d < best_dist:
                     best_dist, best_gi = d, gi
-            if best_gi >= 0:
+            if best_gi >= 0 and best_dist < _color_dist(s_rgb, bg_rgb):
                 g_rgb, g_count, g_core, g_all = groups[best_gi]
                 g_all.extend(s_all)
                 groups[best_gi] = (g_rgb, g_count + s_count, g_core, g_all)
@@ -421,6 +421,43 @@ def _trace_raster(
             "potrace is required for raster-to-BIMI conversion but was "
             "not found. Install it with: apt install potrace"
         )
+
+    # Remove JPEG fringe from non-dominant layers.  Small scattered
+    # components in accent layers are transition artifacts (colored
+    # halos around the primary layer's content).  Drop entire layers
+    # whose largest component is < 100 px (pure fringe).  For layers
+    # with a real shape, drop components < 10% of the largest.
+    from scipy import ndimage as _ndi
+
+    if len(layers) > 1:
+        largest_i = max(range(len(layers)), key=lambda i: int(layers[i][1].sum()))
+        drop = set()
+        for li in range(len(layers)):
+            if li == largest_i:
+                continue
+            color, mask = layers[li]
+            labeled, n_components = _ndi.label(mask)
+            if n_components <= 1:
+                continue
+            comp_sizes = [
+                (int((labeled == cid).sum()), cid) for cid in range(1, n_components + 1)
+            ]
+            comp_sizes.sort(reverse=True)
+            max_comp = comp_sizes[0][0]
+            if max_comp < 100:
+                drop.add(li)
+                continue
+            threshold = max(3, int(max_comp * 0.10))
+            cleaned = np.zeros_like(mask)
+            for sz, cid in comp_sizes:
+                if sz >= threshold:
+                    cleaned |= labeled == cid
+            if cleaned.any():
+                layers[li] = (color, cleaned)
+            else:
+                drop.add(li)
+        if drop:
+            layers = [la for i, la in enumerate(layers) if i not in drop]
 
     # Try union-base first (better silhouette for logos with accent
     # colors that interrupt the primary outline), fall back to
