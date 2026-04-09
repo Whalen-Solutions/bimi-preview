@@ -96,7 +96,8 @@ def _prepare_raster(path: str) -> Image.Image:
     # Stretch the histogram so the faint content becomes traceable.
     rgb = img.convert("RGB")
     extrema = rgb.getextrema()  # ((r_min,r_max), (g_min,g_max), (b_min,b_max))
-    dyn_range = max(hi - lo for lo, hi in extrema)
+    extrema_pairs: tuple[tuple[int, int], ...] = extrema  # type: ignore[assignment]
+    dyn_range = max(hi - lo for lo, hi in extrema_pairs)
     if dyn_range < 50:
         from PIL import ImageFilter, ImageOps
 
@@ -129,7 +130,9 @@ def _quantize_colors(
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
     # +1 to account for the background color occupying a slot
-    quantized = img.convert("RGB").quantize(colors=max_colors + 1, dither=0)
+    quantized = img.convert("RGB").quantize(
+        colors=max_colors + 1, dither=Image.Dither.NONE
+    )
     palette = quantized.getpalette()
     assert palette is not None
     arr = np.array(quantized)
