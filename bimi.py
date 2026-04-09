@@ -445,9 +445,18 @@ def _trace_raster(
             comp_sizes.sort(reverse=True)
             max_comp = comp_sizes[0][0]
             if max_comp < 100:
-                drop.add(li)
+                # Check if this looks like text (wide, thin, moderate
+                # coverage) rather than scattered fringe.  Text has
+                # many small components aligned in a row.
+                ys, xs = np.where(mask)
+                y_span = ys.max() - ys.min() + 1
+                x_span = xs.max() - xs.min() + 1
+                aspect = x_span / max(1, y_span)
+                coverage = int(mask.sum()) / (x_span * y_span)
+                if aspect < 5 or coverage < 0.05:
+                    drop.add(li)
                 continue
-            threshold = max(3, int(max_comp * 0.10))
+            threshold = 3
             cleaned = np.zeros_like(mask)
             for sz, cid in comp_sizes:
                 if sz >= threshold:
