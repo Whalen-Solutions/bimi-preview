@@ -96,7 +96,8 @@ def _prepare_raster(path: str) -> Image.Image:
     # Stretch the histogram so the faint content becomes traceable.
     rgb = img.convert("RGB")
     extrema = rgb.getextrema()  # ((r_min,r_max), (g_min,g_max), (b_min,b_max))
-    dyn_range = max(hi - lo for lo, hi in extrema)
+    extrema_pairs: tuple[tuple[int, int], ...] = extrema  # type: ignore[assignment]
+    dyn_range = max(hi - lo for lo, hi in extrema_pairs)
     if dyn_range < 50:
         from PIL import ImageFilter, ImageOps
 
@@ -129,7 +130,9 @@ def _quantize_colors(
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
     # +1 to account for the background color occupying a slot
-    quantized = img.convert("RGB").quantize(colors=max_colors + 1, dither=0)
+    quantized = img.convert("RGB").quantize(
+        colors=max_colors + 1, dither=Image.Dither.NONE
+    )
     palette = quantized.getpalette()
     assert palette is not None
     arr = np.array(quantized)
@@ -197,7 +200,7 @@ def _quantize_colors(
         changed = False
         for si in range(len(groups) - 1, -1, -1):
             s_rgb, s_count, s_core, s_all = groups[si]
-            if not _is_artifact(s_all):
+            if not _is_artifact(s_core):
                 continue
             best_gi, best_dist = -1, float("inf")
             for gi, (g_rgb, g_count, g_core, g_all) in enumerate(groups):
@@ -224,9 +227,24 @@ def _quantize_colors(
         if count < max(10, total_pixels // 1000):
             continue
         mask = np.isin(arr, all_indices)
-        core_mask = np.isin(arr, core_indices)
-        mean_rgb = rgb_arr[core_mask].mean(axis=0).astype(int)
-        hex_color = "#{:02x}{:02x}{:02x}".format(*mean_rgb)
+        # Sample the purest interior pixels for accurate brand colors.
+        # 1. Erode the full trace mask to exclude anti-aliased edges.
+        # 2. Filter to pixels near the median (exclude outliers from
+        #    absorbed artifacts or JPEG noise).
+        # 3. Take the mean of these pure interior pixels.
+        from PIL import ImageFilter
+
+        mask_img = Image.fromarray(mask.astype(np.uint8) * 255, mode="L")
+        interior = np.array(mask_img.filter(ImageFilter.MinFilter(3))) > 127
+        color_pixels = rgb_arr[interior] if interior.any() else rgb_arr[mask]
+        anchor = np.median(color_pixels.astype(float), axis=0)
+        dists = np.sqrt(((color_pixels.astype(float) - anchor) ** 2).sum(axis=1))
+        close = color_pixels[dists < 30]
+        if len(close) >= 10:
+            rep_rgb = close.mean(axis=0).astype(int)
+        else:
+            rep_rgb = np.median(color_pixels, axis=0).astype(int)
+        hex_color = "#{:02x}{:02x}{:02x}".format(*rep_rgb)
         layers.append((hex_color, mask))
 
     return layers
@@ -315,14 +333,16 @@ def _trace_raster(img: Image.Image, bg_color: str, max_colors: int = 8) -> str:
 def raster_to_bimi_svg(path: str, company_name: str) -> str:
     """Convert a raster image to a BIMI-compliant multi-color SVG string."""
     img = _prepare_raster(path)
-    bg_color = _dominant_color(img)
 
-    # Composite transparent images onto the detected background color
+    # Composite transparent images onto white before color detection —
+    # _dominant_color converts to RGB which turns transparent pixels black,
+    # producing a dark muddy background instead of the expected white.
     if _has_transparency(img):
-        bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
-        bg_img = Image.new("RGB", img.size, bg_rgb)
+        bg_img = Image.new("RGB", img.size, (255, 255, 255))
         bg_img.paste(img, mask=img.split()[-1])
         img = bg_img
+
+    bg_color = _dominant_color(img)
 
     img = img.convert("RGB")
 
@@ -342,7 +362,7 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
 
     # Trace with progressively fewer colors until the SVG fits under 32 KB
     svg = ""
-    for max_colors in (32, 16, 8, 4, 2):
+    for max_colors in (128, 64, 32, 16, 8, 4, 2):
         paths_svg = _trace_raster(img, bg_color, max_colors=max_colors)
 
         svg = (
