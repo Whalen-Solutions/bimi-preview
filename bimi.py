@@ -360,7 +360,7 @@ def _trace_raster(
             continue
         path_strs, xform = result
         combined_d = " ".join(path_strs)
-        path_elem = f'<path d="{combined_d}" fill="{hex_color}"/>'
+        path_elem = f'<path d="{combined_d}" fill="{hex_color}" fill-rule="evenodd"/>'
         if xform:
             parts.append(f'<g transform="{xform}">{path_elem}</g>')
         else:
