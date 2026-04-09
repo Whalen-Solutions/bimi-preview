@@ -118,7 +118,10 @@ def _color_dist(a: tuple[int, ...], b: tuple[int, ...]) -> float:
 
 
 def _quantize_colors(
-    img: Image.Image, bg_color: str, max_colors: int
+    img: Image.Image,
+    bg_color: str,
+    max_colors: int,
+    fg_mask: np.ndarray | None = None,
 ) -> list[tuple[str, np.ndarray]]:
     """Quantize an RGB image and return per-color binary masks.
 
@@ -126,6 +129,12 @@ def _quantize_colors(
     color.  Similar colors are merged into a single group whose mask
     covers *all* pixels of every constituent color — including
     anti-aliasing edges — so potrace traces a complete, smooth outline.
+
+    When *fg_mask* is provided (boolean array from the alpha channel),
+    background detection uses it instead of color distance — a palette
+    entry is background only if <10% of its pixels are opaque.  This
+    preserves white content on colored regions (e.g. white text on a
+    cyan ring) that color-distance filtering would discard.
     """
     bg_rgb = tuple(int(bg_color[i : i + 2], 16) for i in (1, 3, 5))
 
@@ -142,11 +151,18 @@ def _quantize_colors(
     entries: list[tuple[tuple[int, ...], int, int]] = []  # (rgb, count, idx)
     for idx in range(n_palette):
         rgb = tuple(palette[idx * 3 : idx * 3 + 3])
-        if _color_dist(rgb, bg_rgb) < 80:
-            continue
-        count = int((arr == idx).sum())
+        pixel_mask = arr == idx
+        count = int(pixel_mask.sum())
         if count == 0:
             continue
+        if fg_mask is not None:
+            # Use alpha channel: background if <10% of pixels are opaque
+            fg_count = int(pixel_mask[fg_mask].sum())
+            if fg_count / count < 0.1:
+                continue
+        else:
+            if _color_dist(rgb, bg_rgb) < 80:
+                continue
         entries.append((rgb, count, idx))
 
     if not entries:
@@ -294,14 +310,19 @@ def _trace_mask_potrace(mask: np.ndarray) -> tuple[list[str], str] | None:
     return paths, xform
 
 
-def _trace_raster(img: Image.Image, bg_color: str, max_colors: int = 8) -> str:
+def _trace_raster(
+    img: Image.Image,
+    bg_color: str,
+    max_colors: int = 8,
+    fg_mask: np.ndarray | None = None,
+) -> str:
     """Quantize an image and trace each color layer with potrace.
 
     Returns the inner SVG markup (``<path>`` elements) for all
     foreground colors.  The coordinate space uses potrace's native
     PostScript coordinates wrapped in its own transform.
     """
-    layers = _quantize_colors(img, bg_color, max_colors)
+    layers = _quantize_colors(img, bg_color, max_colors, fg_mask=fg_mask)
     if not layers:
         raise ValueError("Could not extract any foreground colors from the image.")
 
@@ -334,10 +355,15 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     """Convert a raster image to a BIMI-compliant multi-color SVG string."""
     img = _prepare_raster(path)
 
-    # Transparent images always get a white background — don't try to
-    # detect a dominant color from edges that may contain logo content.
+    # Transparent images always get a white background.  Save the alpha
+    # channel as a foreground mask so _quantize_colors can distinguish
+    # opaque white content (e.g. white text on a colored ring) from the
+    # actual transparent background — color-distance filtering would
+    # incorrectly discard both.
+    fg_mask: np.ndarray | None = None
     if _has_transparency(img):
         bg_color = "#ffffff"
+        fg_mask = np.array(img.split()[-1]) > 128
         bg_img = Image.new("RGB", img.size, (255, 255, 255))
         bg_img.paste(img, mask=img.split()[-1])
         img = bg_img
@@ -363,7 +389,7 @@ def raster_to_bimi_svg(path: str, company_name: str) -> str:
     # Trace with progressively fewer colors until the SVG fits under 32 KB
     svg = ""
     for max_colors in (128, 64, 32, 16, 8, 4, 2):
-        paths_svg = _trace_raster(img, bg_color, max_colors=max_colors)
+        paths_svg = _trace_raster(img, bg_color, max_colors=max_colors, fg_mask=fg_mask)
 
         svg = (
             f'<svg version="1.2" baseProfile="tiny-ps"\n'
