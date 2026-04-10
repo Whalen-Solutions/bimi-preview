@@ -67,10 +67,16 @@ def _dominant_color(img: Image.Image) -> str:
     return "#{:02x}{:02x}{:02x}".format(*median)
 
 
+_TRACE_MAX_DIM = 500  # Max pixels on long edge for tracing
+
+
 def _prepare_raster(path: str) -> Image.Image:
     """Open a raster image, select the best frame, and normalize mode.
 
-    Returns an RGB or RGBA PIL Image ready for tracing.
+    Returns an RGB or RGBA PIL Image ready for tracing, downscaled to
+    at most ``_TRACE_MAX_DIM`` on the long edge.  Potrace produces
+    vector output so tracing at reduced resolution yields nearly
+    identical SVG curves at a fraction of the cost.
     """
     img = Image.open(path)
 
@@ -90,6 +96,15 @@ def _prepare_raster(path: str) -> Image.Image:
     # is available for _has_transparency.
     if img.mode == "P" and "transparency" in img.info:
         img = img.convert("RGBA")
+
+    # Downscale before any per-pixel work (autocontrast, quantization,
+    # tracing).  LANCZOS preserves sharp edges for logo art.
+    long_edge = max(img.size)
+    if long_edge > _TRACE_MAX_DIM:
+        scale = _TRACE_MAX_DIM / long_edge
+        new_w = max(1, round(img.size[0] * scale))
+        new_h = max(1, round(img.size[1] * scale))
+        img = img.resize((new_w, new_h), Image.LANCZOS)
 
     # Rescue washed-out images where the entire dynamic range is
     # compressed into a narrow band (e.g. near-white LinkedIn exports).
@@ -179,10 +194,10 @@ def _quantize_colors(
             # Near-white entries that are only partially opaque are
             # anti-aliasing fringe — filter them to free color slots
             # for real content.  Fully opaque white (e.g. text) passes.
-            if _color_dist(rgb, bg_rgb) < 80 and fg_count / count < 0.5:
+            if _color_dist(rgb, bg_rgb) < 65 and fg_count / count < 0.5:
                 continue
         else:
-            if _color_dist(rgb, bg_rgb) < 80:
+            if _color_dist(rgb, bg_rgb) < 65:
                 continue
         entries.append((rgb, count, idx))
 
@@ -246,10 +261,21 @@ def _quantize_colors(
                 d = _color_dist(s_rgb, g_rgb)
                 if d < best_dist:
                     best_dist, best_gi = d, gi
-            if best_gi >= 0 and best_dist < _color_dist(s_rgb, bg_rgb):
+            bg_d = _color_dist(s_rgb, bg_rgb)
+            if best_gi >= 0 and best_dist < bg_d:
+                # Closer to a foreground group — merge into it
                 g_rgb, g_count, g_core, g_all = groups[best_gi]
                 g_all.extend(s_all)
                 groups[best_gi] = (g_rgb, g_count + s_count, g_core, g_all)
+                groups.pop(si)
+                changed = True
+            elif (best_gi < 0 or best_dist >= bg_d) and bg_d < 120:
+                # Closer to background than any foreground AND close
+                # to the background in absolute terms — transition
+                # fringe between bg and content.  The absolute cap
+                # prevents dropping legitimate light-colored content
+                # (e.g. gray taglines on white) that happens to be
+                # closer to bg than to a distant dominant fg color.
                 groups.pop(si)
                 changed = True
 
@@ -430,6 +456,12 @@ def _trace_raster(
     from scipy import ndimage as _ndi
 
     if len(layers) > 1:
+        total_px = layers[0][1].size
+        # Scale thresholds relative to image size so they work at any
+        # resolution.  At 200x200 (40K px) small_comp_thresh ≈ 100,
+        # comp_cleanup_thresh ≈ 3.
+        small_comp_thresh = max(10, total_px // 400)
+        comp_cleanup_thresh = max(2, total_px // 15000)
         largest_i = max(range(len(layers)), key=lambda i: int(layers[i][1].sum()))
         drop = set()
         for li in range(len(layers)):
@@ -444,19 +476,19 @@ def _trace_raster(
             ]
             comp_sizes.sort(reverse=True)
             max_comp = comp_sizes[0][0]
-            if max_comp < 100:
-                # Check if this looks like text (wide, thin, moderate
-                # coverage) rather than scattered fringe.  Text has
+            if max_comp < small_comp_thresh:
+                # Check if this looks like text (moderate aspect ratio
+                # and coverage) rather than scattered fringe.  Text has
                 # many small components aligned in a row.
                 ys, xs = np.where(mask)
                 y_span = ys.max() - ys.min() + 1
                 x_span = xs.max() - xs.min() + 1
                 aspect = x_span / max(1, y_span)
                 coverage = int(mask.sum()) / (x_span * y_span)
-                if aspect < 5 or coverage < 0.05:
+                if aspect < 2 or coverage < 0.03:
                     drop.add(li)
                 continue
-            threshold = 3
+            threshold = comp_cleanup_thresh
             cleaned = np.zeros_like(mask)
             for sz, cid in comp_sizes:
                 if sz >= threshold:

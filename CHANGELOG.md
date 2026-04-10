@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-04-10
+
+### Improved
+
+- Reduced background color distance threshold from 80 to 65, preserving subtle foreground details (text, fine lines) that were previously filtered as background noise
+- Smarter artifact absorption: scattered color groups closer to the background than any foreground group (and within distance 120) are now dropped, eliminating JPEG anti-aliasing fringe without affecting legitimate content
+- Relaxed text layer detection: small component layers are now preserved with aspect ratio >= 2 and coverage >= 3% (was >= 5 and >= 5%), keeping small text labels like taglines
+- Large raster inputs are now downscaled to 500px on the long edge before processing -- potrace produces vector output so tracing at reduced resolution yields identical SVG quality at a fraction of the cost and memory
+- Component size thresholds now scale relative to image dimensions instead of using absolute pixel counts, ensuring consistent behavior across input resolutions
+
+### Fixed
+
+- Duplicate `continue` statement in background color filtering
+
 ## [0.8.0] - 2026-04-09
 
 ### Improved
