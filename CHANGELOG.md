@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Duplicate `continue` statement in background color filtering
+- Added missing `scipy` to project dependencies (required for artifact detection)
 
 ## [0.8.0] - 2026-04-09
 
