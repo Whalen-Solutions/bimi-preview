@@ -192,7 +192,10 @@ def preview():
     # Store job_id in session for download
     session["job_id"] = job_id
 
-    cert_type = request.form.get("cert_type", "vmc")
+    cert_type = request.form.get("cert_type")
+    if cert_type not in ("vmc", "cmc"):
+        flash("Please select a BIMI certificate type.", "error")
+        return redirect(url_for("index"))
     show_checkmark = cert_type == "vmc"
 
     # Infer sender address
@@ -213,11 +216,17 @@ def preview():
 
     delta_min = int((now - email_arrived).total_seconds() // 60)
     if delta_min < 60:
-        tmpl = llm_content.get("ui_minutes_ago", "NUM minutes ago")
+        if delta_min == 1:
+            tmpl = llm_content.get("ui_minute_ago", "NUM minute ago")
+        else:
+            tmpl = llm_content.get("ui_minutes_ago", "NUM minutes ago")
         relative = tmpl.replace("NUM", str(delta_min))
     else:
         hours = delta_min // 60
-        tmpl = llm_content.get("ui_hours_ago", "NUM hours ago")
+        if hours == 1:
+            tmpl = llm_content.get("ui_hour_ago", "NUM hour ago")
+        else:
+            tmpl = llm_content.get("ui_hours_ago", "NUM hours ago")
         relative = tmpl.replace("NUM", str(hours))
     email_time = f"{inbox_time} ({relative})"
 

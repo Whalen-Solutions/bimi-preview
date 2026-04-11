@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2026-04-11
+
+### Fixed
+
+- Relative time now uses singular form ("1 hour ago" / "1 minute ago") instead of incorrect plural ("1 hours ago") in all languages
+- Certificate type (VMC/CMC) no longer defaults to VMC -- users must explicitly select to avoid misleading previews
+
 ## [0.9.0] - 2026-04-10
 
 ### Improved
