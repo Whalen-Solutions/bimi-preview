@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] - 2026-04-11
+
+### Changed
+
+- Updated BIMI supporter list (removed redundant Apple Mail and Yahoo Mail mentions, added Comcast)
+- Added Whalen Solutions credit to the home page
+
 ## [0.9.1] - 2026-04-11
 
 ### Fixed
